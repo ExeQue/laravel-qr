@@ -204,8 +204,13 @@ final class ReedSolomon
                 $next[$i + $shift] = ($next[$i + $shift] ?? 0) ^ $this->multiply($scale, $term);
             }
 
+            // One at a time: opcache's optimizer (PHP 8.5) gets a list assignment that reads $errors
+            // while it assigns it wrong, and the locator with it.
             if (2 * $errors <= $n) {
-                [$previous, $errors, $lastDiscrepancy, $shift] = [$current, $n + 1 - $errors, $discrepancy, 1];
+                $previous = $current;
+                $errors = $n + 1 - $errors;
+                $lastDiscrepancy = $discrepancy;
+                $shift = 1;
             } else {
                 $shift++;
             }

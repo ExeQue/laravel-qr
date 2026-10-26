@@ -31,5 +31,5 @@ describe('reading modules', function (): void {
                 yield "{$method} {$case->value}" => [$method, $case];
             }
         }
-    });
+    })->group('scan');
 });

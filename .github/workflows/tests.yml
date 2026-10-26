@@ -89,6 +89,8 @@ jobs:
           php-version: 8.5
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
+          # As in production: opcache's optimizer has broken code here before.
+          ini-values: opcache.enable_cli=1
 
       - name: Setup problem matchers
         run: |
@@ -119,8 +121,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      # The scan tests run on pull requests only: they take as long as the rest together.
       - name: Execute tests
-        run: vendor/bin/pest -p --ci
+        run: vendor/bin/pest -p --ci ${{ github.event_name != 'pull_request' && '--exclude-group=scan' || '' }}
 
   # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
   imagemagick-7:
@@ -146,16 +149,17 @@ jobs:
             /usr/local/lib/php/extensions
             /usr/local/etc/php/conf.d
             /usr/local/bin/composer
-          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v1
+          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v2
 
       - name: Install PHP extensions
         if: steps.extensions.outputs.cache-hit != 'true'
         run: |
           wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
           chmod +x /usr/local/bin/install-php-extensions
-          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
-          # The image has no php.ini, so PHP keeps its 128 MB default; setup-php lifts it as well.
-          echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
+          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov opcache @composer
+          # The image has no php.ini: lift the 128 MB default, and turn on opcache with its JIT for
+          # the command line, as in production; the optimizer has broken code here before.
+          printf 'memory_limit=-1\nopcache.enable_cli=1\nopcache.jit=tracing\nopcache.jit_buffer_size=128M\n' > "$PHP_INI_DIR/conf.d/ci.ini"
 
       - name: Check PHP extensions
         run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { if (! extension_loaded($e)) { fwrite(STDERR, "missing {$e}\n"); exit(1); } } echo Imagick::getVersion()["versionString"], PHP_EOL;'
@@ -170,8 +174,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      # The scan tests run on pull requests only: they take as long as the rest together.
       - name: Execute tests
-        run: vendor/bin/pest -p --ci
+        run: vendor/bin/pest -p --ci ${{ github.event_name != 'pull_request' && '--exclude-group=scan' || '' }}
 
   # Coverage on its own, on pull requests only (it takes a while), once the suite passes on both
   # ImageMagick versions.
@@ -200,16 +205,17 @@ jobs:
             /usr/local/lib/php/extensions
             /usr/local/etc/php/conf.d
             /usr/local/bin/composer
-          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v1
+          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v2
 
       - name: Install PHP extensions
         if: steps.extensions.outputs.cache-hit != 'true'
         run: |
           wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
           chmod +x /usr/local/bin/install-php-extensions
-          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
-          # The image has no php.ini, so PHP keeps its 128 MB default; setup-php lifts it as well.
-          echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
+          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov opcache @composer
+          # The image has no php.ini: lift the 128 MB default, and turn on opcache with its JIT for
+          # the command line, as in production; the optimizer has broken code here before.
+          printf 'memory_limit=-1\nopcache.enable_cli=1\nopcache.jit=tracing\nopcache.jit_buffer_size=128M\n' > "$PHP_INI_DIR/conf.d/ci.ini"
 
       - name: Check PHP extensions
         run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { if (! extension_loaded($e)) { fwrite(STDERR, "missing {$e}\n"); exit(1); } } echo Imagick::getVersion()["versionString"], PHP_EOL;'

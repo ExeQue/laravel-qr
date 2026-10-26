@@ -132,7 +132,10 @@ final class Coverage
      */
     private static function span(array &$partial, array &$whole, float $from, float $to, int $width): void
     {
-        [$from, $to] = [max(0.0, $from), min((float) $width, $to)];
+        // One at a time: opcache's optimizer (PHP 8.5) can get a list assignment that reads what it
+        // assigns wrong.
+        $from = max(0.0, $from);
+        $to = min((float) $width, $to);
 
         if ($to <= $from) {
             return;

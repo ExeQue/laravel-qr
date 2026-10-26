@@ -129,3 +129,28 @@ describe('test conventions', function (): void {
     });
 
 });
+
+describe('opcache safety', function (): void {
+    test('no list assignment reads what it assigns, which opcache gets wrong', function (): void {
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(dirname(__DIR__, 2).'/src', \FilesystemIterator::SKIP_DOTS));
+        $offending = [];
+
+        foreach ($files as $file) {
+            foreach (file((string) $file) ?: [] as $number => $line) {
+                if (preg_match('/^\s*\[([^\]]+)\]\s*=\s*\[(.*)\];/', $line, $match) !== 1) {
+                    continue;
+                }
+
+                preg_match_all('/\$\w+/', $match[1], $targets);
+
+                foreach ($targets[0] as $target) {
+                    if (preg_match('/'.preg_quote($target, '/').'(?!\w)/', $match[2]) === 1) {
+                        $offending[] = basename((string) $file).':'.($number + 1);
+                    }
+                }
+            }
+        }
+
+        expect($offending)->toBe([]);
+    });
+});

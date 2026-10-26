@@ -33,5 +33,5 @@ describe('reading eyes', function (): void {
                 yield "{$method} {$case->value}" => [$method, $case];
             }
         }
-    });
+    })->group('scan');
 });
