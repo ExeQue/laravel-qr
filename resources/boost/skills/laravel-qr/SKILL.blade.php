@@ -53,16 +53,38 @@ The names registered in this application, with the options each takes (as named 
         $describe(app(\ExeQue\Qr\Registries\InnerEyeRegistry::class)),
         implode(', ', array_map(fn ($name) => "`{$name}`", app(\ExeQue\Qr\Registries\EyeRegistry::class)->names())),
         implode(', ', array_map(fn ($name) => "`{$name}`", app(\ExeQue\Qr\Registries\FilterRegistry::class)->names())),
-    ], ['', '', '', '', ''], false);
+        implode(', ', array_map(fn ($name) => "`{$name}`", app(\ExeQue\Qr\Registries\StyleRegistry::class)->names())),
+        implode(', ', array_map(fn ($name, $color) => "`{$name}` ({$color->toCss()})", array_keys(app(\ExeQue\Qr\Colors\ColorNames::class)->all()), app(\ExeQue\Qr\Colors\ColorNames::class)->all())),
+    ], ['', '', '', '', '', '', ''], false);
 @endphp
 - Modules: {!! $names[0] !!}
 - Outer eyes: {!! $names[1] !!}
 - Inner eyes: {!! $names[2] !!}
 - Eye presets: {!! $names[3] !!}
 - Filters: {!! $names[4] !!}
+- Styles of this application: {!! $names[5] ?: 'none yet' !!}
+- Color names of this application: {!! $names[6] ?: 'none yet' !!}
 
 Eye parts whose corners differ (`round-corner`, `drop`, `leaf`, `heart`) turn on each corner by themselves so they point
 out of the code; `->mirrored()` turns the rest the same way.
+
+## The application's own colors and styles
+
+Use a named style or color the application already has before writing a new one. To add one:
+
+@verbatim
+- **Colors**, in `config/qr.php` under `'colors'`: `'brand' => '#be123c'`, `'ink' => 'oklch(0.25 0.05 280)'`, or a
+  color class, `Oklch::make(0.55, 0.24, 293)`. CSS names cannot be redefined. Then `->paint('brand')` anywhere.
+- **Styles**, in `config/qr.php` under `'styles'`, either with the builder's methods,
+  `'brand' => Style::make()->modules('dots-medium')->eyes('rounded')->paint('brand')->margin(2)`, or as plain values,
+  `'brand' => ['modules' => ['shape' => 'dots-medium', 'paint' => 'brand'], 'margin' => 2]`. Both survive
+  `config:cache`: give gradients as arrays (`['kind' => 'linear', 'stops' => [...]]`) and shapes and filters by name,
+  never as gradient objects or closures (colors may be color classes). `'extends' => 'brand'` builds on another style. A class implementing
+  `ProvidesQrStyle` works too, for a style that needs code.
+- Or in a service provider: `Qr::styles()->register('brand', fn () => Qr::style()->modules('dots-medium'))` and
+  `app(ColorNames::class)->define('brand', '#be123c')`.
+- Use a style with `->style('brand')`, or `<x-qr :content="$url" style="brand" />` in Blade.
+@endverbatim
 
 ## Rules that save time
 
@@ -71,6 +93,8 @@ out of the code; `->mirrored()` turns the rest the same way.
 - Check that a styled code still reads with `Qr::read($rendered)->text`; `Qr::read()` also takes an uploaded file.
   `php artisan qr:install` installs zxing-wasm for the zxing reader with the application's package manager.
 - PNG, JPEG and WebP need the Imagick or GD extension (Imagick is faster and draws SVG logos); SVG needs nothing.
+- A logo can be sized with `size: 'auto'`: as large as the error correction allows. Raise the error correction
+  (`->errorCorrection('H')`) for a larger logo.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
 - In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $url)`.
 - Register shapes, filters and styles of the application in a service provider, or as plain values in
