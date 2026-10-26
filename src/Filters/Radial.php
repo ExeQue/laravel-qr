@@ -11,11 +11,14 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Enums\Property;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
+use Illuminate\Validation\Rule;
 
 /**
  * Varies a property from a center outwards: `$inner` there, `$outer` at the farthest corner.
  */
-final class Radial implements ModuleFilter, NamedFilter
+final class Radial implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use AppliesProperty;
     use Scoped;
@@ -47,6 +50,17 @@ final class Radial implements ModuleFilter, NamedFilter
         $distance = sqrt(($cell->x - $centerX) ** 2 + ($cell->y - $centerY) ** 2) / $reach;
 
         return $this->apply($this->property, $style, $this->inner + ($this->outer - $this->inner) * $distance);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'property' => ['sometimes', 'filled', Rule::enum(Property::class)],
+            'inner' => Options::number(0, 2),
+            'outer' => Options::number(0, 2),
+            'center' => ['sometimes', 'list', 'size:2'],
+            'center.*' => ['numeric', 'between:0,1'],
+        ];
     }
 
     public function name(): string

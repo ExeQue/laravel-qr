@@ -14,11 +14,14 @@ use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
 use ExeQue\Qr\Support\Normalizer;
 use ExeQue\Qr\Support\Seed;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\PaintRule;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * A color picked for each corner from a palette, more often the heavier its weight.
  */
-final class EyePalette implements EyeFilter, NamedFilter
+final class EyePalette implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -58,6 +61,19 @@ final class EyePalette implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer ? $style->outer->withPaint($color) : $style->outer)
             ->withInner($this->inner ? $style->inner->withPaint($color) : $style->inner);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'colors' => ['required', 'list', 'min:1', 'max:16'],
+            'colors.*' => [PaintRule::colors()],
+            'weights' => ['sometimes', 'nullable', 'list', 'max:16'],
+            'weights.*' => ['numeric', 'min:0'],
+            'seed' => Options::integer(),
+            'outer' => Options::boolean(),
+            'inner' => Options::boolean(),
+        ];
     }
 
     public function name(): string

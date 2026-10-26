@@ -12,12 +12,14 @@ use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Support\Normalizer;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\PaintRule;
 
 /**
  * Paints the eyes: both parts, or the outer and inner apart. Limit it to some
  * corners with `corners()`.
  */
-final class EyePaint implements EyeFilter, NamedFilter
+final class EyePaint implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -48,6 +50,15 @@ final class EyePaint implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer === null ? $style->outer : $style->outer->withPaint($this->outer))
             ->withInner($this->inner === null ? $style->inner : $style->inner->withPaint($this->inner));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'paint' => ['sometimes', PaintRule::any()->nullable()],
+            'outer' => ['sometimes', PaintRule::any()->nullable()],
+            'inner' => ['sometimes', PaintRule::any()->nullable()],
+        ];
     }
 
     public function name(): string

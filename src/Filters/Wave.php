@@ -12,12 +12,15 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Enums\Property;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
+use Illuminate\Validation\Rule;
 
 /**
  * Varies a property in waves across the symbol: rotation swings by up to the
  * amplitude in degrees; size and opacity swing between 1 and 1 minus the amplitude.
  */
-final class Wave implements ModuleFilter, NamedFilter
+final class Wave implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use AppliesProperty;
     use Scoped;
@@ -58,6 +61,17 @@ final class Wave implements ModuleFilter, NamedFilter
             : 1 - $this->amplitude * ($wave + 1) / 2;
 
         return $this->apply($this->property, $style, $value);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'property' => ['sometimes', 'filled', Rule::enum(Property::class)],
+            'amplitude' => Options::number(-90, 90),
+            'wavelength' => Options::number(1, 100),
+            'angle' => Options::number(-360, 360),
+            'phase' => Options::number(-360, 360),
+        ];
     }
 
     public function name(): string

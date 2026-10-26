@@ -9,12 +9,14 @@ use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Mirrors the eyes, left to right or top to bottom: a leaf, a drop or a heart then leans the
  * other way. Limit it to some corners with `corners()`.
  */
-final class EyeFlip implements EyeFilter, NamedFilter
+final class EyeFlip implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -35,6 +37,14 @@ final class EyeFlip implements EyeFilter, NamedFilter
         return $style
             ->withOuter($style->outer->scaleBy($width, $height))
             ->withInner($style->inner->scaleBy($width, $height));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'horizontal' => Options::boolean(),
+            'vertical' => Options::boolean(),
+        ];
     }
 
     public function name(): string

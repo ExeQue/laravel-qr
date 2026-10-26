@@ -9,12 +9,15 @@ use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Numbers;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Turns each eye's outer and inner part, separately: by a fixed angle, or by
  * one of their own within a range.
  */
-final class EyeTilt implements EyeFilter, NamedFilter
+final class EyeTilt implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -38,6 +41,15 @@ final class EyeTilt implements EyeFilter, NamedFilter
         return $style
             ->withOuter($style->outer->rotateBy($this->degrees($this->outer, $eye, 'outer')))
             ->withInner($style->inner->rotateBy($this->degrees($this->inner, $eye, 'inner')));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'outer' => ['sometimes', new Numbers(-45, 45, 2)],
+            'inner' => ['sometimes', new Numbers(-45, 45, 2)],
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

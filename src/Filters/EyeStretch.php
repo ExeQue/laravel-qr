@@ -9,11 +9,13 @@ use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Stretches the eyes wider than tall, or taller than wide. The scan guards hold how far.
  */
-final class EyeStretch implements EyeFilter, NamedFilter
+final class EyeStretch implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -38,6 +40,16 @@ final class EyeStretch implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer ? $style->outer->scaleBy($this->width, $this->height) : $style->outer)
             ->withInner($this->inner ? $style->inner->scaleBy($this->width, $this->height) : $style->inner);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'width' => Options::number(0.5, 1.5),
+            'height' => Options::number(0.5, 1.5),
+            'outer' => Options::boolean(),
+            'inner' => Options::boolean(),
+        ];
     }
 
     public function name(): string

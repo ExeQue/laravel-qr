@@ -10,13 +10,15 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Gives each module its own shade of its color: lighter or darker by up to a number of points
  * of perceived lightness, and its hue turned by up to a number of degrees. Modules painted with
  * a gradient keep it.
  */
-final class MixedShade implements ModuleFilter, NamedFilter
+final class MixedShade implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -49,6 +51,16 @@ final class MixedShade implements ModuleFilter, NamedFilter
         }
 
         return $style->withPaint($color);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'min' => Options::number(-100, 100),
+            'max' => Options::number(-100, 100),
+            'hue' => Options::number(0, 180),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

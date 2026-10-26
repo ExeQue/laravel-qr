@@ -29,7 +29,7 @@ describe('package conventions', function (): void {
         ->ignoring('ExeQue\Qr\Facades');
 
     arch('contracts are interfaces')
-        ->expect(['ExeQue\Qr\Contracts', 'ExeQue\Qr\Decoding\Contracts', 'ExeQue\Qr\Filters\Contracts', 'ExeQue\Qr\Gradients\Contracts', 'ExeQue\Qr\Shapes\Contracts'])
+        ->expect(['ExeQue\Qr\Contracts', 'ExeQue\Qr\Decoding\Contracts', 'ExeQue\Qr\Filters\Contracts', 'ExeQue\Qr\Gradients\Contracts', 'ExeQue\Qr\Shapes\Contracts', 'ExeQue\Qr\Validation\Contracts'])
         ->toBeInterfaces();
 
     arch('enums are enums')
@@ -73,7 +73,7 @@ describe('test conventions', function (): void {
         // Everything in these namespaces is public API...
         $publicNamespaces = [
             'Builders', 'Colors', 'Contracts', 'Decoding', 'Events', 'Exceptions', 'Facades', 'Filters', 'Icons', 'Logos', 'Payloads', 'Registries',
-            'Geometry', 'Gradients', 'Monocle', 'Paints', 'Rendering', 'Shapes', 'Testing', 'Writers',
+            'Geometry', 'Gradients', 'Monocle', 'Paints', 'Rendering', 'Shapes', 'Testing', 'Validation', 'Writers',
         ];
 
         // ...apart from traits in a Concerns namespace and these helpers.
@@ -95,6 +95,7 @@ describe('test conventions', function (): void {
             'ExeQue\\Qr\\Monocle\\Timeline',
             'ExeQue\\Qr\\Rendering\\Guard',
             'ExeQue\\Qr\\Rendering\\StyleSerializer',
+            'ExeQue\\Qr\\Validation\\StyleInput',
             'ExeQue\\Qr\\Writers\\Boxes',
             'ExeQue\\Qr\\Writers\\Raster\\Coverage',
             'ExeQue\\Qr\\Writers\\Raster\\Gd\\Metadata',
@@ -111,7 +112,7 @@ describe('test conventions', function (): void {
 
             $isPublic = in_array($class, $public, true)
                 || str_contains($class, '\\Enums\\')
-                || (in_array($namespace, $publicNamespaces, true) && ! str_contains($class, '\\Concerns\\') && ! in_array($class, $internal, true));
+                || (in_array($namespace, $publicNamespaces, true) && ! str_contains($class, '\\Concerns\\') && ! str_contains($class, '\\Validation\\Rules\\') && ! in_array($class, $internal, true));
             $isInternal = str_contains((string) new ReflectionClass($class)->getDocComment(), '@internal');
 
             expect($isInternal)->toBe(! $isPublic, $isPublic ? "{$class} is public API but marked @internal" : "{$class} is internal but not marked @internal");

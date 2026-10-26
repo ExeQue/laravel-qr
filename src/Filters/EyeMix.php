@@ -16,12 +16,16 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Support\Normalizer;
 use ExeQue\Qr\Support\Seed;
+use ExeQue\Qr\Validation\Allow;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
+use ExeQue\Qr\Validation\Rules\ShapeName;
 
 /**
  * A shape picked for each corner's outer part, inner part or both, from a few: three eyes
  * alike in spirit, none the same.
  */
-final class EyeMix implements EyeFilter, NamedFilter
+final class EyeMix implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -65,6 +69,17 @@ final class EyeMix implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer === [] ? $style->outer : $style->outer->withShape(Seed::pick($eye->seed, $this->outer, purpose: "{$purpose}:outer")))
             ->withInner($this->inner === [] ? $style->inner : $style->inner->withShape(Seed::pick($eye->seed, $this->inner, purpose: "{$purpose}:inner")));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'outer' => ['sometimes', 'list', 'max:8'],
+            'outer.*' => [new ShapeName('outer', Allow::all())],
+            'inner' => ['sometimes', 'list', 'max:8'],
+            'inner.*' => [new ShapeName('inner', Allow::all())],
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

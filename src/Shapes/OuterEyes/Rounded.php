@@ -11,13 +11,15 @@ use ExeQue\Qr\Shapes\Concerns\HasOptions;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
 use ExeQue\Qr\Shapes\Contracts\Directional;
 use ExeQue\Qr\Shapes\Contracts\OuterEyeShape;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Numbers;
 
 /**
  * A ring with rounded corners, outside and in. A radius is one for every corner, or four:
  * top-right, bottom-right, bottom-left, top-left. A single round corner (round-corner) points out
  * on every eye in a mirrored style.
  */
-final readonly class Rounded implements Configurable, Directional, OuterEyeShape
+final readonly class Rounded implements Configurable, Directional, OuterEyeShape, HasOptionRules
 {
     use HasOptions;
 
@@ -41,6 +43,14 @@ final readonly class Rounded implements Configurable, Directional, OuterEyeShape
                 throw InvalidOptionException::outOfRange(self::class, 'hole', $least, 2.5, $holes[$corner]);
             }
         }
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'outer' => ['sometimes', new Numbers(0, 3.5, 4)],
+            'hole' => ['sometimes', new Numbers(0, 2.5, 4)],
+        ];
     }
 
     public function path(): Path

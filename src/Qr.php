@@ -48,6 +48,7 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
+use ExeQue\Qr\Validation\StyleRule;
 use ExeQue\Qr\Writers\Contracts\Output;
 use ExeQue\Qr\Writers\Contracts\Writer;
 use ExeQue\Qr\Writers\Metadata;
@@ -124,6 +125,14 @@ final class Qr
             ->when(isset($defaults['eye']))->eyes($defaults['eye'] ?? null);
 
         return isset($defaults['style']) ? $builder->style($defaults['style']) : $builder;
+    }
+
+    /**
+     * The application's rules for style input; see StyleRule::defaults().
+     */
+    public function rule(): StyleRule
+    {
+        return StyleRule::defaults() ?? StyleRule::everything();
     }
 
     public function url(string $url): PendingQr

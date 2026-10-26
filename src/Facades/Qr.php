@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static \ExeQue\Qr\Builders\PendingQr make(string|\ExeQue\Qr\Payloads\Contracts\Payload|\ExeQue\Qr\Payloads\Contracts\ProvidesQrContent $content)
  * @method static \ExeQue\Qr\Builders\StyleBuilder style()
+ * @method static \ExeQue\Qr\Validation\StyleRule rule()
  * @method static \ExeQue\Qr\Builders\PendingQr url(string $url)
  * @method static \ExeQue\Qr\Builders\PendingQr wifi(?string $ssid = null, ?string $password = null, \ExeQue\Qr\Payloads\Enums\WifiSecurity|string $security = \ExeQue\Qr\Payloads\Enums\WifiSecurity::Wpa, bool $hidden = false)
  * @method static \ExeQue\Qr\Builders\PendingQr vcard(?string $name = null, ?string $phone = null, ?string $email = null, ?string $organization = null)

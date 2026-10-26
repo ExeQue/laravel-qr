@@ -9,11 +9,13 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Skews each module its own way, up to `$x` and `$y` degrees.
  */
-final class MixedSkew implements ModuleFilter, NamedFilter
+final class MixedSkew implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -36,6 +38,15 @@ final class MixedSkew implements ModuleFilter, NamedFilter
             $style->skewX + $cell->random(-$this->x, $this->x, "{$purpose}:x"),
             $style->skewY + $cell->random(-$this->y, $this->y, "{$purpose}:y"),
         );
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'x' => Options::number(-45, 45),
+            'y' => Options::number(-45, 45),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

@@ -13,12 +13,14 @@ use ExeQue\Qr\Paints\Layer;
 use ExeQue\Qr\Paints\Layered;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Gives each eye the color the modules' gradient has where the eye sits, so a gradient
  * across the code runs through the eyes too, each a single color.
  */
-final class EyeSample implements EyeFilter, NamedFilter
+final class EyeSample implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -39,6 +41,14 @@ final class EyeSample implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer ? $style->outer->withPaint($paint) : $style->outer)
             ->withInner($this->inner ? $style->inner->withPaint($paint) : $style->inner);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'outer' => Options::boolean(),
+            'inner' => Options::boolean(),
+        ];
     }
 
     public function name(): string

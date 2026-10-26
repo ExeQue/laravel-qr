@@ -10,12 +10,14 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\Enums\Corner;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Turns the eyes a step more from corner to corner: top left by nothing, top right by one
  * step, bottom left by two.
  */
-final class EyeTwist implements EyeFilter, NamedFilter
+final class EyeTwist implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -40,6 +42,15 @@ final class EyeTwist implements EyeFilter, NamedFilter
         return $style
             ->withOuter($this->outer ? $style->outer->rotateBy($degrees) : $style->outer)
             ->withInner($this->inner ? $style->inner->rotateBy($degrees) : $style->inner);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'step' => Options::number(-45, 45),
+            'outer' => Options::boolean(),
+            'inner' => Options::boolean(),
+        ];
     }
 
     public function name(): string

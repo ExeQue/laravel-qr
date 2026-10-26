@@ -10,12 +10,14 @@ use ExeQue\Qr\Shapes\Concerns\HasOptions;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
 use ExeQue\Qr\Shapes\Contracts\Directional;
 use ExeQue\Qr\Shapes\Contracts\InnerEyeShape;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Numbers;
 
 /**
  * A block with rounded corners: one radius for every corner, or four, top-right, bottom-right,
  * bottom-left, top-left. At 1.5 all round, a circle.
  */
-final readonly class Rounded implements Configurable, Directional, InnerEyeShape
+final readonly class Rounded implements Configurable, Directional, InnerEyeShape, HasOptionRules
 {
     use HasOptions;
 
@@ -25,6 +27,13 @@ final readonly class Rounded implements Configurable, Directional, InnerEyeShape
     public function __construct(
         public float|array $radius = 0.7,
     ) {
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'radius' => ['sometimes', new Numbers(0, 1.5, 4)],
+        ];
     }
 
     public function path(): Path
