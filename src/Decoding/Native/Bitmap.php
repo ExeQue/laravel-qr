@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Decoding\Native;
 
-use ExeQue\Qr\Exceptions\MissingExtensionException;
 use ExeQue\Qr\Exceptions\UnreadableCodeException;
+use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use Imagick;
 use ImagickException;
 use ImagickPixel;
@@ -33,15 +33,15 @@ final readonly class Bitmap
     ) {
     }
 
-    public static function fromImage(string $bytes): self
+    public static function fromImage(string $bytes, ?Driver $driver = null): self
     {
-        if (! extension_loaded('imagick')) {
-            throw MissingExtensionException::imagick(); // @codeCoverageIgnore
-        }
-
         // Only the raster formats codes come in: ImageMagick reads many more, some of them unsafe.
         if (! self::isRaster($bytes)) {
             throw UnreadableCodeException::unreadableImage();
+        }
+
+        if (Driver::resolve($driver) === Driver::Gd) {
+            return self::withGd($bytes);
         }
 
         try {
@@ -67,6 +67,46 @@ final readonly class Bitmap
             $image->clear();
         } catch (ImagickException) {
             throw UnreadableCodeException::unreadableImage();
+        }
+
+        return new self($width, $height, $grey);
+    }
+
+    /**
+     * The image read with GD, for servers without Imagick.
+     */
+    private static function withGd(string $bytes): self
+    {
+        $size = @getimagesizefromstring($bytes);
+
+        if ($size === false || $size[0] * $size[1] > self::MAX_PIXELS) {
+            throw UnreadableCodeException::unreadableImage();
+        }
+
+        $image = @imagecreatefromstring($bytes);
+
+        if ($image === false) {
+            throw UnreadableCodeException::unreadableImage(); // @codeCoverageIgnore
+        }
+
+        // On white, so transparent parts read as light.
+        $flat = imagecreatetruecolor(imagesx($image), imagesy($image));
+        imagefill($flat, 0, 0, 0xFFFFFF);
+        imagecopy($flat, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+
+        if (max(imagesx($flat), imagesy($flat)) > self::MAX_SIDE) {
+            $ratio = self::MAX_SIDE / max(imagesx($flat), imagesy($flat));
+            $flat = imagescale($flat, max(1, (int) round(imagesx($flat) * $ratio)), max(1, (int) round(imagesy($flat) * $ratio)), IMG_BICUBIC) ?: $flat;
+        }
+
+        [$width, $height] = [imagesx($flat), imagesy($flat)];
+        $grey = [];
+
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $color = imagecolorat($flat, $x, $y);
+                $grey[] = (int) round(0.2126 * (($color >> 16) & 0xFF) + 0.7152 * (($color >> 8) & 0xFF) + 0.0722 * ($color & 0xFF));
+            }
         }
 
         return new self($width, $height, $grey);

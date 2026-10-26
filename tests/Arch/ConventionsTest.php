@@ -88,6 +88,8 @@ test('internal classes are marked @internal and public ones are not', function (
         'ExeQue\\Qr\\Rendering\\Guard',
         'ExeQue\\Qr\\Rendering\\StyleSerializer',
         'ExeQue\\Qr\\Writers\\Boxes',
+        'ExeQue\\Qr\\Writers\\Raster\\Coverage',
+        'ExeQue\\Qr\\Writers\\Raster\\Gd\\Metadata',
     ];
 
     // Elsewhere only these are.

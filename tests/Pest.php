@@ -31,21 +31,19 @@ function cachedConfig(array $config): array
 }
 
 /**
- * Compares an image with a stored baseline by how it looks, not by its bytes. ImageMagick 6
- * and 7 smooth edges differently, so each major version has its own baselines. A missing
- * baseline is written, as is a changed one with --update-snapshots; on CI a missing one skips
- * the comparison instead. On a mismatch a .diff.png lands beside the baseline.
+ * Compares an image with a stored baseline by how it looks, not by its bytes, which differ
+ * between drivers and ImageMagick versions. A missing baseline is written (never on CI), as
+ * is a changed one with --update-snapshots; on a mismatch a .diff.png lands beside it.
  */
-expect()->extend('toMatchImageSnapshot', function (string $as, float $threshold = 0.001): Pest\Expectation {
-    $version = intdiv((int) Imagick::getVersion()['versionNumber'], 0x100);
-    $path = __DIR__."/.pest/snapshots/images/im{$version}/{$as}.png";
+expect()->extend('toMatchImageSnapshot', function (string $as, float $threshold = 0.002): Pest\Expectation {
+    $path = __DIR__."/.pest/snapshots/images/{$as}.png";
     $actual = new Imagick();
     $actual->readImageBlob((string) $this->value);
     $actual->setImageFormat('png');
 
     if (! is_file($path) || Pest\Plugins\Snapshot::$updateSnapshots) {
         if (Pest\Support\Ci::isRunning() && ! Pest\Plugins\Snapshot::$updateSnapshots) {
-            test()->markTestSkipped("Image snapshot [{$as}] has no baseline for ImageMagick {$version}.");
+            PHPUnit\Framework\Assert::fail("Image snapshot [{$as}] is missing; create it locally.");
         }
 
         @mkdir(dirname($path), recursive: true);

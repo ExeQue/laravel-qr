@@ -10,7 +10,22 @@ final class MissingExtensionException extends RuntimeException implements QrExce
 {
     public static function imagick(): self
     {
-        return new self('Writing PNG, JPEG or WebP needs the imagick PHP extension, which is not loaded.');
+        return new self('Writing PNG, JPEG or WebP with the imagick driver needs the imagick PHP extension, which is not loaded.');
+    }
+
+    public static function gd(): self
+    {
+        return new self('Writing PNG, JPEG or WebP with the gd driver needs the gd PHP extension, which is not loaded.');
+    }
+
+    public static function raster(): self
+    {
+        return new self('Writing PNG, JPEG or WebP needs the imagick or the gd PHP extension, and neither is loaded.');
+    }
+
+    public static function svgLogosWithGd(): self
+    {
+        return new self('GD cannot draw an SVG logo on a PNG, JPEG or WebP code: use a raster logo, the imagick driver with SVG support, or write SVG.');
     }
 
     public static function svgLogos(): self

@@ -68,7 +68,7 @@ place of any of the package's services. See [Extending](docs/extending.md).
 composer require exeque/laravel-qr
 
 # Recommended
-pecl install imagick                            # PNG, JPEG and WebP (or your system's package, such as php8.5-imagick)
+pecl install imagick                            # faster PNG, JPEG and WebP than GD (or your system's package, such as php8.5-imagick)
 apk add imagemagick-svg                         # SVG logos on raster codes: Alpine
 apt install libmagickcore-6.q16-7-extra         # SVG logos on raster codes: Ubuntu 24.04 (Debian 13 has it)
 php artisan qr:install --svg                    # the zxing reader, reading SVG too
@@ -76,7 +76,7 @@ composer require enshrined/svg-sanitize         # a dedicated SVG logo sanitizer
 composer require --dev exeque/laravel-monocle   # see the codes each request rendered
 ```
 
-PHP 8.5 and Laravel 13. SVG needs nothing more.
+PHP 8.5 and Laravel 13. SVG needs nothing more; PNG, JPEG and WebP need Imagick or GD.
 
 To read codes with zxing, the most capable reader, install `zxing-wasm` with your package manager (found from your
 lock file, or asked):
@@ -87,8 +87,8 @@ php artisan qr:install
 
 ### Recommended
 
-- **The Imagick extension**, for PNG, JPEG and WebP output, raster logos, and the package's own reader. Built for
-  ImageMagick 7; ImageMagick 6 works too.
+- **The Imagick extension**, for PNG, JPEG and WebP output: 10 to 40 % faster than GD, which is used without it, and
+  needed for SVG logos on raster codes. ImageMagick 6 and 7 both work.
 - **ImageMagick's SVG support**, to put SVG logos on PNG, JPEG and WebP codes: `imagemagick-svg` on Alpine,
   `libmagickcore-6.q16-7-extra` on Ubuntu 24.04; Debian 13 has it with ImageMagick (`libmagickcore-7.q16-10-extra`).
 - **Node.js with `zxing-wasm`**, through `php artisan qr:install`, to read codes with zxing; add `--svg` to read SVG

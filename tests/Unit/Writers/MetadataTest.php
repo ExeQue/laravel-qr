@@ -9,8 +9,8 @@ use ExeQue\Qr\Rendering\Renderer;
 use ExeQue\Qr\Rendering\Style;
 use ExeQue\Qr\Writers\Metadata;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
+use ExeQue\Qr\Writers\Raster\Imagick\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Raster\Options as RasterOptions;
-use ExeQue\Qr\Writers\Raster\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Svg\Options as SvgOptions;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Imagick;
@@ -76,6 +76,7 @@ it('builds an XMP packet', function (): void {
 });
 
 it('says why images cannot be written without Imagick', function (): void {
-    expect(\ExeQue\Qr\Exceptions\MissingExtensionException::imagick()->getMessage())
-        ->toBe('Writing PNG, JPEG or WebP needs the imagick PHP extension, which is not loaded.');
+    expect(\ExeQue\Qr\Exceptions\MissingExtensionException::imagick()->getMessage())->toContain('needs the imagick PHP extension')
+        ->and(\ExeQue\Qr\Exceptions\MissingExtensionException::gd()->getMessage())->toContain('needs the gd PHP extension')
+        ->and(\ExeQue\Qr\Exceptions\MissingExtensionException::raster()->getMessage())->toContain('imagick or the gd PHP extension');
 })->covers(\ExeQue\Qr\Exceptions\MissingExtensionException::class);

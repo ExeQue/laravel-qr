@@ -147,6 +147,8 @@ class Playground extends Component
 
     public int $size = 480;
 
+    public string $driver = 'auto';
+
     public ?int $dpi = null;
 
     public int $quality = 90;
@@ -263,9 +265,9 @@ class Playground extends Component
             $code = $this->code();
             $output = match ($this->format) {
                 'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
-                'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality),
-                'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality),
-                default => $code->png($this->size, dpi: $this->dpi),
+                'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+                'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+                default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver),
             };
             $scene = $code->scene();
 

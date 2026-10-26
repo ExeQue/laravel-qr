@@ -10,7 +10,6 @@ use ExeQue\Qr\Shapes\Enums\Eye;
 use ExeQue\Qr\Shapes\Enums\InnerEye;
 use ExeQue\Qr\Shapes\Enums\Module;
 use ExeQue\Qr\Shapes\Enums\OuterEye;
-use Imagick;
 use Tests\Support\Decoder;
 
 covers(Module::class, OuterEye::class, InnerEye::class, Eye::class);
@@ -39,11 +38,7 @@ function scanCases(): iterable
 }
 
 it('scans every built-in shape as its baseline says', function (string $kind, BackedEnum $shape, bool $mirrored): void {
-    $imagemagick = '@im'.intdiv((int) Imagick::getVersion()['versionNumber'], 0x100);
-    $known = array_map(
-        fn (string $case): string => str_replace($imagemagick, '', $case),
-        (require dirname(__DIR__, 2).'/Support/scan-baselines.php')[$kind][$shape->value] ?? [],
-    );
+    $known = (require dirname(__DIR__, 2).'/Support/scan-baselines.php')[$kind][$shape->value] ?? [];
     $method = ['modules' => 'modules', 'outer-eyes' => 'outer', 'inner-eyes' => 'inner', 'eyes' => 'eyes'][$kind];
 
     foreach (SCAN_CONTENTS as $name => $content) {

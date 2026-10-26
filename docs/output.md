@@ -11,7 +11,8 @@ $code->jpeg(600);    // no transparency: flattened onto the background, or white
 $code->webp(600);
 ```
 
-Without a size, raster formats use `qr.defaults.size` (600). PNG, JPEG and WebP need the Imagick extension.
+Without a size, raster formats use `qr.defaults.size` (600). PNG, JPEG and WebP need the Imagick or GD extension; see
+[Drivers](#drivers).
 
 ## SVG options
 
@@ -38,12 +39,36 @@ Dark modules of the same paint are merged into a single `<path>`, so a plain cod
 $code->png(1200, dpi: 300);      // a print resolution in the file
 $code->jpeg(1200, quality: 85);
 $code->webp(800, quality: 90);
-$code->png(600, supersample: true);  // draw four times as large and scale down: exact joins between touching shapes
+$code->png(600, driver: 'gd');   // draw with GD rather than Imagick, for this code only
 ```
 
-Raster output is drawn with ImageMagick 7 in mind. ImageMagick 6 smooths each shape on its own, which leaves faint
-seams where shapes touch; there `supersample` is on by default, so codes look the same and scan as well on both.
-Pass `supersample: false` to turn it off.
+## Drivers
+
+PNG, JPEG and WebP are drawn with Imagick or with GD. `qr.raster.driver` picks one: `auto` (the default) takes
+Imagick when it is loaded and GD otherwise, or name `imagick` or `gd`. `driver:` picks one for a single code.
+
+Both measure the shapes the same way, filled with the nonzero rule and smoothed at the edges, so a code looks the same
+with either, on ImageMagick 6 and 7 alike, and its edges land where they do in the SVG. Imagick is faster, draws SVG
+logos (with ImageMagick's SVG support) and writes metadata into every format; GD needs no ImageMagick, draws raster
+logos only, and writes metadata into PNG and JPEG but not WebP.
+
+Imagick is the one to install where you can. PNG output, the median of seven runs on one machine
+(`composer bench` runs it on yours):
+
+| Code | Size | Imagick | GD |
+|---|---|---|---|
+| Plain | 600 px | 79 ms | 104 ms |
+| Plain | 1200 px | 225 ms | 314 ms |
+| Dots | 600 px | 98 ms | 116 ms |
+| Dots | 1200 px | 248 ms | 350 ms |
+| Flowing, gradient | 600 px | 303 ms | 356 ms |
+| Flowing, gradient | 1200 px | 505 ms | 716 ms |
+| Clovers, logo | 600 px | 326 ms | 349 ms |
+| Clovers, logo | 1200 px | 663 ms | 760 ms |
+| Long text, dots | 600 px | 466 ms | 499 ms |
+| Long text, dots | 1200 px | 812 ms | 950 ms |
+
+The larger the image, the further ahead Imagick gets. Cache codes on hot pages either way; see [Caching](caching.md).
 
 ## What you can do with the output
 

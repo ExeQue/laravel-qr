@@ -38,10 +38,6 @@ final class InvalidLogoException extends InvalidArgumentException implements QrE
         return new self('The logo is not a data: URI of an image.');
     }
 
-    public static function gifNeedsImagick(): self
-    {
-        return new self('Reading a GIF logo needs the imagick PHP extension, which is not loaded.');
-    }
 
     public static function sizeOutOfRange(float $size): self
     {

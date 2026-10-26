@@ -7,9 +7,11 @@ namespace ExeQue\Qr\Registries;
 use Closure;
 use ExeQue\Qr\Registries\Concerns\IsRegistry;
 use ExeQue\Qr\Writers\Contracts\Writer;
+use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
+use ExeQue\Qr\Writers\Raster\Gd\Writer as GdWriter;
+use ExeQue\Qr\Writers\Raster\Imagick\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Raster\Options as RasterOptions;
-use ExeQue\Qr\Writers\Raster\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Svg\Options as SvgOptions;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Illuminate\Contracts\Container\Container;
@@ -89,8 +91,13 @@ final class WriterRegistry
      */
     private static function raster(ImageFormat $format): Closure
     {
-        return fn (Container $app, array $options): Writer => $app->make(RasterWriter::class, [
-            'options' => new RasterOptions(...[...$options, 'format' => $format]),
-        ]);
+        return function (Container $app, array $options) use ($format): Writer {
+            $driver = Driver::resolve($options['driver'] ?? null);
+            unset($options['driver']);
+
+            return $app->make($driver === Driver::Gd ? GdWriter::class : RasterWriter::class, [
+                'options' => new RasterOptions(...[...$options, 'format' => $format]),
+            ]);
+        };
     }
 }

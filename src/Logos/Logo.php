@@ -6,6 +6,7 @@ namespace ExeQue\Qr\Logos;
 
 use ExeQue\Qr\Exceptions\InvalidLogoException;
 use ExeQue\Qr\Logos\Contracts\SvgSanitizer;
+use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use Imagick;
 
 /**
@@ -122,8 +123,14 @@ final readonly class Logo
      */
     private static function firstFrame(string $gif): string
     {
-        if (! extension_loaded('imagick')) {
-            throw InvalidLogoException::gifNeedsImagick(); // @codeCoverageIgnore
+        if (Driver::resolve() === Driver::Gd) {
+            // GD reads a GIF's first frame only.
+            $image = imagecreatefromstring($gif) ?: throw InvalidLogoException::unreadable();
+            imagesavealpha($image, true);
+            ob_start();
+            imagepng($image);
+
+            return (string) ob_get_clean();
         }
 
         $image = new Imagick();

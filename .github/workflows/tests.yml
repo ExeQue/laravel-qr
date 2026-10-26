@@ -132,7 +132,7 @@ jobs:
       # tar and zstd for actions/cache; the libraries the compiled extensions link against.
       - name: Install system packages
         run: |
-          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-libs icu-libs libzip libpng libjpeg-turbo freetype libgomp
+          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-libs icu-libs libzip libpng libjpeg-turbo freetype libgomp
           echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
 
       # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.

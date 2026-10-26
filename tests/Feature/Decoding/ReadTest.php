@@ -129,3 +129,9 @@ it('says when a file cannot be read', function (SplFileInfo $file): void {
     'a failed upload' => fn () => new UploadedFile(__FILE__, 'code.png', 'image/png', UPLOAD_ERR_PARTIAL, true),
     'a missing file' => fn () => new SplFileInfo('/nowhere/code.png'),
 ]);
+
+it('takes runs too short for a finder as noise', function (): void {
+    $stripes = array_map(fn (int $x): bool => $x % 2 === 0, range(0, 19));
+
+    expect(fn () => new FinderLocator()->locate($stripes, 20, 1))->toThrow(UnreadableCodeException::class);
+});

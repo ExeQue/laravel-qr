@@ -95,6 +95,12 @@ return [
         'xml_declaration' => false,
     ],
 
+    // What draws PNG, JPEG and WebP: 'imagick', 'gd', or 'auto' for Imagick when it is loaded,
+    // else GD. GD needs no ImageMagick, but cannot draw SVG logos.
+    'raster' => [
+        'driver' => env('QR_RASTER_DRIVER', 'auto'),
+    ],
+
     'png' => [
         'dpi' => null,
     ],

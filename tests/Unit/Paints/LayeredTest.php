@@ -16,7 +16,7 @@ use ExeQue\Qr\Rendering\Scene;
 use ExeQue\Qr\Rendering\Style;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Support\Paints;
-use ExeQue\Qr\Writers\Raster\Writer as RasterWriter;
+use ExeQue\Qr\Writers\Raster\Imagick\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 
 covers(Layered::class, Layer::class, InvalidStyleException::class, Hydrate::class, Paints::class, Scene::class, SvgWriter::class, RasterWriter::class);

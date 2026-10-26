@@ -227,6 +227,13 @@
                 @if ($format === 'svg')
                     <label>Precision <input type="number" min="0" max="6" wire:model.live="precision"></label>
                 @else
+                    <label>Drawn with
+                        <select wire:model.live="driver">
+                            <option value="auto">auto (Imagick when loaded)</option>
+                            <option value="imagick">Imagick</option>
+                            <option value="gd">GD</option>
+                        </select>
+                    </label>
                     <label>Size, pixels <input type="number" min="100" max="2400" step="20" wire:model.live.debounce.400ms="size"></label>
                 @endif
             </div>

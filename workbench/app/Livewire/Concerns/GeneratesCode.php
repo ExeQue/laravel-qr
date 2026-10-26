@@ -90,6 +90,7 @@ trait GeneratesCode
                 (string) $this->size,
                 ...($this->dpi === null ? [] : ["dpi: {$this->dpi}"]),
                 ...($this->format !== 'png' && $this->quality !== 90 ? ["quality: {$this->quality}"] : []),
+                ...($this->driver !== 'auto' ? ['driver: '.self::literal($this->driver)] : []),
             ]).');',
         };
 

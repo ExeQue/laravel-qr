@@ -23,7 +23,7 @@ code found, too damaged, unreadable format information - or an upload that did n
 | Name | | Reads |
 |---|---|---|
 | `zxing` | zxing-cpp through Node: fast and the most capable | PNG, JPEG, WebP, GIF; SVG too with `@resvg/resvg-wasm` |
-| `native` | the package's own, in PHP with Imagick; no Node needed | PNG, JPEG, WebP, GIF |
+| `native` | the package's own, in PHP with Imagick or GD; no Node needed | PNG, JPEG, WebP, GIF |
 | `stack` | tries decoders in turn until one reads the code | whatever they read |
 
 `stack` is the default, trying `zxing` and then `native`. A decoder that is not installed is passed over, so the

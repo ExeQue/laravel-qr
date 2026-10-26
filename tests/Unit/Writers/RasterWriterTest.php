@@ -22,8 +22,8 @@ use ExeQue\Qr\Rendering\Style;
 use ExeQue\Qr\Writers\Boxes;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
 use ExeQue\Qr\Writers\Raster\Image;
+use ExeQue\Qr\Writers\Raster\Imagick\Writer;
 use ExeQue\Qr\Writers\Raster\Options;
-use ExeQue\Qr\Writers\Raster\Writer;
 use Imagick;
 
 covers(Writer::class, Options::class, Image::class, ImageFormat::class, Boxes::class, InvalidWriterOptionException::class);
@@ -198,26 +198,22 @@ it('spreads a gradient in its own box across the logo plate', function (): void 
         ->and($shade($maxX - 0.3))->toBeGreaterThan(195);
 });
 
-it('draws shapes large and scales them down when asked, or by default on ImageMagick 6', function (): void {
-    $code = \ExeQue\Qr\Facades\Qr::make(RASTER_URL)->modules('clovers')->paint(LinearGradient::make('#000000', '#1e1b4b'))
-        ->logo(dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', size: 0.15, shape: \ExeQue\Qr\Logos\Enums\LogoShape::Circle);
-
-    foreach ([true, false] as $supersample) {
-        $png = $code->png(300, supersample: $supersample)->contents();
-        expect(\ExeQue\Qr\Facades\Qr::read($png, 'native')->text)->toBe(RASTER_URL);
-    }
-
+it('joins touching shapes without a seam, and draws them where SVG would, with either driver', function (string $driver): void {
     // The finder's top edge, seven touching modules, is dark all along.
     $plain = \ExeQue\Qr\Facades\Qr::make(RASTER_URL);
     $scene = $plain->scene();
     $scale = 300 / $scene->size;
-    $image = new Imagick();
-    $image->readImageBlob($plain->png(300, supersample: true)->contents());
+    $image = imagecreatefromstring($plain->png(300, driver: $driver)->contents());
+    imagepalettetotruecolor($image);
     $shades = array_map(
-        fn (int $x): float => $image->getImagePixelColor($x, (int) (($scene->margin + 0.5) * $scale))->getColor()['r'],
+        fn (int $x): int => imagecolorat($image, $x, (int) (($scene->margin + 0.5) * $scale)) & 0xFF,
         range((int) ceil($scene->margin * $scale), (int) floor(($scene->margin + 7) * $scale) - 1),
     );
+    // At 9 pixels a module, the finder's left edge falls exactly between two pixels.
+    $half = imagecreatefromstring(\ExeQue\Qr\Facades\Qr::make(RASTER_URL)->margin(4)->png(9 * $scene->size, driver: $driver)->contents());
+    imagepalettetotruecolor($half);
 
-    expect(new Options(supersample: true)->supersample)->toBeTrue()
-        ->and(max($shades))->toBeLessThan(64);
-});
+    expect(max($shades))->toBeLessThan(8)
+        ->and(imagecolorat($half, 4 * 9 - 1, 4 * 9 + 4) & 0xFF)->toBe(255)
+        ->and(imagecolorat($half, 4 * 9, 4 * 9 + 4) & 0xFF)->toBeLessThan(8);
+})->with(['imagick', 'gd']);

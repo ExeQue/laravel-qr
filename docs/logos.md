@@ -99,5 +99,5 @@ Choose the sanitizer with `qr.logos.sanitizer`: a class implementing `ExeQue\Qr\
 ## Logos in each format
 
 SVG codes inline an SVG logo as SVG (or embed it as an image with `svg(inlineSvgLogos: false)`) and embed raster
-logos as images. PNG, JPEG and WebP codes draw the logo in; an SVG logo there needs ImageMagick built with SVG
-support (librsvg), and says so when it is missing.
+logos as images. PNG, JPEG and WebP codes draw the logo in; an SVG logo there needs the Imagick driver with
+ImageMagick's SVG support (librsvg), as GD cannot read SVG, and says so when it is missing.

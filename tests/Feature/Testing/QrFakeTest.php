@@ -20,7 +20,7 @@ use Illuminate\Contracts\Container\Container;
 use LogicException;
 use PHPUnit\Framework\AssertionFailedError;
 
-covers(QrFake::class, Qr::class, \ExeQue\Qr\Registries\WriterRegistry::class, \ExeQue\Qr\Writers\Svg\Writer::class, \ExeQue\Qr\Writers\Raster\Writer::class);
+covers(QrFake::class, Qr::class, \ExeQue\Qr\Registries\WriterRegistry::class, \ExeQue\Qr\Writers\Svg\Writer::class, \ExeQue\Qr\Writers\Raster\Imagick\Writer::class);
 
 const FAKE_URL = 'https://example.com/e/ABCD1234';
 

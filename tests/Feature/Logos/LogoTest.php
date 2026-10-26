@@ -26,8 +26,8 @@ use ExeQue\Qr\Rendering\ScanSafety;
 use ExeQue\Qr\Rendering\Scene;
 use ExeQue\Qr\Rendering\SceneItem;
 use ExeQue\Qr\Rendering\Style;
+use ExeQue\Qr\Writers\Raster\Imagick\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Raster\Options as RasterOptions;
-use ExeQue\Qr\Writers\Raster\Writer as RasterWriter;
 use ExeQue\Qr\Writers\Svg\Options as SvgOptions;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Imagick;
@@ -218,9 +218,6 @@ it('paints the plate with a gradient', function (string $gradient): void {
     expect(new SvgWriter()->write(withLogo($style))->contents())->toContain('<path fill=');
 })->with([\ExeQue\Qr\Gradients\LinearGradient::class, \ExeQue\Qr\Gradients\ConicGradient::class]);
 
-it('says why a GIF cannot be read without Imagick', function (): void {
-    expect(InvalidLogoException::gifNeedsImagick()->getMessage())->toBe('Reading a GIF logo needs the imagick PHP extension, which is not loaded.');
-});
 
 it('describes the logo in the scene', function (): void {
     expect(withLogo(new LogoStyle(Logo::fromFile(fixture('badge.svg')), 0.2, plate: new Hex('#ffffff')))->toSnapshot())->toContain("\nlogo image/svg+xml ");

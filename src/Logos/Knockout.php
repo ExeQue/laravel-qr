@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Logos;
 
+use Closure;
 use ExeQue\Qr\Encoder\Enums\Role;
 use ExeQue\Qr\Encoder\Matrix;
 use ExeQue\Qr\Exceptions\InvalidLogoException;
 use ExeQue\Qr\Filters\Region;
 use ExeQue\Qr\Logos\Enums\LogoShape;
+use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use Imagick;
 
 /**
@@ -147,15 +149,13 @@ final readonly class Knockout
 
         // The logo at one pixel per module, over the cells it covers.
         [$columns, $rows] = [(int) ceil($width), (int) ceil($height)];
-        $image = new Imagick();
-        $image->readImageBlob($style->logo->contents);
-        $image->resizeImage($columns, $rows, Imagick::FILTER_BOX, 1);
+        $opacity = self::opacities($style->logo->contents, $columns, $rows);
 
         $visible = [];
 
         for ($row = 0; $row < $rows; $row++) {
             for ($column = 0; $column < $columns; $column++) {
-                if ($image->getImagePixelColor($column, $row)->getColorValue(Imagick::COLOR_ALPHA) > 0.1) {
+                if ($opacity($column, $row) > 0.1) {
                     $visible[] = [(int) floor($x + $column + 0.5), (int) floor($y + $row + 0.5)];
                 }
             }
@@ -199,5 +199,29 @@ final readonly class Knockout
         }
 
         return $count;
+    }
+
+    /**
+     * How opaque the logo is at each pixel, scaled down to `$columns` by `$rows`, 0-1.
+     *
+     * @return Closure(int, int): float
+     */
+    private static function opacities(string $logo, int $columns, int $rows): Closure
+    {
+        if (Driver::resolve() === Driver::Gd) {
+            $image = imagecreatefromstring($logo) ?: imagecreatetruecolor(1, 1);
+            $small = imagecreatetruecolor(max(1, $columns), max(1, $rows));
+            imagealphablending($small, false);
+            imagefill($small, 0, 0, 0x7F000000);
+            imagecopyresampled($small, $image, 0, 0, 0, 0, $columns, $rows, imagesx($image), imagesy($image));
+
+            return fn (int $column, int $row): float => (127 - ((imagecolorat($small, $column, $row) >> 24) & 0x7F)) / 127;
+        }
+
+        $image = new Imagick();
+        $image->readImageBlob($logo);
+        $image->resizeImage($columns, $rows, Imagick::FILTER_BOX, 1);
+
+        return fn (int $column, int $row): float => $image->getImagePixelColor($column, $row)->getColorValue(Imagick::COLOR_ALPHA);
     }
 }

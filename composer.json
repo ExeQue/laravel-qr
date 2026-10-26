@@ -33,9 +33,10 @@
         "pestphp/pest-plugin-type-coverage": "^5.0"
     },
     "suggest": {
-        "ext-imagick": "Required to write PNG, JPEG and WebP codes, and to place raster logos.",
+        "ext-imagick": "Draws PNG, JPEG and WebP codes faster than GD, and SVG logos on them.",
         "enshrined/svg-sanitize": "Sanitizes SVG logos with a dedicated sanitizer instead of the package's own.",
-        "exeque/laravel-monocle": "Shows the codes each request rendered, with timings and advice, in the Monocle profiler."
+        "exeque/laravel-monocle": "Shows the codes each request rendered, with timings and advice, in the Monocle profiler.",
+        "ext-gd": "Draws PNG, JPEG and WebP codes without Imagick."
     },
     "autoload": {
         "psr-4": {
@@ -86,6 +87,7 @@
             "@php vendor/bin/testbench serve --ansi --host=0.0.0.0 --port=8000"
         ],
         "test:types": "vendor/bin/pest --type-coverage --min=100",
-        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G"
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "bench": "php benchmarks/raster.php"
     }
 }
