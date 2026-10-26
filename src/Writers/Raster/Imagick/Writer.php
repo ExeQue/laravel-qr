@@ -233,6 +233,7 @@ final readonly class Writer implements Fakeable, WriterContract
 
         $canvas->setImageFormat($format->value);
         $canvas->setImageCompressionQuality($this->options->quality);
+        $canvas->setOption('png:compression-level', (string) $this->options->compressionLevel);
         // The canvas is new, so there is nothing to strip. Without dates, the same code
         // gives the same bytes every time, which caching relies on.
         $canvas->setOption('png:exclude-chunks', 'date,time');

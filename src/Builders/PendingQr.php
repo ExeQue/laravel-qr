@@ -275,6 +275,7 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
     {
         return $this->format($format, ...[
             'dpi' => $this->config->get('qr.png.dpi'),
+            ...($format === 'png' ? ['compressionLevel' => (int) $this->config->get('qr.png.compression_level', 6)] : []),
             ...$options,
             'size' => $size ?? (int) $this->config->get('qr.defaults.size', 600),
             'metadata' => $this->metadataFor(),

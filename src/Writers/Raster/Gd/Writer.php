@@ -263,7 +263,7 @@ final readonly class Writer implements Fakeable, WriterContract
         ob_start();
 
         match ($format) {
-            ImageFormat::Png => imagepng($canvas),
+            ImageFormat::Png => imagepng($canvas, null, $this->options->compressionLevel),
             ImageFormat::Jpeg => imagejpeg($canvas, null, $this->options->quality),
             ImageFormat::Webp => imagewebp($canvas, null, $this->options->quality),
         };

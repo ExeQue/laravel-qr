@@ -37,6 +37,7 @@ Dark modules of the same paint are merged into a single `<path>`, so a plain cod
 
 ```php
 $code->png(1200, dpi: 300);      // a print resolution in the file
+$code->png(600, compressionLevel: 9);   // 0-9: smaller and slower; the image is the same (6 by default)
 $code->jpeg(1200, quality: 85);
 $code->webp(800, quality: 90);
 $code->png(600, driver: 'gd');   // draw with GD rather than Imagick, for this code only

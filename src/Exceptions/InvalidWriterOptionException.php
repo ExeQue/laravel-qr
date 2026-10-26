@@ -24,6 +24,11 @@ final class InvalidWriterOptionException extends InvalidArgumentException implem
         return new self("The {$option} is at least 1, {$value} given.");
     }
 
+    public static function compressionLevelOutOfRange(int $level): self
+    {
+        return new self("A PNG compression level is from 0 to 9, {$level} given.");
+    }
+
     public static function qualityOutOfRange(int $quality): self
     {
         return new self("The quality is 1 to 100, {$quality} given.");

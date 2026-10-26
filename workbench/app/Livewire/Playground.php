@@ -157,6 +157,8 @@ class Playground extends Component
 
     public int $quality = 90;
 
+    public int $compressionLevel = 6;
+
     public bool $currentColor = false;
 
     public bool $compact = true;
@@ -302,7 +304,7 @@ class Playground extends Component
             'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
             'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
             'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver),
+            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
         };
         $scene = $code->scene();
 

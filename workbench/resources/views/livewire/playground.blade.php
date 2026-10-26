@@ -248,6 +248,8 @@
                     <label>DPI <input type="number" min="72" placeholder="none" wire:model.live.debounce.400ms="dpi"></label>
                     @if ($format !== 'png')
                         <label>Quality <input type="number" min="1" max="100" wire:model.live.debounce.400ms="quality"></label>
+                    @else
+                        <label>Compression level, 0-9 <input type="number" min="0" max="9" wire:model.live.debounce.400ms="compressionLevel"></label>
                     @endif
                 </div>
             @endif

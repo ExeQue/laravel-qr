@@ -103,6 +103,8 @@ return [
 
     'png' => [
         'dpi' => null,
+        // 0-9: how hard PNGs are packed; higher is smaller and slower, the image the same.
+        'compression_level' => 6,
     ],
 
     /*
