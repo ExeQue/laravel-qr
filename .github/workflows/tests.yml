@@ -173,8 +173,10 @@ jobs:
       - name: Execute tests
         run: vendor/bin/pest -p --ci
 
-  # Coverage on its own, once the suite passes on both ImageMagick versions.
+  # Coverage on its own, on pull requests only (it takes a while), once the suite passes on both
+  # ImageMagick versions.
   coverage:
+    if: github.event_name == 'pull_request'
     needs: [imagemagick-6, imagemagick-7]
     runs-on: ubuntu-latest
     container: php:8.5-cli-alpine
