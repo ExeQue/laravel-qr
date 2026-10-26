@@ -193,6 +193,8 @@ return [
     | own "qr" section: timings, cache use and scan guard changes, never the
     | content. Renders slower than slow_render_ms are flagged.
     |
+    | @see https://github.com/ExeQue/laravel-monocle
+    |
     */
 
     'monocle' => [

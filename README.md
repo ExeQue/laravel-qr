@@ -67,13 +67,22 @@ place of any of the package's services. See [Extending](docs/extending.md).
 ```bash
 composer require exeque/laravel-qr
 
+# The config, to change the defaults and name styles and parts of your own (optional)
+php artisan vendor:publish --tag=qr-config
+
 # Recommended
-pecl install imagick                            # faster PNG, JPEG and WebP than GD (or your system's package, such as php8.5-imagick)
-apk add imagemagick-svg                         # SVG logos on raster codes: Alpine
-apt install libmagickcore-6.q16-7-extra         # SVG logos on raster codes: Ubuntu 24.04 (Debian 13 has it)
-php artisan qr:install --svg                    # the zxing reader, reading SVG too
-composer require enshrined/svg-sanitize         # a dedicated SVG logo sanitizer
-composer require --dev exeque/laravel-monocle   # see the codes each request rendered
+# Imagick, for faster PNG, JPEG and WebP than GD (or your system's package, such as php8.5-imagick)
+pecl install imagick
+# SVG logos on PNG, JPEG and WebP codes: Alpine
+apk add imagemagick-svg
+# SVG logos on PNG, JPEG and WebP codes: Ubuntu 24.04 (Debian 13 has it already)
+apt install libmagickcore-6.q16-7-extra
+# The zxing reader, reading SVG too
+php artisan qr:install --svg
+# A dedicated sanitizer for SVG logos
+composer require enshrined/svg-sanitize
+# See the codes each request rendered, in the Monocle profiler
+composer require --dev exeque/laravel-monocle
 ```
 
 PHP 8.5 and Laravel 13. SVG needs nothing more; PNG, JPEG and WebP need Imagick or GD.
