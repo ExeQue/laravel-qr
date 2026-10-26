@@ -72,67 +72,12 @@ jobs:
       - name: Static analysis
         run: composer analyse
 
-  test:
+  # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
+  imagemagick-6:
     needs: lint
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        php: [8.5]
-        stability: [prefer-stable]
-
-    name: PHP-${{ matrix.php }} - ${{ matrix.stability }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
-          coverage: none
-
-      - name: Setup problem matchers
-        run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Get the Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Composer downloads
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-          restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-composer-
-
-      - name: Install dependencies
-        run: |
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      # zxing-cpp decodes the codes in the scan tests.
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Execute tests
-        run: vendor/bin/pest -p --ci
-
-  coverage:
-    needs: lint
-    runs-on: ubuntu-latest
-
-    name: Coverage
+    name: PHP 8.5 - ImageMagick 6
 
     steps:
       - name: Checkout code
@@ -143,7 +88,12 @@ jobs:
         with:
           php-version: 8.5
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
-          coverage: pcov
+          coverage: none
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Get the Composer cache directory
         id: composer-cache
@@ -164,6 +114,37 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+
+      # zxing-cpp decodes the codes in the scan tests.
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Execute tests
+        run: vendor/bin/pest -p --ci
+
+  # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
+  imagemagick-7:
+    needs: lint
+    runs-on: ubuntu-latest
+    container: php:8.5-cli-alpine
+
+    name: PHP 8.5 - ImageMagick 7, with coverage
+
+    steps:
+      - name: Install system packages
+        run: apk add --no-cache git nodejs npm imagemagick imagemagick-svg
+
+      - name: Install PHP extensions
+        run: |
+          wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
+          chmod +x /usr/local/bin/install-php-extensions
+          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: composer update --prefer-stable --prefer-dist --no-interaction
 
       # zxing-cpp decodes the codes in the scan tests.
       - name: Install Node dependencies

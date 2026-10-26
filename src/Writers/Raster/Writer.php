@@ -41,6 +41,9 @@ final readonly class Writer implements Fakeable, WriterContract
     // The most samples a gradient takes along each side; scaled up smoothly, more is not visible.
     private const int GRADIENT_SAMPLES = 128;
 
+    // How much larger ImageMagick 6 draws shapes before scaling them down: 16 levels of smoothing.
+    private const int SUPERSAMPLE = 4;
+
     public function __construct(
         private Options $options = new Options(),
         private StreamFactory $streams = new StreamFactory(),
@@ -129,8 +132,19 @@ final readonly class Writer implements Fakeable, WriterContract
      */
     private function fill(Imagick $canvas, Paint $paint, array $paths, float $opacity, Scene $scene, SceneItem|Path|null $shape, float $scale): void
     {
-        if ($paint instanceof ColorContract) {
+        if ($paint instanceof ColorContract && ! $this->supersamples()) {
             $canvas->drawImage($this->draw($paths, $scale, $paint, $opacity));
+
+            return;
+        }
+
+        if ($paint instanceof ColorContract) {
+            $rgba = $paint->toRgba();
+            $layer = new Imagick();
+            $layer->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel(sprintf('rgba(%d,%d,%d,%F)', round($rgba->red), round($rgba->green), round($rgba->blue), $rgba->alpha * $opacity)));
+            $layer->setImageAlphaChannel(Imagick::ALPHACHANNEL_SET);
+            $layer->compositeImage($this->mask($canvas, $paths, $scale), Imagick::COMPOSITE_DSTIN, 0, 0);
+            $canvas->compositeImage($layer, Imagick::COMPOSITE_OVER, 0, 0);
 
             return;
         }
@@ -148,9 +162,7 @@ final readonly class Writer implements Fakeable, WriterContract
         }
 
         // The gradient, as large as its box, kept only where the shapes are.
-        $mask = new Imagick();
-        $mask->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel('transparent'));
-        $mask->drawImage($this->draw($paths, $scale, Color::parse('#ffffff'), 1.0));
+        $mask = $this->mask($canvas, $paths, $scale);
 
         $layer = new Imagick();
         $layer->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel('transparent'));
@@ -192,10 +204,7 @@ final readonly class Writer implements Fakeable, WriterContract
         $placed->compositeImage($image, Imagick::COMPOSITE_OVER, (int) round($x + ($width - $imageWidth) / 2), (int) round($y + ($height - $imageHeight) / 2));
 
         if ($layer->crop !== null) {
-            $crop = new Imagick();
-            $crop->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel('transparent'));
-            $crop->drawImage($this->draw([$layer->crop], $scale, Color::parse('#ffffff'), 1.0));
-            $placed->compositeImage($crop, Imagick::COMPOSITE_DSTIN, 0, 0);
+            $placed->compositeImage($this->mask($canvas, [$layer->crop], $scale), Imagick::COMPOSITE_DSTIN, 0, 0);
         }
 
         $canvas->compositeImage($placed, Imagick::COMPOSITE_OVER, 0, 0);
@@ -207,6 +216,41 @@ final readonly class Writer implements Fakeable, WriterContract
     private static function readable(Logo $logo): string
     {
         return ! $logo->isSvg() || Imagick::queryFormats('SVG') !== [] ? $logo->contents : throw MissingExtensionException::svgLogos();
+    }
+
+    /**
+     * Where the shapes are, as the alpha of an image the size of the canvas.
+     *
+     * ImageMagick 6 smooths each part of a path on its own, which leaves seams where shapes meet,
+     * and gives edge pixels drawn without smoothing the wrong color. Supersampled, the shapes are
+     * drawn unsmoothed four times as large and scaled down, and only the alpha is used.
+     *
+     * @param list<Path> $paths
+     */
+    private function mask(Imagick $canvas, array $paths, float $scale): Imagick
+    {
+        [$width, $height] = [$canvas->getImageWidth(), $canvas->getImageHeight()];
+        $factor = $this->supersamples() ? self::SUPERSAMPLE : 1;
+
+        $mask = new Imagick();
+        $mask->newImage($width * $factor, $height * $factor, new ImagickPixel('transparent'));
+        $mask->setAntiAlias($factor === 1);
+        $mask->drawImage($this->draw($paths, $scale * $factor, Color::parse('#ffffff'), 1.0));
+
+        if ($factor > 1) {
+            $mask->scaleImage($width, $height);
+        }
+
+        return $mask;
+    }
+
+    /**
+     * Whether shapes are drawn large and scaled down: when asked, or on ImageMagick 6, which
+     * draws touching shapes with seams.
+     */
+    private function supersamples(): bool
+    {
+        return $this->options->supersample ?? Imagick::getVersion()['versionNumber'] < 0x700;
     }
 
     /**

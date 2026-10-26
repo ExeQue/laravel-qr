@@ -14,6 +14,9 @@ final readonly class Options
      * @param int $size Width and height in pixels.
      * @param int|null $dpi Resolution written into PNG and JPEG files, for print; WebP has no place for it.
      * @param int $quality 1-100, for JPEG and WebP.
+     * @param bool|null $supersample Draw shapes four times as large and scale them down, for exact joins
+     *                               between touching shapes; null does so on ImageMagick 6 only, which
+     *                               leaves seams between them otherwise.
      */
     public function __construct(
         public int $size = 600,
@@ -21,6 +24,7 @@ final readonly class Options
         public ?int $dpi = null,
         public int $quality = 90,
         public Metadata $metadata = new Metadata(),
+        public ?bool $supersample = null,
     ) {
         if ($size < 1) {
             throw InvalidWriterOptionException::notPositive('size', $size);

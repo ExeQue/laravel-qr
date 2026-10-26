@@ -197,3 +197,27 @@ it('spreads a gradient in its own box across the logo plate', function (): void 
     expect($shade($minX + 0.3))->toBeLessThan(60)
         ->and($shade($maxX - 0.3))->toBeGreaterThan(195);
 });
+
+it('draws shapes large and scales them down when asked, or by default on ImageMagick 6', function (): void {
+    $code = \ExeQue\Qr\Facades\Qr::make(RASTER_URL)->modules('clovers')->paint(LinearGradient::make('#000000', '#1e1b4b'))
+        ->logo(dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', size: 0.15, shape: \ExeQue\Qr\Logos\Enums\LogoShape::Circle);
+
+    foreach ([true, false] as $supersample) {
+        $png = $code->png(300, supersample: $supersample)->contents();
+        expect(\ExeQue\Qr\Facades\Qr::read($png, 'native')->text)->toBe(RASTER_URL);
+    }
+
+    // The finder's top edge, seven touching modules, is dark all along.
+    $plain = \ExeQue\Qr\Facades\Qr::make(RASTER_URL);
+    $scene = $plain->scene();
+    $scale = 300 / $scene->size;
+    $image = new Imagick();
+    $image->readImageBlob($plain->png(300, supersample: true)->contents());
+    $shades = array_map(
+        fn (int $x): float => $image->getImagePixelColor($x, (int) (($scene->margin + 0.5) * $scale))->getColor()['r'],
+        range((int) ceil($scene->margin * $scale), (int) floor(($scene->margin + 7) * $scale) - 1),
+    );
+
+    expect(new Options(supersample: true)->supersample)->toBeTrue()
+        ->and(max($shades))->toBeLessThan(64);
+});

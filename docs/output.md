@@ -38,7 +38,12 @@ Dark modules of the same paint are merged into a single `<path>`, so a plain cod
 $code->png(1200, dpi: 300);      // a print resolution in the file
 $code->jpeg(1200, quality: 85);
 $code->webp(800, quality: 90);
+$code->png(600, supersample: true);  // draw four times as large and scale down: exact joins between touching shapes
 ```
+
+Raster output is drawn with ImageMagick 7 in mind. ImageMagick 6 smooths each shape on its own, which leaves faint
+seams where shapes touch; there `supersample` is on by default, so codes look the same and scan as well on both.
+Pass `supersample: false` to turn it off.
 
 ## What you can do with the output
 
