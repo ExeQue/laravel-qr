@@ -81,8 +81,8 @@ php artisan qr:install
 
 - **The Imagick extension**, for PNG, JPEG and WebP output, raster logos, and the package's own reader. Built for
   ImageMagick 7; ImageMagick 6 works too.
-- **ImageMagick's SVG support** (librsvg, such as `imagemagick-svg` on Alpine), to put SVG logos on PNG, JPEG and
-  WebP codes.
+- **ImageMagick's SVG support**, to put SVG logos on PNG, JPEG and WebP codes: `imagemagick-svg` on Alpine,
+  `libmagickcore-6.q16-7-extra` on Ubuntu 24.04; Debian 13 has it with ImageMagick (`libmagickcore-7.q16-10-extra`).
 - **Node.js with `zxing-wasm`**, through `php artisan qr:install`, to read codes with zxing; add `--svg` to read SVG
   images too.
 - [`enshrined/svg-sanitize`](https://github.com/darylldoyle/svg-sanitizer), to sanitize SVG logos with a dedicated
