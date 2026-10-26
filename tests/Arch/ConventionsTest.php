@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Tests\Arch;
 
 use ExeQue\Qr\Exceptions\QrExceptionInterface;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
@@ -132,7 +135,7 @@ describe('test conventions', function (): void {
 
 describe('opcache safety', function (): void {
     test('no list assignment reads what it assigns, which opcache gets wrong', function (): void {
-        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(dirname(__DIR__, 2).'/src', \FilesystemIterator::SKIP_DOTS));
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__, 2).'/src', FilesystemIterator::SKIP_DOTS));
         $offending = [];
 
         foreach ($files as $file) {
