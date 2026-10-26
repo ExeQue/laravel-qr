@@ -194,7 +194,7 @@ return [
     |
     | Names of your own, usable wherever a color is, next to the CSS names:
     | 'brand' => '#be123c' makes ->paint('brand') work. The value is any color
-    | notation, a color instance such as new Oklch(0.55, 0.24, 293), or an
+    | notation, a color instance such as Oklch::make(0.55, 0.24, 293), or an
     | array such as ['r' => 190, 'g' => 18, 'b' => 60]; all of them survive
     | php artisan config:cache. CSS names cannot be redefined.
     |
@@ -205,9 +205,9 @@ return [
         // 'brand' => '#be123c',
         // 'ink' => 'oklch(0.25 0.05 280)',
         // As a color class:
-        // 'accent' => new ExeQue\Qr\Colors\Hex('#0f766e'),
-        // 'highlight' => new ExeQue\Qr\Colors\Oklch(0.55, 0.24, 293),
-        // 'sand' => new ExeQue\Qr\Colors\Rgb(240, 222, 196),
+        // 'accent' => ExeQue\Qr\Colors\Hex::make('#0f766e'),
+        // 'highlight' => ExeQue\Qr\Colors\Oklch::make(0.55, 0.24, 293),
+        // 'sand' => ExeQue\Qr\Colors\Rgb::make(240, 222, 196),
         // As an array:
         // 'paper' => ['r' => 255, 'g' => 251, 'b' => 245],
     ],
@@ -255,11 +255,16 @@ return [
     | building on others with 'extends'; or an enum class implementing
     | ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle, every case under its value.
     | Shapes, filters and gradients go by their registered names, colors by
-    | any notation or a name from 'colors'. Use one with ->style('brand').
+    | any notation or a name from 'colors'. A class name works too: one that
+    | implements ProvidesQrStyle, for a style made with the style builder.
+    | Use one with ->style('brand').
     |
     */
 
     'styles' => [
+        // A class whose qrStyle() builds the style, as Qr::style()->modules('dots-medium')->...->toStyle():
+        // 'brand' => App\Qr\BrandStyle::class,
+        // Or the style as plain values:
         // 'brand' => [
         //     'modules' => ['shape' => 'dots-medium', 'paint' => 'brand'],
         //     'eyes' => [

@@ -131,6 +131,28 @@ or describe it in `config/qr.php`, where only plain values may go, so it survive
 ],
 ```
 
+To use the style builder from config, name a class that implements `ProvidesQrStyle`; a class name survives the
+config cache where a closure would not:
+
+```php
+use ExeQue\Qr\Facades\Qr;
+use ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle;
+use ExeQue\Qr\Rendering\Style;
+
+final class BrandStyle implements ProvidesQrStyle
+{
+    public function qrStyle(): Style
+    {
+        return Qr::style()->modules('dots-medium')->eyes('rounded')->paint('#1e1b4b')->toStyle();
+    }
+}
+
+'styles' => [
+    'brand' => BrandStyle::class,
+    'wedding' => ['extends' => 'brand', 'modules' => ['paint' => '#be123c']],
+],
+```
+
 and use it by name, in code or in Blade:
 
 ```php
