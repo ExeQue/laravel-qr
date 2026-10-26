@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# Content snapshots hold CRLF where the formats (vCard, iCalendar) require it.
+/tests/.pest/snapshots/**/*.snap -text
+
 /.gitattributes         export-ignore
 /.gitignore             export-ignore
 /.github                export-ignore
