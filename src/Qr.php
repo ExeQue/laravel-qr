@@ -52,6 +52,8 @@ use ExeQue\Qr\Writers\Contracts\Writer;
 use ExeQue\Qr\Writers\Metadata;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Traits\Macroable;
+use SplFileInfo;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * What the Qr facade stands for.
@@ -245,18 +247,33 @@ final class Qr
     }
 
     /**
-     * Reads the code in an image: PNG, JPEG, WebP or GIF bytes, or a rendered code - with the
-     * decoder `qr.reading.decoder` names, or `$using`.
+     * Reads the code in an image: PNG, JPEG, WebP or GIF bytes, a file (such as an upload from a
+     * request), or a rendered code - with the decoder `qr.reading.decoder` names, or `$using`.
      *
-     * @throws UnreadableCodeException When no code can be read.
+     * @throws UnreadableCodeException When no code can be read, or the upload failed.
      */
-    public function read(Rendered|Output|string $image, ?string $using = null): Decoded
+    public function read(Rendered|Output|SplFileInfo|string $image, ?string $using = null): Decoded
     {
         $name = $using ?? (string) $this->container->make('config')->get('qr.reading.decoder', 'stack');
-        $bytes = is_string($image) ? $image : $image->contents();
+        $bytes = match (true) {
+            is_string($image) => $image,
+            $image instanceof SplFileInfo => self::fileContents($image),
+            default => $image->contents(),
+        };
         $decoded = $this->decoders()->get($name)->decode($bytes);
 
         return $decoded->decoder === null ? $decoded->withDecoder($name) : $decoded;
+    }
+
+    /**
+     * A file's bytes; an upload that did not arrive, or a file that cannot be read, is no image.
+     */
+    private static function fileContents(SplFileInfo $file): string
+    {
+        $readable = ! ($file instanceof UploadedFile && ! $file->isValid()) && $file->isFile() && $file->isReadable();
+        $bytes = $readable ? file_get_contents($file->getPathname()) : false;
+
+        return $bytes === false ? throw UnreadableCodeException::unreadableFile() : $bytes;
     }
 
     public function decoders(): DecoderRegistry

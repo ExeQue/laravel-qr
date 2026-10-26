@@ -19,11 +19,13 @@ use ExeQue\Qr\Shapes\Enums\Eye;
 use ExeQue\Qr\Shapes\Enums\InnerEye;
 use ExeQue\Qr\Shapes\Enums\Module;
 use ExeQue\Qr\Shapes\Enums\OuterEye;
+use Illuminate\Http\UploadedFile;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
+use SplFileInfo;
 
-covers(NativeDecoder::class, Bitmap::class, FinderLocator::class, Sampler::class, Perspective::class, SymbolReader::class, UnreadableCodeException::class);
+covers(\ExeQue\Qr\Qr::class, NativeDecoder::class, Bitmap::class, FinderLocator::class, Sampler::class, Perspective::class, SymbolReader::class, UnreadableCodeException::class);
 
 const READ_URL = 'https://example.com/e/ABCD1234';
 
@@ -108,4 +110,22 @@ it('says when there is no code to read', function (Closure $image, string $messa
         $rub->rectangle(120, 120, 280, 280);
         $image->drawImage($rub);
     }), 'too damaged'],
+]);
+
+it('reads a file, such as an upload from a request', function (): void {
+    $png = Qr::make('uploaded')->png(300)->contents();
+    $path = tempnam(sys_get_temp_dir(), 'qr');
+    file_put_contents($path, $png);
+
+    expect(Qr::read(UploadedFile::fake()->createWithContent('code.png', $png), 'native')->text)->toBe('uploaded')
+        ->and(Qr::read(new SplFileInfo($path), 'native')->text)->toBe('uploaded');
+
+    unlink($path);
+})->skip(! extension_loaded('imagick'), 'Imagick is needed for raster output.');
+
+it('says when a file cannot be read', function (SplFileInfo $file): void {
+    expect(fn () => Qr::read($file, 'native'))->toThrow(UnreadableCodeException::class, 'did not arrive whole');
+})->with([
+    'a failed upload' => fn () => new UploadedFile(__FILE__, 'code.png', 'image/png', UPLOAD_ERR_PARTIAL, true),
+    'a missing file' => fn () => new SplFileInfo('/nowhere/code.png'),
 ]);

@@ -18,6 +18,11 @@ final class UnreadableCodeException extends RuntimeException implements QrExcept
         return new self('The image could not be read: give PNG, JPEG, WebP or GIF bytes.');
     }
 
+    public static function unreadableFile(): self
+    {
+        return new self('The file could not be read: the upload did not arrive whole, or the file is missing or not readable.');
+    }
+
     public static function tooDamaged(): self
     {
         return new self('The QR code is too damaged to read: it has more errors than its error correction can repair.');

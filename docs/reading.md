@@ -5,7 +5,7 @@
 ```php
 use ExeQue\Qr\Facades\Qr;
 
-$decoded = Qr::read($request->file('photo')->get());
+$decoded = Qr::read($request->file('photo'));
 
 $decoded->text;              // what the code holds
 $decoded->version;           // 1 to 40, when the decoder tells
@@ -14,8 +14,9 @@ $decoded->decoder;           // which decoder read it
 (string) $decoded;           // the text
 ```
 
-It takes image bytes, or a code you rendered (`Rendered`, or any `Output`). An image without a readable code throws
-an `UnreadableCodeException` that says why: no code found, too damaged, unreadable format information.
+It takes image bytes, a file (an `UploadedFile` from the request, or any `SplFileInfo`), or a code you rendered
+(`Rendered`, or any `Output`). An image without a readable code throws an `UnreadableCodeException` that says why: no
+code found, too damaged, unreadable format information - or an upload that did not arrive whole.
 
 ## Decoders
 
