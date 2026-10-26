@@ -65,7 +65,22 @@ A little of everything: rotation, size and offset. `Jitter(rotate: 10, size: 0.1
 
 ### gradient-fill
 
-One gradient across all the modules, whatever their own paint. `GradientFill(gradient)`.
+Gives each module a single color: the one a gradient has at the module's middle, across the code.
+`GradientFill(gradient)`.
+
+A gradient set with `->paint()` runs through the modules as one continuous paint, eyes included. `gradient-fill`
+colors module by module instead, so it can be limited to some roles or a region, leaves the eyes their own paint, and
+hands the filters after it plain colors to work on:
+
+```php
+// A gradient in the middle of the code only
+->paint('#1e1b4b')
+->filter((new GradientFill(RadialGradient::make('#be123c', '#7c3aed')))->in(Region::circle(14.5, 14.5, 7)))
+
+// Every module its own shade of the gradient
+->filter(new GradientFill(LinearGradient::make('#be123c', '#1e1b4b')->angle(135)))
+->filter(new MixedShade(min: -20, max: 20))
+```
 
 ### wave
 
@@ -87,11 +102,57 @@ pick from per corner.
 
 ### eye-size
 
-Scales the inner eyes. `EyeSize(inner: 0.85)`.
+Scales the inner eyes. `EyeSize(inner: 0.85, seed: 0)`, or a range such as `[0.6, 1.0]` to pick from per corner.
 
 ### eye-paint
 
 Paints the eyes. `EyePaint(paint: null, outer: null, inner: null)`: both parts, or each apart; any color or gradient.
+
+### eye-mix
+
+A shape picked per corner. `EyeMix(outer: ['circle', 'rounded', 'leaf'], inner: ['circle', 'soft', 'leaf'], seed:
+0)`; registered names, enum cases or shape instances. An empty list leaves that part as it is.
+
+### eye-palette
+
+A color picked per corner. `EyePalette(colors, weights: null, seed: 0, outer: true, inner: true)`; weights, one per
+color, make some come up more often.
+
+### eye-shade
+
+Each corner a little lighter or darker than its color, and its hue a little turned. `EyeShade(min: -15, max: 15,
+hue: 0, seed: 0)`; lightness in percent, hue in degrees either way. Gradients are left as they are.
+
+### eye-jitter
+
+Each eye part turned, sized and faded by an amount of its own. `EyeJitter(rotate: 6, size: 0.06, opacity: 0, seed:
+0)`; degrees either way, and shares either way and to fade by.
+
+### eye-twist
+
+The eyes turned a step further from corner to corner: top left not at all, top right one step, bottom left two.
+`EyeTwist(step: 6, outer: true, inner: true)`, in degrees.
+
+### eye-sample
+
+Each eye the color the modules' paint has where the eye sits, so a gradient set with `->paint()` runs through the
+eyes too, each in a single color. `EyeSample(outer: true, inner: true)`. Each layer of a layered paint is sampled
+on its own; plain colors stay as they are.
+
+### eye-echo
+
+The inner eye a lighter or darker echo of the outer eye's color. `EyeEcho(lightness: -25)`, in percent; negative
+darkens. Gradients are left as they are.
+
+### eye-stretch
+
+The eyes wider than tall, or taller than wide. `EyeStretch(width: 1.12, height: 0.9, outer: true, inner: true)`, as
+shares of the shape's own size.
+
+### eye-flip
+
+The eyes mirrored, left to right or top to bottom, so a leaf, drop or heart leans the other way.
+`EyeFlip(horizontal: true, vertical: false)`; limit it to some corners with `->corners()`.
 
 ## Choosing where a filter applies
 
