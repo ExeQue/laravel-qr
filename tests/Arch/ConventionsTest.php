@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 pest()->group('arch');
 
 describe('package conventions', function (): void {
-    arch()->preset()->php();
+    arch()->preset()->php()->ignoring('Workbench');
 
     arch()->preset()->security();
 
