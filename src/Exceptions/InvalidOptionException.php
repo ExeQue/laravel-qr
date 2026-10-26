@@ -28,6 +28,14 @@ final class InvalidOptionException extends InvalidArgumentException implements Q
         return self::about($option, "{$class}'s \"{$option}\" must be from {$min} to {$max}, {$value} given.");
     }
 
+    /**
+     * @param list<string> $accepted
+     */
+    public static function notOneOf(string $class, string $option, array $accepted, string $value): self
+    {
+        return self::about($option, "{$class}'s \"{$option}\" is one of ".implode(', ', $accepted).", {$value} given.");
+    }
+
     private static function about(string $option, string $message): self
     {
         $exception = new self($message);

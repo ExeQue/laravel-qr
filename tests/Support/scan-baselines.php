@@ -13,8 +13,5 @@ return [
     'modules' => [],
     'outer-eyes' => [],
     'inner-eyes' => [],
-    'eyes' => [
-        // Turned a quarter by mirrored(), its points stand up and down; it is symmetric and needs no mirroring.
-        'hexagon' => ['wifi:svg:mirrored', 'wifi:png:mirrored'],
-    ],
+    'eyes' => [],
 ];

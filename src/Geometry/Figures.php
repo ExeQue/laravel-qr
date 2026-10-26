@@ -80,10 +80,20 @@ final class Figures
     }
 
     /**
-     * A hexagon filling the box: flat along the top and bottom, its points at the middle of the sides.
+     * A hexagon filling the box: lying, flat along the top and bottom with its points at the middle of
+     * the sides; or standing, flat along the sides with its points at the middle of the top and bottom.
      */
-    public static function hexagon(float $x, float $y, float $width, float $height): Path
+    public static function hexagon(float $x, float $y, float $width, float $height, bool $standing = false): Path
     {
+        if ($standing) {
+            [$half, $quarter, $rise] = [$height / 2, $height / 4, $width / 2];
+
+            return Path::polygon([
+                [$x, $y - $half], [$x + $rise, $y - $quarter], [$x + $rise, $y + $quarter],
+                [$x, $y + $half], [$x - $rise, $y + $quarter], [$x - $rise, $y - $quarter],
+            ]);
+        }
+
         [$half, $quarter, $rise] = [$width / 2, $width / 4, $height / 2];
 
         return Path::polygon([

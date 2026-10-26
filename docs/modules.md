@@ -64,10 +64,10 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `flowers` | `stars` | `snowflakes` | `hexagons` |
 | ![octagons](images/modules/octagons.png) | ![leaves](images/modules/leaves.png) | ![drops](images/modules/drops.png) | ![sparkles](images/modules/sparkles.png) |
 | `octagons` | `leaves` | `drops` | `sparkles` |
-| ![crosses](images/modules/crosses.png) | ![clovers](images/modules/clovers.png) | ![pills](images/modules/pills.png) | ![bricks](images/modules/bricks.png) |
-| `crosses` | `clovers` | `pills` | `bricks` |
-| ![sketch](images/modules/sketch.png) | | | |
-| `sketch` | | | |
+| ![crosses](images/modules/crosses.png) | ![clovers](images/modules/clovers.png) | ![pills](images/modules/pills.png) | ![bricks-horizontal](images/modules/bricks-horizontal.png) |
+| `crosses` | `clovers` | `pills` | `bricks-horizontal` |
+| ![pills-horizontal](images/modules/pills-horizontal.png) | ![bricks-vertical](images/modules/bricks-vertical.png) | ![hexagons-standing](images/modules/hexagons-standing.png) | ![sketch](images/modules/sketch.png) |
+| `pills-horizontal` | `bricks-vertical` | `hexagons-standing` | `sketch` |
 
 | Name | Class | Options |
 |---|---|---|
@@ -78,15 +78,18 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `flowers` | `Modules\Flower` | `petal` 0.19, `reach` 0.31, `heart` 0.25, `petals` 6 (3 to 12) |
 | `stars` | `Modules\Star` | `outer` 0.52, `inner` 0.34, `points` 5 (3 to 12) |
 | `snowflakes` | `Modules\Snowflake` | `reach` 0.52, `width` 0.26 |
-| `hexagons` | `Modules\Hexagon` | `radius` 0.5 (0.1 to 0.6), point up |
+| `hexagons` | `Modules\Hexagon` | `radius` 0.5 (0.1 to 0.6), `standing` false: flat top and bottom, as the hexagon eyes |
+| `hexagons-standing` | `Modules\Hexagon` | the same, `standing` true: a point up |
 | `octagons` | `Modules\Octagon` | `side` 0.96 (0.1 to 1), a regular octagon |
-| `leaves` | `Modules\Leaf` | `side` 0.94, `point` top-left, `seed` 0: two opposite corners fully round, the other two pointed |
+| `leaves` | `Modules\Leaf` | `side` 0.94, `point` top-left (top-left, top-right or random), `seed` 0: two opposite corners fully round, the other two pointed |
 | `drops` | `Modules\Drop` | `side` 0.94, `point` top-left, `seed` 0: three corners round, one pointed |
 | `sparkles` | `Modules\Sparkle` | `radius` 0.56 (0.2 to 0.6), `pinch` 0.32 (0.1 to 1): a four-pointed sparkle |
 | `crosses` | `Modules\Cross` | `width` 0.4 (0.1 to 1): a plus |
 | `clovers` | `Modules\Clover` | a four-leaf clover |
-| `pills` | `Modules\Pill` | `width` 0.6 (0.2 to 1): a pill standing up |
-| `bricks` | `Modules\Brick` | `height` 0.76 (0.3 to 1): rows read as courses of bricks |
+| `pills` | `Modules\Pill` | `width` 0.6 (0.2 to 1), `vertical` true: a pill standing up |
+| `pills-horizontal` | `Modules\Pill` | the same, `vertical` false: a pill lying down |
+| `bricks-horizontal` | `Modules\Brick` | `height` 0.76 (0.3 to 1), `vertical` false: rows read as courses of bricks |
+| `bricks-vertical` | `Modules\Brick` | the same, `vertical` true: columns read as courses |
 | `sketch` | `Modules\Sketch` | `wobble` 0.06 (0 to 0.1): a square drawn by hand, each its own way |
 
 `point` picks the pointed corner of drops and leaves: `top-left`, `top-right`, `bottom-right`, `bottom-left`, or

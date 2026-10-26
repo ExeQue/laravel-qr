@@ -113,10 +113,12 @@ describe('every shape', function (): void {
     it('draws every outer eye in its 7x7 box, with a hole', function (OuterEye $eye): void {
         $path = $eye->qrOuterEye()->path();
 
-        // The hexagon's points reach into the separator; everything else keeps to the box.
+        // The hexagon's points reach into the separator, at the sides or standing at the top and bottom;
+        // everything else keeps to the box.
         $width = $eye === OuterEye::Hexagon ? round(7 / M_SQRT3, 3) : 3.5;
+        $height = $eye === OuterEye::HexagonStanding ? round(7 / M_SQRT3, 3) : 3.5;
 
-        expect(boundsOf($path))->toBe([-$width, -3.5, $width, 3.5])
+        expect(boundsOf($path))->toBe([-$width, -$height, $width, $height])
             // A ring and its hole; a ring of dots is a dot per module.
             ->and(substr_count($path->toSvg(), 'M'))->toBe($eye === OuterEye::DottedRing ? 24 : 2);
     })->with(OuterEye::cases());

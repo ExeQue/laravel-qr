@@ -30,6 +30,7 @@ enum OuterEye: string implements ProvidesQrOuterEye
     case Squircle = 'squircle';
     case Octagon = 'octagon';
     case Hexagon = 'hexagon';
+    case HexagonStanding = 'hexagon-standing';
     case Leaf = 'leaf';
     case Drop = 'drop';
     case Scalloped = 'scalloped';
@@ -46,7 +47,7 @@ enum OuterEye: string implements ProvidesQrOuterEye
             self::Square => Square::class,
             self::Squircle => Squircle::class,
             self::Octagon => Octagon::class,
-            self::Hexagon => Hexagon::class,
+            self::Hexagon, self::HexagonStanding => Hexagon::class,
             self::Scalloped => Scalloped::class,
             self::DottedRing => DottedRing::class,
             default => Rounded::class,
@@ -69,6 +70,7 @@ enum OuterEye: string implements ProvidesQrOuterEye
             self::SoftRoundCorner => ['outer' => [1.9, 1.9, 1.9, 3.5], 'hole' => [0.9, 0.9, 0.9, 2.5]],
             self::Leaf => ['outer' => [3.0, 0.0, 3.0, 0.0], 'hole' => [2.0, 0.0, 2.0, 0.0]],
             self::Drop => ['outer' => [3.0, 3.0, 3.0, 0.0], 'hole' => [2.0, 2.0, 2.0, 0.0]],
+            self::HexagonStanding => ['standing' => true],
             default => [],
         };
     }
