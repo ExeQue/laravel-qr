@@ -22,6 +22,8 @@ use PHPUnit\Framework\AssertionFailedError;
 
 covers(QrFake::class, Qr::class, \ExeQue\Qr\Registries\WriterRegistry::class, \ExeQue\Qr\Writers\Svg\Writer::class, \ExeQue\Qr\Writers\Raster\Imagick\Writer::class);
 
+pest()->group('builder');
+
 const FAKE_URL = 'https://example.com/e/ABCD1234';
 
 it('records codes instead of writing them', function (): void {

@@ -14,6 +14,8 @@ use Tests\Support\Decoder;
 
 covers(Module::class, OuterEye::class, InnerEye::class, Eye::class);
 
+pest()->group('shapes');
+
 const SCAN_CONTENTS = [
     'url' => 'https://example.com/e/ABCD1234',
     'wifi' => 'WIFI:T:WPA;S:Home;P:correct horse battery;;',

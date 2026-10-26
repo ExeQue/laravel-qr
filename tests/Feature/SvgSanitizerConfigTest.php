@@ -11,6 +11,8 @@ use ExeQue\Qr\QrServiceProvider;
 
 covers(QrServiceProvider::class);
 
+pest()->group('logos');
+
 it('picks a sanitizer by default', function (): void {
     expect(app(SvgSanitizer::class))->toBeInstanceOf(AutoSvgSanitizer::class);
 });

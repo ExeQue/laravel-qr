@@ -16,6 +16,8 @@ use ExeQue\Qr\Shapes\OuterEyes\Rounded as RoundedOuter;
 
 covers(Renderer::class, Corner::class, RoundedOuter::class, RoundedInner::class, Heart::class);
 
+pest()->group('shapes');
+
 it('knows the eye parts with corners unlike each other', function (object $shape, bool $directional): void {
     expect($shape->isDirectional())->toBe($directional);
 })->with([

@@ -10,6 +10,8 @@ use ExeQue\Qr\QrServiceProvider;
 
 covers(QrServiceProvider::class);
 
+pest()->group('styling');
+
 it('takes color names from the config', function (): void {
     config()->set('qr.colors', ['brand' => '#be123c']);
 

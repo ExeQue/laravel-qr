@@ -12,6 +12,8 @@ use Illuminate\Container\Container;
 
 covers(ColorNames::class, Named::class, InvalidColorException::class);
 
+pest()->group('styling');
+
 beforeEach(function (): void {
     $this->names = new ColorNames();
     Container::setInstance(new Container())->instance(ColorNames::class, $this->names);

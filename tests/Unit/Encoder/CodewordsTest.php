@@ -11,6 +11,8 @@ use ExeQue\Qr\Encoder\Segment;
 
 covers(Codewords::class, Segment::class, BitBuffer::class);
 
+pest()->group('encoding');
+
 // Hand-checked vectors: ISO/IEC 18004:2015 annex I and Thonky's tutorial.
 it('builds the data codewords', function (string $content, array $expected): void {
     expect(new Codewords()->data(Segment::for($content), 1, ErrorCorrection::Medium))->toBe($expected);

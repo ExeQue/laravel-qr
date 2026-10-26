@@ -9,6 +9,8 @@ use ExeQue\Qr\Exceptions\UnreadableCodeException;
 
 covers(SegmentParser::class, UnreadableCodeException::class);
 
+pest()->group('decoding');
+
 /**
  * Codewords from a bit string, padded with zeros to whole bytes.
  *

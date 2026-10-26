@@ -11,6 +11,8 @@ use ExeQue\Qr\Encoder\Tables;
 
 covers(Encoder::class);
 
+pest()->group('encoding');
+
 /**
  * The longest content of `$mode` that fits `$version` - every block full.
  */

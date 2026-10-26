@@ -17,6 +17,8 @@ use ExeQue\Qr\Shapes\Modules\Leaf;
 
 covers(Drop::class, Leaf::class, Direction::class, PointsToACorner::class, Factory::class);
 
+pest()->group('shapes');
+
 function pointCell(int $seed = 7): ModuleContext
 {
     return new ModuleContext(0, 0, 21, Role::Data, [], $seed);

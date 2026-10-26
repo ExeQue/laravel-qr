@@ -27,6 +27,8 @@ use SplFileInfo;
 
 covers(\ExeQue\Qr\Qr::class, NativeDecoder::class, Bitmap::class, FinderLocator::class, Sampler::class, Perspective::class, SymbolReader::class, UnreadableCodeException::class);
 
+pest()->group('decoding');
+
 const READ_URL = 'https://example.com/e/ABCD1234';
 
 /**
@@ -65,73 +67,78 @@ function everyShape(): iterable
     }
 }
 
-it('reads every built-in shape', function (string $method, BackedEnum $shape): void {
-    $decoded = new NativeDecoder()->decode(Qr::make(READ_URL)->{$method}($shape)->png(600)->contents());
+describe('images', function (): void {
+    it('reads every built-in shape', function (string $method, BackedEnum $shape): void {
+        $decoded = new NativeDecoder()->decode(Qr::make(READ_URL)->{$method}($shape)->png(600)->contents());
 
-    expect($decoded->text)->toBe(READ_URL)
-        ->and($decoded->version)->toBe(3);
-})->with(everyShape(...));
+        expect($decoded->text)->toBe(READ_URL)
+            ->and($decoded->version)->toBe(3);
+    })->with(everyShape(...));
 
-it('reads codes however they come', function (Closure $image, string $content): void {
-    expect(new NativeDecoder()->decode($image())->text)->toBe($content);
-})->with([
-    'version 1' => [fn () => Qr::make('hi')->png(200)->contents(), 'hi'],
-    'JPEG' => [fn () => Qr::make(READ_URL)->jpeg(200)->contents(), READ_URL],
-    'WebP' => [fn () => Qr::make(READ_URL)->webp(300)->contents(), READ_URL],
-    'GIF' => [fn () => changed(Qr::make(READ_URL)->png(300)->contents(), fn (Imagick $image) => $image->setImageFormat('gif')), READ_URL],
-    'large' => [fn () => Qr::make(READ_URL)->png(2000)->contents(), READ_URL],
-    'gradient' => [fn () => Qr::make(READ_URL)->paint(LinearGradient::make('#be123c', '#1e1b4b'))->png(500)->contents(), READ_URL],
-    'light on dark' => [fn () => Qr::make(READ_URL)->paint('#ffffff')->background('#111111')->png(500)->contents(), READ_URL],
-    'turned' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->rotateImage(new ImagickPixel('white'), 17)), READ_URL],
-    'upside down' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->rotateImage(new ImagickPixel('white'), 180)), READ_URL],
-    'mirrored' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->flopImage()), READ_URL],
-    'in perspective' => [fn () => changed(Qr::make(str_repeat('perspective ', 12))->png(600)->contents(), fn (Imagick $image) => $image->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_WHITE) && $image->distortImage(Imagick::DISTORTION_PERSPECTIVE, [0, 0, 40, 20, 600, 0, 560, 60, 0, 600, 10, 580, 600, 600, 590, 540], false)), str_repeat('perspective ', 12)],
-    'large versions' => [fn () => Qr::make(str_repeat('Version 30 is large. ', 50))->png(1200)->contents(), str_repeat('Version 30 is large. ', 50)],
-    'under uneven light' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), function (Imagick $image): void {
-        $shade = new Imagick();
-        $shade->newPseudoImage(500, 500, 'gradient:#000000-#ffffff');
-        $image->compositeImage($shade, Imagick::COMPOSITE_PLUS, 0, 0);
-    }), READ_URL],
-]);
+    it('says when there is no code to read', function (Closure $image, string $message): void {
+        expect(fn () => new NativeDecoder()->decode($image()))->toThrow(UnreadableCodeException::class, $message);
+    })->with([
+        'a blank image' => [fn () => changed(Qr::make(READ_URL)->png(200)->contents(), fn (Imagick $image) => $image->thresholdImage(-1)), 'No QR code'],
+        'not an image' => [fn () => 'not an image', 'could not be read'],
+        'an SVG' => [fn () => Qr::make(READ_URL)->svg()->contents(), 'could not be read'],
+        'a format codes do not come in' => [fn () => "%!PS-Adobe-3.0\n", 'could not be read'],
+        'a decompression bomb' => [fn () => hugeGif(), 'could not be read'],
+        'a broken PNG' => [fn () => "\x89PNG\r\n\x1A\n broken", 'could not be read'],
+        'a dense code in strong perspective' => [fn () => changed(Qr::make(str_repeat('x', 1250))->errorCorrection('L')->png(1100)->contents(), fn (Imagick $image) => $image->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_WHITE) && $image->distortImage(Imagick::DISTORTION_PERSPECTIVE, [0, 0, 60, 0, 1100, 0, 1040, 60, 0, 1100, 0, 1100, 1100, 1100, 1100, 1040], false)), 'too damaged'],
+        'a code with its data rubbed out' => [fn () => changed(Qr::make(READ_URL)->png(400)->contents(), function (Imagick $image): void {
+            $rub = new ImagickDraw();
+            $rub->setFillColor(new ImagickPixel('white'));
+            $rub->rectangle(120, 120, 280, 280);
+            $image->drawImage($rub);
+        }), 'too damaged'],
+    ]);
 
-it('says when there is no code to read', function (Closure $image, string $message): void {
-    expect(fn () => new NativeDecoder()->decode($image()))->toThrow(UnreadableCodeException::class, $message);
-})->with([
-    'a blank image' => [fn () => changed(Qr::make(READ_URL)->png(200)->contents(), fn (Imagick $image) => $image->thresholdImage(-1)), 'No QR code'],
-    'not an image' => [fn () => 'not an image', 'could not be read'],
-    'an SVG' => [fn () => Qr::make(READ_URL)->svg()->contents(), 'could not be read'],
-    'a format codes do not come in' => [fn () => "%!PS-Adobe-3.0\n", 'could not be read'],
-    'a decompression bomb' => [fn () => hugeGif(), 'could not be read'],
-    'a broken PNG' => [fn () => "\x89PNG\r\n\x1A\n broken", 'could not be read'],
-    'a dense code in strong perspective' => [fn () => changed(Qr::make(str_repeat('x', 1250))->errorCorrection('L')->png(1100)->contents(), fn (Imagick $image) => $image->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_WHITE) && $image->distortImage(Imagick::DISTORTION_PERSPECTIVE, [0, 0, 60, 0, 1100, 0, 1040, 60, 0, 1100, 0, 1100, 1100, 1100, 1100, 1040], false)), 'too damaged'],
-    'a code with its data rubbed out' => [fn () => changed(Qr::make(READ_URL)->png(400)->contents(), function (Imagick $image): void {
-        $rub = new ImagickDraw();
-        $rub->setFillColor(new ImagickPixel('white'));
-        $rub->rectangle(120, 120, 280, 280);
-        $image->drawImage($rub);
-    }), 'too damaged'],
-]);
+    it('takes runs too short for a finder as noise', function (): void {
+        $stripes = array_map(fn (int $x): bool => $x % 2 === 0, range(0, 19));
 
-it('reads a file, such as an upload from a request', function (): void {
-    $png = Qr::make('uploaded')->png(300)->contents();
-    $path = tempnam(sys_get_temp_dir(), 'qr');
-    file_put_contents($path, $png);
+        expect(fn () => new FinderLocator()->locate($stripes, 20, 1))->toThrow(UnreadableCodeException::class);
+    });
 
-    expect(Qr::read(UploadedFile::fake()->createWithContent('code.png', $png), 'native')->text)->toBe('uploaded')
-        ->and(Qr::read(new SplFileInfo($path), 'native')->text)->toBe('uploaded');
+});
 
-    unlink($path);
-})->skip(! extension_loaded('imagick'), 'Imagick is needed for raster output.');
+describe('inputs', function (): void {
+    it('reads codes however they come', function (Closure $image, string $content): void {
+        expect(new NativeDecoder()->decode($image())->text)->toBe($content);
+    })->with([
+        'version 1' => [fn () => Qr::make('hi')->png(200)->contents(), 'hi'],
+        'JPEG' => [fn () => Qr::make(READ_URL)->jpeg(200)->contents(), READ_URL],
+        'WebP' => [fn () => Qr::make(READ_URL)->webp(300)->contents(), READ_URL],
+        'GIF' => [fn () => changed(Qr::make(READ_URL)->png(300)->contents(), fn (Imagick $image) => $image->setImageFormat('gif')), READ_URL],
+        'large' => [fn () => Qr::make(READ_URL)->png(2000)->contents(), READ_URL],
+        'gradient' => [fn () => Qr::make(READ_URL)->paint(LinearGradient::make('#be123c', '#1e1b4b'))->png(500)->contents(), READ_URL],
+        'light on dark' => [fn () => Qr::make(READ_URL)->paint('#ffffff')->background('#111111')->png(500)->contents(), READ_URL],
+        'turned' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->rotateImage(new ImagickPixel('white'), 17)), READ_URL],
+        'upside down' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->rotateImage(new ImagickPixel('white'), 180)), READ_URL],
+        'mirrored' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), fn (Imagick $image) => $image->flopImage()), READ_URL],
+        'in perspective' => [fn () => changed(Qr::make(str_repeat('perspective ', 12))->png(600)->contents(), fn (Imagick $image) => $image->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_WHITE) && $image->distortImage(Imagick::DISTORTION_PERSPECTIVE, [0, 0, 40, 20, 600, 0, 560, 60, 0, 600, 10, 580, 600, 600, 590, 540], false)), str_repeat('perspective ', 12)],
+        'large versions' => [fn () => Qr::make(str_repeat('Version 30 is large. ', 50))->png(1200)->contents(), str_repeat('Version 30 is large. ', 50)],
+        'under uneven light' => [fn () => changed(Qr::make(READ_URL)->png(500)->contents(), function (Imagick $image): void {
+            $shade = new Imagick();
+            $shade->newPseudoImage(500, 500, 'gradient:#000000-#ffffff');
+            $image->compositeImage($shade, Imagick::COMPOSITE_PLUS, 0, 0);
+        }), READ_URL],
+    ]);
 
-it('says when a file cannot be read', function (SplFileInfo $file): void {
-    expect(fn () => Qr::read($file, 'native'))->toThrow(UnreadableCodeException::class, 'did not arrive whole');
-})->with([
-    'a failed upload' => fn () => new UploadedFile(__FILE__, 'code.png', 'image/png', UPLOAD_ERR_PARTIAL, true),
-    'a missing file' => fn () => new SplFileInfo('/nowhere/code.png'),
-]);
+    it('reads a file, such as an upload from a request', function (): void {
+        $png = Qr::make('uploaded')->png(300)->contents();
+        $path = tempnam(sys_get_temp_dir(), 'qr');
+        file_put_contents($path, $png);
 
-it('takes runs too short for a finder as noise', function (): void {
-    $stripes = array_map(fn (int $x): bool => $x % 2 === 0, range(0, 19));
+        expect(Qr::read(UploadedFile::fake()->createWithContent('code.png', $png), 'native')->text)->toBe('uploaded')
+            ->and(Qr::read(new SplFileInfo($path), 'native')->text)->toBe('uploaded');
 
-    expect(fn () => new FinderLocator()->locate($stripes, 20, 1))->toThrow(UnreadableCodeException::class);
+        unlink($path);
+    })->skip(! extension_loaded('imagick'), 'Imagick is needed for raster output.');
+
+    it('says when a file cannot be read', function (SplFileInfo $file): void {
+        expect(fn () => Qr::read($file, 'native'))->toThrow(UnreadableCodeException::class, 'did not arrive whole');
+    })->with([
+        'a failed upload' => fn () => new UploadedFile(__FILE__, 'code.png', 'image/png', UPLOAD_ERR_PARTIAL, true),
+        'a missing file' => fn () => new SplFileInfo('/nowhere/code.png'),
+    ]);
 });

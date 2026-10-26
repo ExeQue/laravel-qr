@@ -8,6 +8,8 @@ use ExeQue\Qr\Exceptions\QrExceptionInterface;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
+pest()->group('arch');
+
 arch()->preset()->php();
 
 arch()->preset()->security();

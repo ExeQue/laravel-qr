@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Blade;
 
 covers(Code::class);
 
+pest()->group('view');
+
 const COMPONENT_URL = 'https://example.com/e/ABCD1234';
 
 it('renders a code as inline SVG, labelled for screen readers', function (): void {

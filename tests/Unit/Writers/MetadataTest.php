@@ -17,6 +17,8 @@ use Imagick;
 
 covers(Metadata::class, RasterWriter::class, SvgWriter::class);
 
+pest()->group('writers');
+
 function attribution(): Metadata
 {
     return Metadata::make(

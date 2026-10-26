@@ -27,6 +27,8 @@ use ExeQue\Qr\Writers\Svg\Writer;
 
 covers(Writer::class, Options::class, Document::class, InvalidWriterOptionException::class, ColorNotation::class);
 
+pest()->group('writers', 'svg');
+
 const SVG_URL = 'https://example.com/e/ABCD1234';
 
 function svg(?Style $style = null, Options $options = new Options()): Document
@@ -35,23 +37,66 @@ function svg(?Style $style = null, Options $options = new Options()): Document
     return new Writer($options)->write(new Renderer()->render(new Encoder()->encode(SVG_URL), $style ?? Style::default(), ScanSafety::off()));
 }
 
-it('writes one path per paint, filled nonzero', function (): void {
-    $svg = svg()->toString();
+describe('output', function (): void {
+    it('writes one path per paint, filled nonzero', function (): void {
+        $svg = svg()->toString();
 
-    expect($svg)->toStartWith('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37">')
-        ->and(substr_count($svg, '<path '))->toBe(1)
-        ->and($svg)->toContain('fill-rule="nonzero"')
-        ->and($svg)->toContain('<rect width="37" height="37" fill="#ffffff"/>');
+        expect($svg)->toStartWith('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37">')
+            ->and(substr_count($svg, '<path '))->toBe(1)
+            ->and($svg)->toContain('fill-rule="nonzero"')
+            ->and($svg)->toContain('<rect width="37" height="37" fill="#ffffff"/>');
+    });
+
+    it('scans', function (?Style $style): void {
+        expect(svg($style))->toDecodeAs(SVG_URL);
+    })->with([
+        'default' => [null],
+        'mirrored, gradient' => [fn () => Style::default()->mirrored()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(45))],
+        'radial' => [fn () => Style::default()->withPaint(RadialGradient::make('#1e1b4b', '#be123c'))],
+        'conic, per module' => [fn () => Style::default()->withPaint(ConicGradient::make('#1e1b4b', '#0f766e'))],
+    ])->group('scan');
+
+    it('writes numbers with a decimal point whatever the locale', function (): void {
+        $locale = setlocale(LC_NUMERIC, '0');
+        setlocale(LC_NUMERIC, 'da_DK.UTF-8', 'da_DK', 'de_DE.UTF-8');
+
+        try {
+            expect(svg(Style::default()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(30)))->toString())->not->toMatch('/\d,\d/');
+        } finally {
+            setlocale(LC_NUMERIC, $locale);
+        }
+    });
+
+    it('writes the same code identically every time', function (): void {
+        expect(svg()->toString())->toBe(svg()->toString())
+            ->and((string) svg())->toBe(svg()->toString());
+    });
+
+    it('is an SVG file, in a stream that can be handed over', function (): void {
+        $svg = svg();
+        $contents = $svg->contents();
+
+        expect($svg->mimeType())->toBe('image/svg+xml')
+            ->and($svg->extension())->toBe('svg')
+            ->and(implode(iterator_to_array($svg->chunks(100), false)))->toBe($contents)
+            ->and(stream_get_contents($copy = $svg->resource()))->toBe($contents);
+
+        fclose($copy);
+
+        $handle = $svg->detach();
+        unset($svg);
+
+        expect(stream_get_contents($handle))->toBe($contents);
+        fclose($handle);
+    });
+
+    it('writes device CMYK as sRGB in CSS notation', function (): void {
+        $svg = Qr::make('https://example.com')->paint(new \ExeQue\Qr\Colors\Cmyk(0, 91, 68, 25))->svg(colorNotation: \ExeQue\Qr\Writers\Svg\Enums\ColorNotation::Css)->contents();
+
+        expect($svg)->toContain('fill="rgb(')->not->toContain('cmyk(');
+    });
+
 });
-
-it('scans', function (?Style $style): void {
-    expect(svg($style))->toDecodeAs(SVG_URL);
-})->with([
-    'default' => [null],
-    'mirrored, gradient' => [fn () => Style::default()->mirrored()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(45))],
-    'radial' => [fn () => Style::default()->withPaint(RadialGradient::make('#1e1b4b', '#be123c'))],
-    'conic, per module' => [fn () => Style::default()->withPaint(ConicGradient::make('#1e1b4b', '#0f766e'))],
-])->group('scan');
 
 it('snapshots every option', function (Options $options, ?Style $style): void {
     expect(svg($style, $options))->toMatchSnapshot();
@@ -73,53 +118,15 @@ it('snapshots every option', function (Options $options, ?Style $style): void {
     'translucent gradient' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c80', '#1e1b4b')->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
 ]);
 
-it('writes numbers with a decimal point whatever the locale', function (): void {
-    $locale = setlocale(LC_NUMERIC, '0');
-    setlocale(LC_NUMERIC, 'da_DK.UTF-8', 'da_DK', 'de_DE.UTF-8');
+describe('refusals', function (): void {
+    it('refuses options that do not fit together', function (callable $options, string $message): void {
+        expect($options)->toThrow(InvalidWriterOptionException::class, $message);
+    })->with([
+        [fn () => new Options(pixels: true), 'Coordinates in pixels need a size in pixels.'],
+        [fn () => new Options(symbol: '1code'), '"1code" is not a usable id: start with a letter, then letters, digits, _, - or .'],
+    ]);
 
-    try {
-        expect(svg(Style::default()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(30)))->toString())->not->toMatch('/\d,\d/');
-    } finally {
-        setlocale(LC_NUMERIC, $locale);
-    }
-});
-
-it('writes the same code identically every time', function (): void {
-    expect(svg()->toString())->toBe(svg()->toString())
-        ->and((string) svg())->toBe(svg()->toString());
-});
-
-it('refuses options that do not fit together', function (callable $options, string $message): void {
-    expect($options)->toThrow(InvalidWriterOptionException::class, $message);
-})->with([
-    [fn () => new Options(pixels: true), 'Coordinates in pixels need a size in pixels.'],
-    [fn () => new Options(symbol: '1code'), '"1code" is not a usable id: start with a letter, then letters, digits, _, - or .'],
-]);
-
-it('refuses paints that are neither colors nor gradients', function (): void {
-    svg(Style::default()->withPaint(new class () implements \ExeQue\Qr\Contracts\Paint {}));
-})->throws(InvalidWriterOptionException::class, 'is neither a color nor a gradient.');
-
-it('is an SVG file, in a stream that can be handed over', function (): void {
-    $svg = svg();
-    $contents = $svg->contents();
-
-    expect($svg->mimeType())->toBe('image/svg+xml')
-        ->and($svg->extension())->toBe('svg')
-        ->and(implode(iterator_to_array($svg->chunks(100), false)))->toBe($contents)
-        ->and(stream_get_contents($copy = $svg->resource()))->toBe($contents);
-
-    fclose($copy);
-
-    $handle = $svg->detach();
-    unset($svg);
-
-    expect(stream_get_contents($handle))->toBe($contents);
-    fclose($handle);
-});
-
-it('writes device CMYK as sRGB in CSS notation', function (): void {
-    $svg = Qr::make('https://example.com')->paint(new \ExeQue\Qr\Colors\Cmyk(0, 91, 68, 25))->svg(colorNotation: \ExeQue\Qr\Writers\Svg\Enums\ColorNotation::Css)->contents();
-
-    expect($svg)->toContain('fill="rgb(')->not->toContain('cmyk(');
+    it('refuses paints that are neither colors nor gradients', function (): void {
+        svg(Style::default()->withPaint(new class () implements \ExeQue\Qr\Contracts\Paint {}));
+    })->throws(InvalidWriterOptionException::class, 'is neither a color nor a gradient.');
 });

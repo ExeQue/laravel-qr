@@ -16,6 +16,8 @@ use Symfony\Component\Finder\Finder;
 
 covers(IconsCommand::class, IsRegistry::class);
 
+pest()->group('console');
+
 final class DiamondModule implements ModuleShape
 {
     public function draw(ModuleContext $cell): Path

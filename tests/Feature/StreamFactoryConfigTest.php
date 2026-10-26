@@ -9,6 +9,8 @@ use ExeQue\Qr\Writers\StreamFactory;
 
 covers(QrServiceProvider::class);
 
+pest()->group('writers');
+
 it('takes the memory limit of temporary streams from the config', function (?int $maxMemory, string $uri): void {
     config()->set('qr.streams.max_memory', $maxMemory);
 

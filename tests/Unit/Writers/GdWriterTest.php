@@ -30,6 +30,8 @@ use ValueError;
 
 covers(Writer::class, Coverage::class, Metadata::class, Driver::class, WriterRegistry::class, Bitmap::class, Knockout::class, Logo::class, MissingExtensionException::class);
 
+pest()->group('writers', 'raster');
+
 const GD_URL = 'https://example.com/e/ABCD1234';
 
 function gdLogo(string $name): string
@@ -143,7 +145,7 @@ describe('logos', function (): void {
         expect($logo->mimeType)->toBe('image/png')
             ->and(Qr::read($knocked, 'native')->text)->toBe(GD_URL);
     });
-});
+})->group('logos');
 
 describe('metadata', function (): void {
     it('writes text chunks and XMP into a PNG, XMP into a JPEG, and the resolution into both', function (): void {

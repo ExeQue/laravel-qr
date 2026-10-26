@@ -12,6 +12,8 @@ use Symfony\Component\Process\ExecutableFinder;
 
 covers(InstallCommand::class);
 
+pest()->group('console');
+
 /**
  * A finder that knows only the given package managers.
  *

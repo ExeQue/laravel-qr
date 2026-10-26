@@ -16,6 +16,8 @@ use ExeQue\Qr\Rendering\ModuleStyle;
 
 covers(QrLens::class, Timeline::class, \ExeQue\Qr\QrServiceProvider::class);
 
+pest()->group('monocle');
+
 it('records each code, never its content', function (): void {
     $eyepiece = app(Eyepiece::class);
     $eyepiece->start(CaptureType::Request);

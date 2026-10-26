@@ -8,6 +8,8 @@ use ExeQue\Qr\Encoder\ReedSolomon;
 
 covers(ReedSolomon::class);
 
+pest()->group('encoding');
+
 // Hand-checked vectors: ISO/IEC 18004:2015 annex I ("01234567", 1-M) and Thonky's tutorial ("HELLO WORLD", 1-M).
 it('computes the error correction codewords', function (array $data, array $expected): void {
     expect(new ReedSolomon()->remainder($data, count($expected)))->toBe($expected);

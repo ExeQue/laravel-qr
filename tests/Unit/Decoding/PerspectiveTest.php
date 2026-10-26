@@ -9,6 +9,8 @@ use ExeQue\Qr\Exceptions\UnreadableCodeException;
 
 covers(Perspective::class);
 
+pest()->group('decoding');
+
 const UNIT_SQUARE = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
 
 it('maps corners onto corners', function (): void {

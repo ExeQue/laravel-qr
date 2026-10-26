@@ -9,6 +9,8 @@ use ExeQue\Qr\Encoder\Tables;
 
 covers(Grid::class, Tables::class);
 
+pest()->group('encoding');
+
 it('leaves room for exactly the version\'s codewords and its remainder bits', function (int $version): void {
     // Remainder bits per version, ISO/IEC 18004:2015 table 1.
     $remainder = match (true) {

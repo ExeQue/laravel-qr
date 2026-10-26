@@ -13,6 +13,8 @@ use ExeQue\Qr\Shapes\Enums\OuterEye;
 
 covers(Module::class, OuterEye::class, InnerEye::class, Eye::class);
 
+pest()->group('shapes');
+
 /**
  * @return iterable<string, array{string, BackedEnum}>
  */
