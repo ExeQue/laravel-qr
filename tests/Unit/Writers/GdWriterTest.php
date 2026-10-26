@@ -26,7 +26,6 @@ use ExeQue\Qr\Writers\Raster\Gd\Writer;
 use ExeQue\Qr\Writers\Raster\Imagick\Writer as ImagickWriter;
 use ExeQue\Qr\Writers\Raster\Options;
 use GdImage;
-use ValueError;
 
 covers(Writer::class, Coverage::class, Metadata::class, Driver::class, WriterRegistry::class, Bitmap::class, Knockout::class, Logo::class, MissingExtensionException::class);
 
@@ -53,7 +52,7 @@ describe('the driver', function (): void {
     });
 
     it('refuses a driver it does not know', function (): void {
-        expect(fn () => Driver::resolve('vips'))->toThrow(ValueError::class);
+        expect(fn () => Driver::resolve('vips'))->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"driver" is one of auto, imagick, gd, vips given.');
     });
 });
 

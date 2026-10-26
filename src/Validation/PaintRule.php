@@ -220,7 +220,7 @@ final readonly class PaintRule implements ValidationRule
         return match (true) {
             is_array($stored) && is_array($input) => array_diff_key($input, $stored) === []
                 && array_all($input, fn (mixed $value, int|string $key): bool => self::fits($value, $stored[$key])),
-            is_int($stored), is_float($stored) => is_numeric($input),
+            is_int($stored), is_float($stored) => is_numeric($input) && is_finite((float) $input),
             is_string($stored) => is_string($input),
             default => $input === $stored,
         };

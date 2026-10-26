@@ -173,6 +173,15 @@ describe('placement', function (): void {
             ->and(Knockout::for(logoMatrix($level), $style->withSize(min(1, $size * 1.15)))->clearedDataCells)->toBeGreaterThan(Knockout::budget(logoMatrix($level), 0.6));
     })->with([ErrorCorrection::Medium, ErrorCorrection::High]);
 
+    it('grows the cells under an alpha logo by its padding, every way', function (): void {
+        $cleared = fn (int $padding): array => Knockout::for(logoMatrix(), new LogoStyle(Logo::fromFile(fixture('ellipse.png')), 0.25, $padding, LogoShape::Alpha))->clearedCells();
+        $bounds = fn (array $cells): array => [min(array_column($cells, 0)), min(array_column($cells, 1)), max(array_column($cells, 0)), max(array_column($cells, 1))];
+        [$left, $top, $right, $bottom] = $bounds($cleared(0));
+
+        expect($bounds($cleared(1)))->toBe([$left - 1, $top - 1, $right + 1, $bottom + 1])
+            ->and(count($cleared(1)))->toBeGreaterThan(count($cleared(0)));
+    });
+
     it('clears the whole box of an SVG logo for the alpha shape, as its pixels cannot be read', function (): void {
         $style = new LogoStyle(Logo::fromFile(fixture('badge.svg')), 0.2, shape: LogoShape::Alpha);
 
@@ -265,6 +274,11 @@ describe('drawing', function (): void {
 });
 
 describe('files', function (): void {
+    it('reads logos from local files only, never through a URL or stream wrapper', function (string $source): void {
+        expect(fn () => \ExeQue\Qr\Facades\Qr::style()->logo($source)->toStyle())->toThrow(InvalidLogoException::class, 'logos are never fetched from elsewhere')
+            ->and(fn () => Logo::fromFile($source))->toThrow(InvalidLogoException::class, 'logos are never fetched from elsewhere');
+    })->with(['ftp://example.com/logo.png', 'https://example.com/logo.svg', 'phar://logo.phar/logo.png']);
+
     it('reads a logo from a file object, such as an upload', function (): void {
         $style = \ExeQue\Qr\Facades\Qr::style()->logo(new SplFileInfo(fixture('badge.svg')), size: 0.2)->toStyle();
 
@@ -279,6 +293,15 @@ describe('large logos', function (): void {
 
         Logo::fromBytes($png);
     })->throws(InvalidLogoException::class, 'A logo may have at most 16777216 pixels; this one is 12000 by 12000.');
+
+    it('refuses a GIF whose frame is larger than its canvas says', function (): void {
+        Logo::fromFile(fixture('oversized-frame.gif'));
+    })->throws(InvalidLogoException::class, 'this one is 6000 by 6000')
+        ->skip(! extension_loaded('imagick'), 'Imagick reads the frames.');
+
+    it('refuses a GIF whose frames cannot be read', function (): void {
+        Logo::fromBytes('GIF89a'.pack('vv', 1, 1)."\x00\x00\x00garbage");
+    })->throws(InvalidLogoException::class, 'cannot be read');
 
     it('refuses HEIF and AVIF it cannot read the size of', function (): void {
         Logo::fromBytes("\x00\x00\x00\x18ftypheic".str_repeat("\x00", 32));

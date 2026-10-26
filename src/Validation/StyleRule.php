@@ -48,7 +48,7 @@ final readonly class StyleRule implements ValidationRule
      * @param array<string, array<string, mixed>> $fields The allowed fields and how each is narrowed.
      * @param array<string, array<string, array<string, array{float|int, float|int}>>> $shapeRanges Option ranges by shape kind and name.
      * @param array<string, array<string, array{float|int, float|int}>> $filterRanges Option ranges by filter name.
-     * @param array{safety: ScanSafety|null, content: string}|null $scannable
+     * @param array{safety: ScanSafety|null, content: string, base: Style|string|null}|null $scannable
      */
     private function __construct(
         private array $fields = [],
@@ -276,10 +276,11 @@ final readonly class StyleRule implements ValidationRule
      * the guards given or else the configured ones; nothing is refused for guards turned off.
      *
      * @param string $content What the code is checked with; the logo and margin guards depend on its size.
+     * @param Style|string|null $base The style the input goes over, as given to toStyle(); the default style when null.
      */
-    public function scannable(?ScanSafety $safety = null, string $content = self::CONTENT): self
+    public function scannable(?ScanSafety $safety = null, string $content = self::CONTENT, Style|string|null $base = null): self
     {
-        return clone($this, ['scannable' => ['safety' => $safety, 'content' => $content]]);
+        return clone($this, ['scannable' => ['safety' => $safety, 'content' => $content, 'base' => $base]]);
     }
 
     /**
@@ -293,7 +294,7 @@ final readonly class StyleRule implements ValidationRule
         $rules = [$attribute => ['sometimes', new KnownKeys(array_values(array_unique(array_map(self::group(...), array_keys($this->fields)))))]];
 
         if ($this->scannable !== null) {
-            $rules[$attribute][] = new Scannable(clone($this, ['scannable' => null]), $this->scannable['safety'], $this->scannable['content']);
+            $rules[$attribute][] = new Scannable(clone($this, ['scannable' => null]), $this->scannable['safety'], $this->scannable['content'], $this->scannable['base']);
         }
 
         if (isset($this->fields['modules'])) {

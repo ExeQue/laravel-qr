@@ -191,7 +191,8 @@ describe('modules', function (): void {
             ])
             ->and(styleErrors(['modules' => ['shape' => 'leaves', 'options' => ['point' => 'up']]], $rule))->toHaveKey('style.modules.options.point')
             ->and(styleErrors(['modules' => ['options' => ['radius' => 0.1]]], $rule))->toBe(['style.modules.shape' => ['The style.modules.shape field is required when style.modules.options is present.']])
-            ->and(styleErrors(['modules' => ['shape' => 'rounded', 'options' => 'round']], $rule))->toHaveKey('style.modules.options');
+            ->and(styleErrors(['modules' => ['shape' => 'rounded', 'options' => 'round']], $rule))->toHaveKey('style.modules.options')
+            ->and(styleErrors(['modules' => ['shape' => 'rounded', 'options' => '']], $rule))->toHaveKey('style.modules.options');
     });
 
     it('takes options for shapes registered by closure, and reports what building them throws', function (): void {
@@ -318,7 +319,7 @@ describe('filters', function (): void {
     it('takes shapes\' options in filters only where the style takes them, every shape where it names none', function (): void {
         $shapes = ['filters' => [['name' => 'mixed-shape', 'options' => ['shapes' => ['hearts', ['shape' => 'rounded', 'options' => ['radius' => 0.1]]]]]]];
 
-        expect(styleErrors($shapes, StyleRule::make()->modules()->filters()))->toBe(['style.filters.0.options.shapes.1' => ['The style.filters.0.options.shapes.1 field must be a shape: its name, or its name and options.']])
+        expect(styleErrors($shapes, StyleRule::make()->modules()->filters()))->toBe(['style.filters.0.options.shapes.1' => ['The style.filters.0.options.shapes.1 field may name a shape, but not give its options.']])
             ->and(styleErrors($shapes, StyleRule::make()->filters()))->toHaveKey('style.filters.0.options.shapes.1')
             ->and(styleErrors(['filters' => [['name' => 'mixed-shape', 'options' => ['shapes' => ['hearts', ['shape' => 'rounded']]]]]], StyleRule::make()->filters()))->toBe([]);
     });
@@ -383,7 +384,8 @@ describe('scannable', function (): void {
     })->with([
         'contrast, background' => [['background' => '#111111'], 'style.background'],
         'contrast, modules' => [['modules' => ['paint' => '#eeeeee']], 'style.modules.paint'],
-        'contrast, eyes' => [['eyes' => ['paint' => '#eeeeee']], 'style'],
+        'contrast, eyes' => [['eyes' => ['paint' => '#eeeeee']], 'style.eyes.paint'],
+        'contrast, filters' => [['filters' => [['name' => 'eye-paint', 'options' => ['paint' => '#eeeeee']]]], 'style'],
         'logo' => [['logo' => ['size' => 0.9]], 'style.logo.size'],
         'margin' => [['margin' => 0], 'style.margin'],
         'scale, modules' => [['modules' => ['scaleX' => 3]], 'style.modules'],
@@ -395,6 +397,23 @@ describe('scannable', function (): void {
         config(['qr.defaults.error_correction' => 'H']);
 
         expect(styleErrors(['modules' => ['shape' => 'dots-medium']], StyleRule::everything()->scannable()))->toBe([]);
+    });
+
+    it('checks a logo at the error correction it is drawn with', function (): void {
+        $rule = StyleRule::make()->logo(size: [0.05, 0.3])->scannable();
+
+        expect(styleErrors(['logo' => ['size' => 0.25]], $rule))->toBe([]);
+
+        config(['qr.logo.auto_error_correction' => false]);
+
+        expect(styleErrors(['logo' => ['size' => 0.25]], $rule))->toHaveKey('style.logo.size');
+    });
+
+    it('checks the input over the base it is given', function (): void {
+        $dark = \ExeQue\Qr\Rendering\Style::default()->withBackground(new \ExeQue\Qr\Colors\Hex('#111111'));
+
+        expect(styleErrors(['modules' => ['shape' => 'dots-medium']], StyleRule::everything()->scannable(base: $dark)))->toHaveKey('style')
+            ->and(styleErrors(['background' => '#ffffff'], StyleRule::everything()->scannable(base: $dark)))->toBe([]);
     });
 
     it('passes what scans, refuses nothing with the guards off, and stays silent beside other errors', function (): void {

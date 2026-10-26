@@ -81,7 +81,7 @@ use ExeQue\Qr\Gradients\Enums\ColorSpace;
 use ExeQue\Qr\Gradients\Enums\HueInterpolation;
 
 ->in(ColorSpace::Srgb)                                  // as older CSS blends
-->in(ColorSpace::Oklch, HueInterpolation::Longer)       // round the long way of the color wheel
+->in(ColorSpace::Oklch, HueInterpolation::Longer)       // around the long way of the color wheel
 ```
 
 Spaces: `oklab`, `oklch`, `srgb`, `srgb-linear`, `lch`, `hsl`. Hue interpolation applies to the polar ones (`oklch`,

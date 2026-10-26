@@ -6,6 +6,7 @@ namespace ExeQue\Qr\Builders;
 
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Exceptions\InvalidLogoException;
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Logos\Contracts\ProvidesQrLogo;
 use ExeQue\Qr\Logos\Enums\LogoShape;
 use ExeQue\Qr\Logos\Logo;
@@ -46,6 +47,7 @@ final class LogoBuilder
             $source instanceof ProvidesQrLogo => $source->qrLogo(),
             $source instanceof SplFileInfo => Logo::fromFile($source->getPathname()),
             is_string($source) && str_starts_with($source, 'data:') => Logo::fromDataUri($source),
+            is_string($source) && strlen($source) < 4096 && ! str_contains($source, '<') && preg_match('#^[a-z][a-z0-9+.-]*://#i', $source) === 1 => Logo::fromFile($source),
             is_string($source) && strlen($source) < 4096 && ! str_contains($source, '<') && is_file($source) => Logo::fromFile($source),
             is_string($source) => Logo::fromBytes($source),
             default => throw InvalidLogoException::unreadableSource(get_debug_type($source)),
@@ -73,7 +75,7 @@ final class LogoBuilder
 
     public function shape(LogoShape|string $shape): self
     {
-        return $this->with(shape: $shape instanceof LogoShape ? $shape : LogoShape::from($shape));
+        return $this->with(shape: $shape instanceof LogoShape ? $shape : self::logoShape($shape));
     }
 
     /**
@@ -100,7 +102,7 @@ final class LogoBuilder
     public function with(mixed ...$settings): self
     {
         if (isset($settings['shape']) && is_string($settings['shape'])) {
-            $settings['shape'] = LogoShape::from($settings['shape']);
+            $settings['shape'] = self::logoShape($settings['shape']);
         }
 
         if (($settings['size'] ?? null) === 'auto') {
@@ -122,5 +124,11 @@ final class LogoBuilder
     private static function disk(Logo|ProvidesQrLogo|SplFileInfo|Filesystem|string|null $disk): Filesystem
     {
         return $disk instanceof Filesystem ? $disk : Storage::disk(is_string($disk) ? $disk : null);
+    }
+
+    private static function logoShape(LogoShape|string $shape): LogoShape
+    {
+        return $shape instanceof LogoShape ? $shape : (LogoShape::tryFrom($shape)
+            ?? throw InvalidOptionException::notOneOf(LogoShape::class, 'shape', array_column(LogoShape::cases(), 'value'), $shape));
     }
 }

@@ -154,7 +154,7 @@ return [
     | Qr::read() reads the code in an image with the decoder named here:
     | 'zxing' (zxing-cpp through Node: `npm install zxing-wasm`, plus
     | @resvg/resvg-wasm to read SVG - the most capable), 'native' (the
-    | package's own, in PHP, with Imagick - no Node needed), or 'stack', which
+    | package's own, in PHP, with Imagick or GD - no Node needed), or 'stack', which
     | tries the decoders listed in turn until one reads the code, moving past
     | any that is not installed. Your own decoders go under 'decoders' below.
     |

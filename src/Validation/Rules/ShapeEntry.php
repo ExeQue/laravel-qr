@@ -48,7 +48,13 @@ final class ShapeEntry implements ValidationRule
         $name = is_array($value) ? ($value['shape'] ?? null) : $value;
         $options = is_array($value) ? ($value['options'] ?? []) : [];
 
-        $keys = $this->options ? ['shape', 'options'] : ['shape'];
+        if (is_array($value) && array_key_exists('options', $value) && ! $this->options) {
+            $fail(trans('qr::validation.shape.no_options'));
+
+            return;
+        }
+
+        $keys = ['shape', 'options'];
 
         if (is_array($value) && (array_diff(array_map(strval(...), array_keys($value)), $keys) !== [] || ! is_array($options))) {
             $fail(trans('qr::validation.shape.entry'));

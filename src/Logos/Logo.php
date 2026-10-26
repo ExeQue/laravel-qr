@@ -75,6 +75,11 @@ final readonly class Logo
 
     public static function fromFile(string $path, ?SvgSanitizer $sanitizer = null): self
     {
+        // A stream wrapper (ftp://, http://, phar://...) would fetch from elsewhere or run code.
+        if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $path) === 1) {
+            throw InvalidLogoException::notLocal($path);
+        }
+
         $bytes = is_file($path) && is_readable($path) ? file_get_contents($path) : false;
 
         return self::fromBytes($bytes === false ? throw InvalidLogoException::missingFile($path) : $bytes, $sanitizer);
@@ -125,15 +130,53 @@ final readonly class Logo
      */
     private static function checkPixels(string $bytes, string $mimeType): void
     {
-        $size = in_array($mimeType, ['image/heif', 'image/avif'], true) ? self::pinged($bytes) : getimagesizefromstring($bytes);
+        $size = match ($mimeType) {
+            'image/heif', 'image/avif' => self::pinged($bytes),
+            default => getimagesizefromstring($bytes),
+        };
 
         if ($size === false) {
             throw InvalidLogoException::unreadable();
         }
 
-        if ($size[0] * $size[1] > self::MAX_PIXELS) {
-            throw InvalidLogoException::tooLarge($size[0], $size[1], self::MAX_PIXELS);
+        // A GIF's header gives its canvas, which its frames may be larger than.
+        $sizes = match ($mimeType) {
+            'image/gif' => [$size, ...self::frames($bytes)],
+            default => [$size],
+        };
+
+        foreach ($sizes as [$width, $height]) {
+            if ($width * $height > self::MAX_PIXELS) {
+                throw InvalidLogoException::tooLarge($width, $height, self::MAX_PIXELS);
+            }
         }
+    }
+
+    /**
+     * The size of each of a GIF's frames, from ImageMagick reading their headers only; none without Imagick.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function frames(string $gif): array
+    {
+        if (! extension_loaded('imagick')) {
+            return []; // @codeCoverageIgnore
+        }
+
+        try {
+            $image = new Imagick();
+            $image->pingImageBlob($gif);
+        } catch (ImagickException) {
+            return [];
+        }
+
+        $sizes = [];
+
+        foreach ($image as $frame) {
+            $sizes[] = [$frame->getImageWidth(), $frame->getImageHeight()];
+        }
+
+        return $sizes;
     }
 
     /**
@@ -210,14 +253,18 @@ final readonly class Logo
             return (string) ob_get_clean();
         }
 
-        $image = new Imagick();
-        $image->readImageBlob($gif);
-        $image->setIteratorIndex(0);
+        try {
+            $image = new Imagick();
+            $image->readImageBlob($gif);
+            $image->setIteratorIndex(0);
 
-        $frame = $image->getImage();
-        $frame->setImageFormat('png');
-        $frame->setOption('png:exclude-chunks', 'date,time');
+            $frame = $image->getImage();
+            $frame->setImageFormat('png');
+            $frame->setOption('png:exclude-chunks', 'date,time');
 
-        return $frame->getImageBlob();
+            return $frame->getImageBlob();
+        } catch (ImagickException) {
+            throw InvalidLogoException::unreadable();
+        }
     }
 }

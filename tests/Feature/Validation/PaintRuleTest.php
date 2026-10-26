@@ -73,6 +73,7 @@ describe('paint rule', function (): void {
             ->and(paintErrors(['kind' => 'linear', 'stops' => [['color' => '#be123c', 'position' => 0]]], PaintRule::any()))->toBe(['The paint field must have at least two color stops.'])
             ->and(paintErrors(['kind' => 'linear'], PaintRule::any()))->toBe(['The paint field must have at least two color stops.'])
             ->and(paintErrors(['kind' => 'linear', 'stops' => $stops, 'angel' => 90], PaintRule::any()))->toBe(['The paint field has settings a gradient does not take, or of the wrong type.'])
+            ->and(paintErrors(['kind' => 'linear', 'stops' => $stops, 'angle' => '1e999'], PaintRule::any()))->toBe(['The paint field has settings a gradient does not take, or of the wrong type.'])
             ->and(paintErrors(['kind' => 'linear', 'stops' => $stops, 'angle' => 'steep'], PaintRule::any()))->toBe(['The paint field has settings a gradient does not take, or of the wrong type.'])
             ->and(paintErrors(['kind' => 'linear', 'stops' => $stops, 'spread' => 'sideways'], PaintRule::any())[0])->toStartWith('The paint field is not a gradient:')
             ->and(paintErrors(['kind' => 'linear', 'stops' => $stops, 'spread' => 4], PaintRule::any())[0])->toStartWith('The paint field is not a gradient:')

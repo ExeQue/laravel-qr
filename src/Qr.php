@@ -234,19 +234,23 @@ final class Qr
     }
 
     /**
-     * A shape on its own as a small SVG: a module (or a whole eye preset) first, or an
-     * outer and/or inner eye by name. `Qr::icon(Module::Square)`, `Qr::icon(outer: 'square')`.
+     * A shape on its own as a small SVG: a module (or a whole eye preset) first, an eye preset by
+     * name, or an outer and/or inner eye by name. `Qr::icon(Module::Square)`, `Qr::icon(eye: 'heart')`,
+     * `Qr::icon(outer: 'square')`.
      */
     public function icon(
         ModuleShape|ProvidesQrModule|ProvidesQrEye|string|null $shape = null,
         OuterEyeShape|ProvidesQrOuterEye|string|null $outer = null,
         InnerEyeShape|ProvidesQrInnerEye|string|null $inner = null,
         bool $withOuter = true,
-        ?Corner $corner = null,
+        Corner|string|null $corner = null,
+        ProvidesQrEye|string|null $eye = null,
     ): Icon {
         $icons = $this->container->make(Icons::class);
+        $corner = is_string($corner) ? Corner::from($corner) : $corner;
 
         return match (true) {
+            $eye !== null => $icons->eye($eye, corner: $corner),
             $shape instanceof ProvidesQrEye && ! $shape instanceof ProvidesQrModule => $icons->eye($shape, corner: $corner),
             $shape !== null => $icons->module($shape),
             $outer !== null && $inner !== null => $icons->eye(outer: $outer, inner: $inner, corner: $corner),

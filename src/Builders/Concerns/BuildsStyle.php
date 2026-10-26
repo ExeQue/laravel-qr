@@ -15,6 +15,7 @@ use ExeQue\Qr\Builders\StyleBuilder;
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Encoder\Enums\ErrorCorrection;
 use ExeQue\Qr\Encoder\Enums\Mask;
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
 use ExeQue\Qr\Logos\Contracts\ProvidesQrLogo;
@@ -202,7 +203,8 @@ trait BuildsStyle
 
     public function errorCorrection(ErrorCorrection|string $level): static
     {
-        return $this->with(errorCorrection: $level instanceof ErrorCorrection ? $level : ErrorCorrection::from($level));
+        return $this->with(errorCorrection: $level instanceof ErrorCorrection ? $level : (ErrorCorrection::tryFrom(strtoupper($level))
+            ?? throw InvalidOptionException::notOneOf(ErrorCorrection::class, 'level', array_column(ErrorCorrection::cases(), 'value'), $level)));
     }
 
     /**
@@ -215,7 +217,8 @@ trait BuildsStyle
 
     public function mask(Mask|int $mask): static
     {
-        return $this->with(mask: $mask instanceof Mask ? $mask : Mask::from($mask));
+        return $this->with(mask: $mask instanceof Mask ? $mask : (Mask::tryFrom($mask)
+            ?? throw InvalidOptionException::notOneOf(Mask::class, 'mask', array_map(strval(...), array_column(Mask::cases(), 'value')), (string) $mask)));
     }
 
     /**

@@ -16,6 +16,7 @@ return [
         'outer' => 'The :attribute field is not an outer eye that may be chosen.',
         'inner' => 'The :attribute field is not an inner eye that may be chosen.',
         'entry' => 'The :attribute field must be a shape: its name, or its name and options.',
+        'no_options' => 'The :attribute field may name a shape, but not give its options.',
     ],
 
     'filter' => [

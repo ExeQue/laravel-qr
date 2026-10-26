@@ -43,6 +43,9 @@ final class EyePalette implements EyeFilter, NamedFilter, HasOptionRules
         private bool $outer = true,
         private bool $inner = true,
     ) {
+        // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        $this->weights = $weights === null ? null : array_map(floatval(...), $weights);
+
         if ($colors === [] || ($weights !== null && count($weights) !== count($colors))) {
             throw InvalidFilterException::weightsDoNotMatch($this->name(), count($colors), $weights === null ? null : count($weights));
         }

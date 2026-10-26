@@ -231,7 +231,7 @@ Regions are in modules, from the top-left of the code (its margin left out):
 |---|---|
 | `Region::rect($x, $y, $width, $height)` | a rectangle |
 | `Region::rounded($x, $y, $width, $height, $radius)` | a rectangle with rounded corners |
-| `Region::circle($x, $y, $radius)` | a circle about a point |
+| `Region::circle($centerX, $centerY, $radius)` | a circle about a point |
 | `Region::cells([[$column, $row], ...])` | single modules |
 | `Region::logo()` | the area the code's logo clears |
 
@@ -247,7 +247,8 @@ The same can be written as filters that wrap another:
 
 ## Several at once
 
-`Compound` keeps filters together under one name, for a reusable look:
+`Compound` keeps filters together as one filter, for a reusable look; register it under a name of your own to use
+it by that name:
 
 ```php
 ->filter(new Compound(new MixedOpacity(min: 0.75), new MixedShade(), new EyeTilt()))

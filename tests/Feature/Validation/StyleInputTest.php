@@ -87,7 +87,7 @@ describe('to a style', function (): void {
             ->and([$kept->logo?->plate, $kept->logo?->plateRadius, $kept->logo?->position])->toBe([null, 2.0, null])
             ->and([$radiusOnly->logo?->plate?->toCss(), $radiusOnly->logo?->plateRadius])->toBe(['#ffffff', 3.0])
             ->and(StyleRule::toStyle(['logo' => ['size' => 0.1]], logo: Logo::fromSvg(LOGO_SVG))->logo?->size)->toBe(0.1)
-            ->and(fn () => StyleRule::toStyle(['logo' => ['size' => 0.1]]))->toThrow(InvalidStyleException::class, 'A stored logo has no source');
+            ->and(fn () => StyleRule::toStyle(['logo' => ['size' => 0.1]]))->toThrow(InvalidStyleException::class, 'The style has logo settings but no logo');
 
         unlink($file);
     });

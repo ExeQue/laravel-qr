@@ -4,7 +4,7 @@ Every shape can be drawn on its own as a small SVG, from the same paths codes ar
 settings screens:
 
 - **Module icons** show five modules in a 3×3 box, so shapes that join their neighbors show how.
-- **Outer eye icons** show the ring in an 8×8 box, with half a module of air round it.
+- **Outer eye icons** show the ring in an 8×8 box, with half a module of air around it.
 - **Inner eye icons** show the inner eye with the square outer eye faintly behind it, so its size reads right.
 - **Eye icons** show an outer and an inner eye together.
 
@@ -21,6 +21,7 @@ Qr::icon(outer: OuterEye::Octagon);
 Qr::icon(inner: 'star', withOuter: false);
 Qr::icon(outer: 'soft', inner: InnerEye::Heart);  // a whole eye
 Qr::icon(Eye::Heart);
+Qr::icon(eye: 'heart');                           // an eye preset by name
 Qr::icon(Eye::Heart, corner: Corner::TopRight);   // turned as it sits on that corner when mirrored
 
 Qr::icon(Module::Hearts)->withAttributes('class="size-5"');

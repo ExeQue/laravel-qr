@@ -77,6 +77,7 @@ describe('stripping', function (): void {
         'a cross-fade in a style attribute' => ['<svg xmlns="http://www.w3.org/2000/svg"><rect style="background:cross-fade(a, b)"/></svg>', 'cross-fade'],
         'a quoted string in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>a[x="{"],body{display:none}</style></svg>', 'display'],
         'a comment in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>a,body/*}*/{display:none}</style></svg>', 'display'],
+        'a url( hidden in an element in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style><g>.a{fill:url(https://evil/x)}</g></style></svg>', 'evil'],
         'an element of another namespace' => ['<svg xmlns="http://www.w3.org/2000/svg"><h:style xmlns:h="http://www.w3.org/1999/xhtml">body{display:none}</h:style></svg>', 'display'],
     ]);
 
@@ -123,6 +124,6 @@ describe('styles', function (): void {
     it('drops style sheets it cannot keep to the logo', function (string $css): void {
         expect(SvgIds::prefix('<svg xmlns="http://www.w3.org/2000/svg"><style>'.$css.'</style></svg>', 'p-'))
             ->toBe('<svg xmlns="http://www.w3.org/2000/svg" id="p-root"/>');
-    })->with(['@media print{.a{fill:red}}', '.a{fill:u\72l(x)}', '.a{fill:red', 'a[x="{"],body/*}*/{display:none}', "a[x='}']{fill:red}"]);
+    })->with(['@media print{.a{fill:red}}', '.a{fill:u\72l(x)}', '.a{fill:red', 'a[x="{"],body/*}*/{display:none}', "a[x='}']{fill:red}", '<g>.a{fill:url(https://evil/x)}</g>', '~ rect{fill:red}', '.a{fill:red} + rect{fill:red}']);
 
 });

@@ -20,7 +20,7 @@ php artisan vendor:publish --tag=qr-config
 | ImageMagick's SVG support (librsvg) (optional) | SVG logos on PNG, JPEG and WebP codes |
 | `enshrined/svg-sanitize` (optional) | a dedicated sanitizer for SVG logos; without it the package's own allowlist sanitizer is used |
 | `exeque/laravel-monocle` (optional) | the [Monocle lens](events.md#monocle) |
-| Node.js with `zxing-wasm` (optional) | the [zxing reader](reading.md#zxing) |
+| Node.js with `zxing-wasm` (optional) | the [zxing reader](reading.md#setting-up-zxing) |
 
 SVG output needs nothing beyond PHP. Without Imagick and GD, `->png()`, `->jpeg()` and `->webp()` throw a `MissingExtensionException`
 that says what to install.

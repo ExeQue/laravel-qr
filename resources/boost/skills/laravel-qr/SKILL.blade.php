@@ -98,7 +98,8 @@ Use a named style or color the application already has before writing a new one.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
 - In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->text() === $url)`.
 - Validate a style from a form with `StyleRule` (`'style' => StyleRule::defaults()`, or
-  `...StyleRule::defaults()->for('style')`), and turn it into a style with `$request->qrStyle('style')`; never pass
+  `...StyleRule::defaults()->for('style')`), and turn it into a style with `$request->qrStyle('style')`, which the
+  `ExeQue\Qr\Validation\InteractsWithQrStyle` trait on the form request or Livewire form gives; never pass
   request input to `Style::fromArray()`.
 - Register shapes, filters and styles of the application in a service provider, or as plain values in
   `config/qr.php`; `php artisan qr:check` builds every one and lists problems.

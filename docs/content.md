@@ -7,6 +7,17 @@ format phones read, with every special character escaped.
 use ExeQue\Qr\Facades\Qr;
 
 Qr::make('Any text at all');
+Qr::text('Any text at all');   // the same
+```
+
+A code tells what it holds and how it is laid out before anything is drawn:
+
+```php
+$code = Qr::url('https://example.com');
+
+$code->text();       // the text it holds
+$code->matrix();     // the modules: version, size, error correction, mask
+$code->forget();     // its cached outputs dropped, when caching is on
 ```
 
 Text beyond ASCII is written as UTF-8 and marked as such, so phones show `blåbærgrød` and `日本語` correctly.

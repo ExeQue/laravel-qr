@@ -119,6 +119,8 @@ final class BasicSvgSanitizer implements SvgSanitizer
         foreach (iterator_to_array($element->childNodes) as $child) {
             /** @var DOMNode $child */
             match (true) {
+                // A style sheet is text only: an element in it would hide its text from the checks below.
+                $child instanceof DOMElement && $element->localName === 'style' => $element->removeChild($child),
                 $child instanceof DOMElement && self::isSvgElement($child, self::ELEMENTS) => self::cleanElement($child),
                 $child->nodeType === XML_TEXT_NODE, $child->nodeType === XML_CDATA_SECTION_NODE => self::cleanText($child, $element),
                 default => $element->removeChild($child),

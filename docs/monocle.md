@@ -42,8 +42,8 @@ request's timeline.
 
 ## Privacy
 
-The content of a code is never recorded: only its kind, its length, a hash keyed with the application key (so short
-content such as a phone number cannot be found again by hashing guesses) and a link's host.
+The content of a code is never recorded: only its kind, its length, a hash keyed with the application key and a
+link's host.
 
 ## Configuration
 

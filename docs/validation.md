@@ -190,6 +190,7 @@ allow them, within the ranges `shape()` sets. Where the field is not allowed, ev
 there is its name, or its name and options:
 
 ```php
+// Options on a shape here need ->modules(options: true)
 ['name' => 'mixed-shape', 'options' => ['shapes' => ['square', ['shape' => 'rounded', 'options' => ['radius' => 0.1]]]]]
 ```
 

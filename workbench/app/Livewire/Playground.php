@@ -328,11 +328,14 @@ class Playground extends Component
 
     private function output(PendingQr $code, string $format): Rendered
     {
+        // The size comes from the browser: kept to what the size field offers.
+        $size = max(64, min(4096, $this->size));
+
         return match ($format) {
             'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
-            'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
+            'jpeg' => $code->jpeg($size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            'webp' => $code->webp($size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            default => $code->png($size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
         };
     }
 
@@ -342,7 +345,7 @@ class Playground extends Component
             ->withoutCache()
             ->errorCorrection($this->errorCorrection)
             ->minVersion(max(1, min(40, $this->minVersion)))
-            ->margin($this->margin)
+            ->margin(max(0, min(40, $this->margin)))
             ->modules($this->module, ...$this->typed('modules', $this->module, $this->moduleOptions))
             ->paint($this->paintOf($this->paint))
             ->background($this->transparent ? null : $this->paintOf($this->background));

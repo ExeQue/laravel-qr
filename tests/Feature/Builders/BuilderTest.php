@@ -59,6 +59,8 @@ covers(
     InvalidLogoException::class,
     ScanSafety::class,
     \ExeQue\Qr\Rendering\EyeStyle::class,
+    \ExeQue\Qr\Exceptions\InvalidOptionException::class,
+    \ExeQue\Qr\Writers\Raster\Enums\Driver::class,
 );
 
 pest()->group('builder');
@@ -131,6 +133,22 @@ describe('making codes', function (): void {
             ->and(Qr::make(BUILDER_URL)->margin(0)->scanSafety(ScanSafety::off())->scene()->margin)->toBe(0)
             ->and(ScanSafety::fromConfig(['on_violation' => \ExeQue\Qr\Rendering\Enums\Violation::Warn])->onViolation)->toBe(\ExeQue\Qr\Rendering\Enums\Violation::Warn);
     });
+});
+
+describe('named settings', function (): void {
+    it('takes error correction in either case', function (): void {
+        expect(Qr::make(BUILDER_URL)->errorCorrection('q')->matrix()->errorCorrection)->toBe(ErrorCorrection::Quartile);
+    });
+
+    it('says which values a named setting takes', function (callable $build, string $message): void {
+        expect($build)->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, $message);
+    })->with([
+        [fn () => Qr::make(BUILDER_URL)->errorCorrection('x'), '"level" is one of L, M, Q, H, x given.'],
+        [fn () => Qr::make(BUILDER_URL)->mask(9), '"mask" is one of 0, 1, 2, 3, 4, 5, 6, 7, 9 given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(logoFixture(), shape: 'oval'), '"shape" is one of square, rounded, circle, alpha, oval given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(fn (LogoBuilder $logo) => $logo->from(logoFixture())->shape('oval')), '"shape" is one of'],
+        [fn () => Qr::make(BUILDER_URL)->png(driver: 'foo'), '"driver" is one of auto, imagick, gd, foo given.'],
+    ]);
 });
 
 describe('styling', function (): void {

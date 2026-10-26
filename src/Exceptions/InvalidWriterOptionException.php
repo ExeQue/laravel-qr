@@ -24,6 +24,11 @@ final class InvalidWriterOptionException extends InvalidArgumentException implem
         return new self("The {$option} is at least 1, {$value} given.");
     }
 
+    public static function tooLarge(int $size, int $max): self
+    {
+        return new self("An image is at most {$max} pixels wide, {$size} given.");
+    }
+
     public static function compressionLevelOutOfRange(int $level): self
     {
         return new self("A PNG compression level is from 0 to 9, {$level} given.");

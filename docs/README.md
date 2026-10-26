@@ -34,7 +34,7 @@
 | `->svg()`, `->png()`, `->save()`, `->download()` | [Output](output.md) |
 | `->modules()`, `->eyes()`, `->paint()`, `->margin()` | [Styling](styling.md) |
 | Flowing (liquid) modules | [Modules](modules.md#flowing) |
-| Turning eyes so their corners point out | [Eyes](eyes.md#mirrored) |
+| Turning eyes so their corners point out | [Eyes](eyes.md#turned-to-point-out) |
 | `lighten()`, `darken()`, `shift()`, `invert()` | [Colors](colors.md#adjusting-colors) |
 | Random rotation, size, color per module | [Filters](filters.md) |
 | `<x-qr::code>` | [Blade](blade.md) |

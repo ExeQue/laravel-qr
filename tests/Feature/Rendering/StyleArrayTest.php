@@ -187,7 +187,7 @@ describe('reading back', function (): void {
 describe('invalid input', function (): void {
     it('refuses a logo it cannot read back', function (): void {
         Style::fromArray(['logo' => ['hash' => 'abc', 'size' => 0.2]]);
-    })->throws(InvalidStyleException::class, 'A stored logo has no source to read it from');
+    })->throws(InvalidStyleException::class, 'The style has logo settings but no logo');
 
     it('builds no class from a stored name that is not a shape', function (): void {
         \Tests\Fixtures\ConstructionSpy::$built = 0;

@@ -120,11 +120,14 @@ final readonly class Writer implements Fakeable, WriterContract
             throw InvalidWriterOptionException::unsupportedPaint($paint);
         }
 
-        // The gradient, as large as its box, kept only where the shapes are.
-        $layer = new Imagick();
-        $layer->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel('transparent'));
+        // The gradient, as large as its box and carried on past it with its edge colors, as GD and
+        // browsers do, then kept only where the shapes are.
         [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, Boxes::on($paint, $scene, $shape));
-        $layer->compositeImage($this->sample($paint, (int) max(1, round($width)), (int) max(1, round($height))), Imagick::COMPOSITE_OVER, (int) round($x), (int) round($y));
+        $layer = $this->sample($paint, (int) max(1, round($width)), (int) max(1, round($height)));
+        $layer->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_EDGE);
+        $layer->setImageArtifact('distort:viewport', sprintf('%dx%d+0+0', $canvas->getImageWidth(), $canvas->getImageHeight()));
+        $layer->distortImage(Imagick::DISTORTION_SCALEROTATETRANSLATE, [0, 0, 1, 0, round($x), round($y)], false);
+        $layer->setImagePage(0, 0, 0, 0);
 
         if ($paths !== null) {
             $layer->compositeImage($this->mask($canvas, $paths, $scale), Imagick::COMPOSITE_DSTIN, 0, 0);

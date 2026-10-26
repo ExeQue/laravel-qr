@@ -22,10 +22,10 @@ final readonly class ScanSafety
      * @param float|null $maxSkew How far a module may be skewed, in degrees each way.
      * @param float|null $maxSkip The share of what the error correction can still restore, after a logo,
      *                            that modules left out may use.
+     * @param float|null $maxLogoShare The share of what the error correction can restore that a logo may clear.
      * @param array{float, float}|null $outerEyeScale How much an outer eye may shrink or grow; it must stay about 7 modules wide.
      * @param array{float, float}|null $innerEyeScale How much an inner eye may shrink or grow.
      * @param float|null $eyeRotationWarning Degrees off a quarter turn from which a turned eye is warned about.
-     * @param float|null $maxLogoShare The share of what the error correction can restore that a logo may clear.
      */
     public function __construct(
         public ?float $minContrast = 3.0,
@@ -33,13 +33,13 @@ final readonly class ScanSafety
         public ?int $minMargin = 2,
         public ?float $maxOffset = 0.15,
         public ?float $minScale = 0.6,
+        public ?float $maxScale = 1.25,
+        public ?float $maxSkew = 20.0,
         public ?float $maxSkip = 0.25,
+        public ?float $maxLogoShare = 0.6,
         public ?array $outerEyeScale = [0.93, 1.0],
         public ?array $innerEyeScale = [0.6, 1.15],
         public ?float $eyeRotationWarning = 10.0,
-        public ?float $maxLogoShare = 0.6,
-        public ?float $maxScale = 1.25,
-        public ?float $maxSkew = 20.0,
     ) {
     }
 
@@ -60,13 +60,13 @@ final readonly class ScanSafety
             minMargin: $value('min_margin', $default->minMargin),
             maxOffset: $value('max_offset', $default->maxOffset),
             minScale: $value('min_scale', $default->minScale),
+            maxScale: $value('max_scale', $default->maxScale),
+            maxSkew: $value('max_skew', $default->maxSkew),
             maxSkip: $value('max_skip', $default->maxSkip),
+            maxLogoShare: $value('max_logo_share', $default->maxLogoShare),
             outerEyeScale: $value('outer_eye_scale', $default->outerEyeScale),
             innerEyeScale: $value('inner_eye_scale', $default->innerEyeScale),
             eyeRotationWarning: $value('eye_rotation_warning', $default->eyeRotationWarning),
-            maxLogoShare: $value('max_logo_share', $default->maxLogoShare),
-            maxScale: $value('max_scale', $default->maxScale),
-            maxSkew: $value('max_skew', $default->maxSkew),
         );
     }
 
@@ -75,6 +75,19 @@ final readonly class ScanSafety
      */
     public static function off(): self
     {
-        return new self(null, Violation::Warn, null, null, null, null, null, null, null, null, null, null);
+        return new self(
+            minContrast: null,
+            onViolation: Violation::Warn,
+            minMargin: null,
+            maxOffset: null,
+            minScale: null,
+            maxScale: null,
+            maxSkew: null,
+            maxSkip: null,
+            maxLogoShare: null,
+            outerEyeScale: null,
+            innerEyeScale: null,
+            eyeRotationWarning: null,
+        );
     }
 }

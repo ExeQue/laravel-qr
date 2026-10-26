@@ -21,6 +21,11 @@ use Throwable;
 final class ShapeOptions implements DataAwareRule, ValidationRule
 {
     /**
+     * Run on empty strings too, which Laravel otherwise passes.
+     */
+    public bool $implicit = true;
+
+    /**
      * @var array<array-key, mixed>
      */
     private array $data = [];

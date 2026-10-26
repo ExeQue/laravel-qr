@@ -45,7 +45,9 @@ final readonly class SymbolReader
         $codewords = $this->codewords($modules, $grid, $mask, Tables::totalCodewords($version));
         $data = $this->correct($codewords, $version, $level);
 
-        return new Decoded($this->segments->parse($data, $version), $version, $level, $mask);
+        $text = $this->segments->parse($data, $version);
+
+        return new Decoded($text, $version, $level, $mask, bytes: $this->segments->raw());
     }
 
     /**

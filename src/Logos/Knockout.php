@@ -205,12 +205,12 @@ final readonly class Knockout
         foreach ($visible as [$column, $row]) {
             for ($dy = -$padding; $dy <= $padding; $dy++) {
                 for ($dx = -$padding; $dx <= $padding; $dx++) {
-                    $cells["{$column},{$row}"] = [$column + $dx, $row + $dy];
+                    $cells[($column + $dx).','.($row + $dy)] = [$column + $dx, $row + $dy];
                 }
             }
         }
 
-        return Region::cells(array_values(array_unique($cells, SORT_REGULAR)));
+        return Region::cells(array_values($cells));
     }
 
     private function coversFunctionPatterns(Matrix $matrix): bool

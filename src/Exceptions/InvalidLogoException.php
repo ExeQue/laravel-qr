@@ -69,6 +69,11 @@ final class InvalidLogoException extends InvalidArgumentException implements QrE
         return new self("A logo may have at most {$max} pixels; this one is {$width} by {$height}.");
     }
 
+    public static function notLocal(string $path): self
+    {
+        return new self("A logo is read from a local file, not from \"{$path}\": logos are never fetched from elsewhere.");
+    }
+
     public static function noSource(): self
     {
         return new self('The logo has no image: call from() first.');

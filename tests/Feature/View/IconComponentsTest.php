@@ -30,6 +30,8 @@ describe('drawing', function (): void {
             ->and((string) Qr::icon(inner: 'square'))->toContain('<path opacity="0.3"')->toContain('M2.5 2.5')
             ->and((string) Qr::icon(inner: InnerEye::Square, withOuter: false))->not->toContain('opacity')
             ->and(substr_count((string) Qr::icon(Eye::Square), '<path'))->toBe(2)
+            ->and((string) Qr::icon(eye: 'heart'))->toBe((string) Qr::icon(Eye::Heart))
+            ->and((string) Qr::icon(eye: 'leaf', corner: 'top-right'))->toBe((string) Qr::icon(Eye::Leaf, corner: \ExeQue\Qr\Rendering\Enums\Corner::TopRight))
             ->and((string) Qr::icon(outer: 'square', inner: 'square'))->toBe((string) Qr::icon(Eye::Square))
             ->and(Qr::icon(Eye::Square)->toHtml())->toBe((string) app(Icons::class)->eye());
     });

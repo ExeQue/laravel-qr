@@ -83,8 +83,18 @@ final class SvgIds
     {
         $css = $style->textContent;
 
+        // A style sheet is text only; with elements in it, it cannot be checked as it reads.
+        foreach ($style->childNodes as $child) {
+            if ($child instanceof DOMElement) {
+                $style->parentNode?->removeChild($style);
+
+                return;
+            }
+        }
+
         // Comments and quoted strings could hide braces from the rules matched below.
-        if (preg_match('/[@\\\\"\']|\/\*/', $css) === 1 || substr_count($css, '{') !== substr_count($css, '}')) {
+        // A selector that starts with a sibling combinator would reach past the logo once scoped.
+        if (preg_match('/[@\\\\"\']|\/\*|(^|[{},])\s*[~+]/', $css) === 1 || substr_count($css, '{') !== substr_count($css, '}')) {
             $style->parentNode?->removeChild($style);
 
             return;

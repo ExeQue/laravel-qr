@@ -14,7 +14,7 @@ use ExeQue\Qr\Exceptions\UnreadableCodeException;
 /**
  * The package's own reader, in PHP: finds the finder patterns, reads the grid of modules
  * under the perspective they give, and decodes it with error correction. It reads raster
- * images - PNG, JPEG, WebP, GIF - through Imagick, light codes on dark ones too, and needs
+ * images - PNG, JPEG, WebP, GIF - through Imagick or GD, light codes on dark ones too, and needs
  * no Node. For photos of large codes at a steep angle, zxing reads more.
  */
 final readonly class NativeDecoder implements Decoder

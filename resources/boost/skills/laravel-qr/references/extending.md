@@ -104,7 +104,8 @@ RoundedRect::circle($x, $y, $radius);
 ```
 
 `ExeQue\Qr\Geometry\Figures` has the figures the built-in shapes use: `squircle()`, `heart()`, `star()`, `diamond()`,
-`turnedSquare()`, `flower()`, `snowflake()`, `octagon()` and `hexagon()`.
+`turnedSquare()`, `flower()`, `snowflake()`, `sparkle()`, `cross()`, `clover()`, `blob()`, `scalloped()`, `octagon()` and
+`hexagon()` (lying, or standing with `standing: true`).
 
 ### Configurable
 
@@ -131,7 +132,7 @@ dark and light runs of 1:1:3:1:1 through the middle, so their geometry has rules
 
 - drawn in a box from -3.5 to 3.5, centered on `(0, 0)`: seven modules across, both ways;
 - the ring about one module wide, its hole about five modules across, drawn the opposite way round to the outline;
-- straight-ish sides; a point may reach half a module past the box, into the light border round the eye.
+- straight-ish sides; a point may reach half a module past the box, into the light border around the eye.
 
 **Inner eye** (`InnerEyeShape::path()`):
 
@@ -220,7 +221,8 @@ final class Checkerboard implements HasOptionRules, ModuleFilter, NamedFilter
 }
 ```
 
-What the constructor throws for an option, such as an `InvalidOptionException` for a value out of range, becomes an
+`optionRules()` takes the place of the constructor's types, so it lists every option the class takes; one it leaves
+out is refused. What the constructor throws for an option, such as an `InvalidOptionException` for a value out of range, becomes an
 error on that option. To find rules some other way, bind your own `ResolvesOptionRules` in place of the package's.
 
 ## Gradients

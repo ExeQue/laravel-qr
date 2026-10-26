@@ -35,6 +35,8 @@ final class Radial implements ModuleFilter, NamedFilter, HasOptionRules
         private array $center = [0.5, 0.5],
     ) {
         $this->property = $property instanceof Property ? $property : Property::from($property);
+        // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        $this->center = array_map(floatval(...), $center);
     }
 
     public function module(ModuleContext $cell, ModuleStyle $style): ModuleStyle

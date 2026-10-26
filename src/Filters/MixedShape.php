@@ -43,6 +43,9 @@ final class MixedShape implements ModuleFilter, NamedFilter, HasOptionRules
         private ?array $weights = null,
         private int $seed = 0,
     ) {
+        // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        $this->weights = $weights === null ? null : array_map(floatval(...), $weights);
+
         if ($shapes === [] || ($weights !== null && count($weights) !== count($shapes))) {
             throw InvalidFilterException::weightsDoNotMatch($this->name(), count($shapes), $weights === null ? null : count($weights));
         }

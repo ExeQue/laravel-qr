@@ -13,7 +13,6 @@ use ExeQue\Qr\Rendering\GuardAdjustment;
 use ExeQue\Qr\Rendering\Renderer;
 use ExeQue\Qr\Rendering\ScanSafety;
 use ExeQue\Qr\Rendering\Style;
-use ExeQue\Qr\Validation\StyleInput;
 use ExeQue\Qr\Validation\StyleRule;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -32,6 +31,7 @@ final readonly class Scannable implements ValidationRule
         private StyleRule $rules,
         private ?ScanSafety $safety,
         private string $content,
+        private Style|string|null $base = null,
     ) {
     }
 
@@ -50,10 +50,11 @@ final readonly class Scannable implements ValidationRule
         try {
             // A stand-in logo: the guards weigh only how much of the code it clears.
             $logo = Logo::fromSvg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><rect width="1" height="1"/></svg>');
-            $style = StyleInput::apply($value, Style::default(), $logo);
+            $style = StyleRule::toStyle($value, $this->base, $logo);
             $default = config('qr.defaults.error_correction', ErrorCorrection::Medium);
             $level = match (true) {
-                $style->logo !== null => ErrorCorrection::High,
+                // As a code is drawn: raised for a logo, unless that is turned off.
+                $style->logo !== null && (bool) config('qr.logo.auto_error_correction', true) => ErrorCorrection::High,
                 $default instanceof ErrorCorrection => $default,
                 default => ErrorCorrection::from((string) $default),
             };
@@ -87,6 +88,7 @@ final readonly class Scannable implements ValidationRule
             'contrast' => match (true) {
                 array_key_exists('background', $input) => 'background',
                 isset($input['modules']['paint']) => 'modules.paint',
+                isset($input['eyes']['paint']) => 'eyes.paint',
                 default => null,
             },
             'logo' => 'logo.size',

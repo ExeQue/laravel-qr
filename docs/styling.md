@@ -87,7 +87,7 @@ use ExeQue\Qr\Rendering\Enums\Corner;
 
 ## Margin
 
-The quiet zone round the code, in modules. Scanners need some; the [scan guards](scan-safety.md) keep at least two.
+The quiet zone around the code, in modules. Scanners need some; the [scan guards](scan-safety.md) keep at least two.
 
 ```php
 ->margin(2)

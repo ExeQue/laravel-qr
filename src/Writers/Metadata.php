@@ -107,8 +107,11 @@ final readonly class Metadata
             .'<?xpacket end="r"?>';
     }
 
+    /**
+     * Text as XML takes it: escaped, without the control characters XML 1.0 cannot hold.
+     */
     public static function escape(string $value): string
     {
-        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars((string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $value), ENT_XML1 | ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }
