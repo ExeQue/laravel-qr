@@ -240,6 +240,6 @@ final class QrLens implements Advises, Lens, Presentable, RequiresPackages, Rese
 
     private function slowMs(): float
     {
-        return (float) $this->config->get('qr.monocle.slow_render_ms', 50);
+        return (float) $this->config->get('qr.monocle.slow_render_ms', 100);
     }
 }

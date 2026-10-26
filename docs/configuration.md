@@ -98,7 +98,7 @@ See [Reading codes](reading.md).
 | Key | Default | |
 |---|---|---|
 | `enabled` | `true` (`QR_MONOCLE`) | show codes in Monocle, when it is installed |
-| `slow_render_ms` | 50 | renders slower than this are flagged |
+| `slow_render_ms` | 100 | renders slower than this are flagged |
 
 ## Registries
 

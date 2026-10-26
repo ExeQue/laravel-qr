@@ -186,7 +186,7 @@ return [
 
     'monocle' => [
         'enabled' => (bool) env('QR_MONOCLE', true),
-        'slow_render_ms' => 50,
+        'slow_render_ms' => 100,
     ],
 
     /*
