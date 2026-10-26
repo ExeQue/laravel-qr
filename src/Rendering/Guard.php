@@ -273,7 +273,9 @@ final class Guard
             return $part;
         }
 
-        [$x, $y] = [max($range[0], min($range[1], $part->scaleX)), max($range[0], min($range[1], $part->scaleY))];
+        // A negative scale is a flip: its size is held, its direction kept.
+        $x = (($part->scaleX <=> 0) ?: 1) * max($range[0], min($range[1], abs($part->scaleX)));
+        $y = (($part->scaleY <=> 0) ?: 1) * max($range[0], min($range[1], abs($part->scaleY)));
 
         if ([$x, $y] === [$part->scaleX, $part->scaleY]) {
             return $part;

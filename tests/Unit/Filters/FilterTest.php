@@ -19,9 +19,18 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Enums\Filter;
 use ExeQue\Qr\Filters\Enums\Property;
+use ExeQue\Qr\Filters\EyeEcho;
+use ExeQue\Qr\Filters\EyeFlip;
+use ExeQue\Qr\Filters\EyeJitter;
+use ExeQue\Qr\Filters\EyeMix;
 use ExeQue\Qr\Filters\EyePaint;
+use ExeQue\Qr\Filters\EyePalette;
+use ExeQue\Qr\Filters\EyeSample;
+use ExeQue\Qr\Filters\EyeShade;
 use ExeQue\Qr\Filters\EyeSize;
+use ExeQue\Qr\Filters\EyeStretch;
 use ExeQue\Qr\Filters\EyeTilt;
+use ExeQue\Qr\Filters\EyeTwist;
 use ExeQue\Qr\Filters\GradientFill;
 use ExeQue\Qr\Filters\InRegion;
 use ExeQue\Qr\Filters\Jitter;
@@ -72,6 +81,15 @@ covers(
     EyeTilt::class,
     EyeSize::class,
     EyePaint::class,
+    EyeEcho::class,
+    EyeFlip::class,
+    EyeJitter::class,
+    EyeMix::class,
+    EyePalette::class,
+    EyeSample::class,
+    EyeShade::class,
+    EyeStretch::class,
+    EyeTwist::class,
     Compound::class,
     ClosureFilter::class,
     Region::class,
@@ -128,6 +146,17 @@ dataset('filters', [
     'eye-tilt, seeded' => [fn () => new EyeTilt(outer: [-5, 5], inner: [-8, 8], seed: 3)],
     'eye-size' => [fn () => new EyeSize()],
     'eye-paint' => [fn () => new EyePaint('#be123c', inner: '#1e1b4b')],
+    'eye-size, ranged' => [fn () => new EyeSize(inner: [0.75, 1.0], seed: 2)],
+    'eye-mix' => [fn () => new EyeMix()],
+    'eye-mix, outer only' => [fn () => new EyeMix(outer: ['rounded', \ExeQue\Qr\Shapes\Enums\OuterEye::Circle], inner: [], seed: 4)],
+    'eye-palette' => [fn () => new EyePalette(['#be123c', '#1e1b4b', '#0f766e'], weights: [1, 1, 2])],
+    'eye-shade' => [fn () => new EyeShade(hue: 20)],
+    'eye-jitter' => [fn () => new EyeJitter(opacity: 0.1)],
+    'eye-twist' => [fn () => new EyeTwist()],
+    'eye-sample' => [fn () => new EyeSample()],
+    'eye-echo' => [fn () => new Compound(new EyePaint('#be123c'), new EyeEcho())],
+    'eye-stretch' => [fn () => new EyeStretch()],
+    'eye-flip' => [fn () => new EyeFlip(vertical: true)],
     'compound' => [fn () => new Compound(new MixedOpacity(min: 0.8), new EyeTilt())],
 ]);
 
@@ -204,7 +233,7 @@ describe('scope', function (): void {
 
         expect($corners->items[0]->paint->toCss())->toBe('#000000')
             ->and($corners->items[2]->paint->toCss())->toBe('#be123c')
-            ->and(new EyeSize()->corners(Corner::TopLeft)->options())->toBe(['inner' => 0.85, 'corners' => ['top-left']])
+            ->and(new EyeSize()->corners(Corner::TopLeft)->options())->toBe(['inner' => 0.85, 'seed' => 0, 'corners' => ['top-left']])
             ->and(new MixedSize()->only(Role::Data)->in(Region::cells([[1, 2]]))->options())->toBe([
                 'min' => 0.85, 'max' => 1.0, 'seed' => 0, 'only' => ['data'], 'in' => ['kind' => 'cells', 'cells' => ['1,2']],
             ]);
@@ -235,7 +264,7 @@ describe('scope', function (): void {
 
         expect($scoped->items[2]->transform->toString())->toBe($plain->items[2]->transform->toString())
             ->and($scoped->items[2]->paint)->toEqual($plain->items[2]->paint);
-    })->with([[new EyeTilt()], [new EyeSize()], [new EyePaint('#be123c')], [new Compound(new EyeTilt())]]);
+    })->with([[new EyeTilt()], [new EyeSize()], [new EyePaint('#be123c')], [new Compound(new EyeTilt())], [fn () => new EyeMix()], [new EyePalette(['#be123c'])], [new EyeShade()], [new EyeJitter()], [new EyeTwist()], [new EyeStretch()], [new EyeFlip()]]);
 
     it('describes regions', function (): void {
         expect(Region::rect(1, 2, 3, 4)->toArray())->toBe(['kind' => 'rect', 'x' => 1.0, 'y' => 2.0, 'width' => 3.0, 'height' => 4.0])
@@ -258,11 +287,11 @@ describe('scope', function (): void {
 describe('built-in filters', function (): void {
     it('gives the built-in filters by name, with their defaults', function (Filter $filter): void {
         expect($filter->qrFilter()->name())->toBe($filter->value);
-    })->with(array_filter(Filter::cases(), fn (Filter $filter): bool => ! in_array($filter, [Filter::MixedShape, Filter::Palette, Filter::GradientFill, Filter::ByRole, Filter::Region, Filter::Compound], true)));
+    })->with(array_filter(Filter::cases(), fn (Filter $filter): bool => ! in_array($filter, [Filter::MixedShape, Filter::Palette, Filter::EyePalette, Filter::GradientFill, Filter::ByRole, Filter::Region, Filter::Compound], true)));
 
     it('needs options for the filters without defaults', function (Filter $filter): void {
         $filter->qrFilter();
-    })->with([Filter::MixedShape, Filter::Palette, Filter::GradientFill, Filter::ByRole, Filter::Region, Filter::Compound])
+    })->with([Filter::MixedShape, Filter::Palette, Filter::EyePalette, Filter::GradientFill, Filter::ByRole, Filter::Region, Filter::Compound])
         ->throws(InvalidFilterException::class, 'filter has no defaults; give it its options.');
 
     it('refuses lists and weights that do not match', function (callable $build, string $message): void {
@@ -271,6 +300,7 @@ describe('built-in filters', function (): void {
         [fn () => new Palette([]), 'The palette filter needs at least one option to pick from.'],
         [fn () => new Palette(['red'], weights: [1, 2]), 'The palette filter has 1 options but 2 weights.'],
         [fn () => new MixedShape([Module::Square], weights: []), 'The mixed-shape filter has 1 options but 0 weights.'],
+        [fn () => new EyePalette([]), 'The eye-palette filter needs at least one option to pick from.'],
     ]);
 
     it('picks by weight', function (): void {
@@ -327,4 +357,115 @@ describe('built-in filters', function (): void {
         expect(abs($covariance / $spread))->toBeLessThan(0.2);
     });
 
+});
+
+describe('eye filters', function (): void {
+    /**
+     * @return array{SceneItem, SceneItem}
+     */
+    function eye(Scene $scene, Corner $corner): array
+    {
+        $index = array_search($corner, Corner::cases(), true) * 2;
+
+        return [$scene->items[$index], $scene->items[$index + 1]];
+    }
+
+    it('mixes shapes per corner, by name, enum or instance', function (): void {
+        $mixed = new EyeMix(outer: ['rounded', \ExeQue\Qr\Shapes\Enums\OuterEye::Circle, new \ExeQue\Qr\Shapes\OuterEyes\Square()], inner: ['circle']);
+        $scene = filtered($mixed);
+
+        expect(eye($scene, Corner::TopLeft)[1]->shapeName)->toBe(eye(filtered(new EyeMix(outer: [], inner: [\ExeQue\Qr\Shapes\Enums\InnerEye::Circle])), Corner::TopLeft)[1]->shapeName)
+            ->and(filtered(new EyeMix(outer: [], inner: []))->toSnapshot())->toBe(filtered()->toSnapshot())
+            ->and($mixed->options()['inner'])->toHaveCount(1);
+    });
+
+    it('picks a color per corner from a palette', function (): void {
+        $scene = filtered(new EyePalette(['#be123c', '#0f766e'], outer: false));
+
+        foreach (Corner::cases() as $corner) {
+            [$outer, $inner] = eye($scene, $corner);
+
+            expect($outer->paint->toCss())->toBe('#000000')
+                ->and($inner->paint->toCss())->toBeIn(['#be123c', '#0f766e']);
+        }
+    });
+
+    it('shades each corner lighter or darker, and leaves gradients', function (): void {
+        [$lighter] = eye(filtered(new EyeShade(min: 30, max: 30)), Corner::TopLeft);
+        [$darker] = eye(filtered(new EyePaint('#be123c'), new EyeShade(min: -20, max: -20)), Corner::TopLeft);
+        [$gradient] = eye(filtered(new EyePaint(LinearGradient::make('#be123c', '#1e1b4b')), new EyeShade()), Corner::TopLeft);
+
+        expect($lighter->paint->toCss())->not->toBe('#000000')
+            ->and($darker->paint->toCss())->not->toBe('#be123c')
+            ->and($gradient->paint)->toBeInstanceOf(LinearGradient::class);
+    });
+
+    it('jitters each part by an amount of its own', function (): void {
+        [$outer, $inner] = eye(filtered(new EyeJitter(rotate: 10, size: 0, opacity: 0.5)), Corner::TopRight);
+
+        expect($outer->transform->toString())->not->toBe($inner->transform->toString())
+            ->and($outer->opacity)->toBeLessThanOrEqual(1.0)->toBeGreaterThanOrEqual(0.5);
+    });
+
+    it('twists each corner a step further', function (): void {
+        $twisted = filtered(new EyeTwist(step: 10, inner: false));
+        $plain = filtered();
+
+        expect(eye($twisted, Corner::TopLeft)[0]->transform->toString())->toBe(eye($plain, Corner::TopLeft)[0]->transform->toString())
+            ->and(eye($twisted, Corner::TopRight)[0]->transform->toString())->not->toBe(eye($plain, Corner::TopRight)[0]->transform->toString())
+            ->and(eye($twisted, Corner::BottomLeft)[1]->transform->toString())->toBe(eye($plain, Corner::BottomLeft)[1]->transform->toString());
+    });
+
+    it('samples the modules\' gradient where each eye sits', function (): void {
+        $gradient = LinearGradient::make('#ff0000', '#0000ff')->angle(45);
+        $style = Style::default()->withModules(Style::default()->modules->withPaint($gradient))->withFilters(new EyeSample(inner: false));
+        $scene = new Renderer()->render(new Encoder()->encode(FILTER_URL, ErrorCorrection::Quartile), $style);
+        [$left] = eye($scene, Corner::TopLeft);
+        [$right] = eye($scene, Corner::TopRight);
+        [$bottom] = eye($scene, Corner::BottomLeft);
+
+        expect($left->paint)->toBeInstanceOf(\ExeQue\Qr\Contracts\Color::class)
+            ->and([$right->paint->toCss(), $bottom->paint->toCss()])->not->toBe([$left->paint->toCss(), $left->paint->toCss()])
+            ->and(eye($scene, Corner::TopLeft)[1]->paint)->toBeInstanceOf(LinearGradient::class);
+    });
+
+    it('samples each layer of layered module paint, and keeps plain colors', function (): void {
+        $layered = new \ExeQue\Qr\Paints\Layered([
+            new \ExeQue\Qr\Paints\Layer(new Hex('#be123c')),
+            new \ExeQue\Qr\Paints\Layer(LinearGradient::make('#ff0000', '#0000ff'), 0.5),
+        ]);
+        $eye = EyeContext::of(Corner::TopLeft, 29, $layered);
+        $style = new EyeSample()->eye($eye, Style::default()->eye(Corner::TopLeft));
+
+        expect($style->outer->paint)->toBeInstanceOf(\ExeQue\Qr\Paints\Layered::class)
+            ->and($style->outer->paint->layers[1]->paint)->toBeInstanceOf(\ExeQue\Qr\Contracts\Color::class)
+            ->and($style->outer->paint->layers[0]->paint->toCss())->toBe('#be123c')
+            ->and(new EyeSample()->eye(EyeContext::of(Corner::TopLeft, 29), Style::default()->eye(Corner::TopLeft)))->toEqual(Style::default()->eye(Corner::TopLeft));
+    });
+
+    it('echoes the outer color in the inner part', function (): void {
+        [$outer, $inner] = eye(filtered(new EyePaint('#be123c'), new EyeEcho(lightness: 8)), Corner::TopLeft);
+        [, $darker] = eye(filtered(new EyePaint('#be123c'), new EyeEcho()), Corner::TopLeft);
+        [, $gradient] = eye(filtered(new EyePaint(LinearGradient::make('#be123c', '#1e1b4b')), new EyeEcho()), Corner::TopLeft);
+
+        expect($outer->paint->toCss())->toBe('#be123c')
+            ->and($inner->paint->toCss())->not->toBe('#be123c')
+            ->and($darker->paint->toCss())->not->toBe($inner->paint->toCss())
+            ->and($gradient->paint)->toBeInstanceOf(LinearGradient::class);
+    });
+
+    it('stretches and flips the eyes', function (): void {
+        $plain = eye(filtered(), Corner::TopLeft);
+
+        expect(eye(filtered(new EyeStretch(outer: false)), Corner::TopLeft)[0]->transform->toString())->toBe($plain[0]->transform->toString())
+            ->and(eye(filtered(new EyeStretch(inner: false)), Corner::TopLeft)[0]->transform->toString())->not->toBe($plain[0]->transform->toString())
+            ->and(eye(filtered(new EyeFlip()), Corner::TopLeft)[1]->transform->toString())->not->toBe($plain[1]->transform->toString())
+            ->and(eye(filtered(new EyeFlip(horizontal: false)), Corner::TopLeft)[1]->transform->toString())->toBe($plain[1]->transform->toString());
+    });
+
+    it('sizes the inner part from a range per corner', function (): void {
+        $scene = filtered(new EyeSize(inner: [0.6, 1.0], seed: 1));
+
+        expect(eye($scene, Corner::TopLeft)[1]->transform->toString())->not->toBe(eye($scene, Corner::TopRight)[1]->transform->toString());
+    });
 });

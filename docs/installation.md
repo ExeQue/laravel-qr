@@ -33,3 +33,13 @@ php artisan qr:check
 
 builds every shape, filter, gradient, style, writer and reader your config names, and lists anything it cannot. Run
 it in CI and after deploys; see [Artisan commands](commands.md).
+
+## Laravel Boost
+
+The package ships a [Laravel Boost](https://github.com/laravel/boost) skill, `laravel-qr`, which teaches AI agents
+to make, style, cache, test and read codes with the package, and carries this documentation as references. It lists
+the application's own color names and named styles too. Boost finds it on install:
+
+```bash
+php artisan boost:install
+```

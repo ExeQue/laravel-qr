@@ -57,7 +57,7 @@ final readonly class Renderer
         $items = [];
 
         foreach (Corner::cases() as $corner) {
-            $context = EyeContext::of($corner, $matrix->size);
+            $context = EyeContext::of($corner, $matrix->size, $style->modules->paint);
             $eye = $style->eye($corner);
 
             foreach ($style->filters() as $filter) {

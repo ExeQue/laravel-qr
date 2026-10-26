@@ -10,9 +10,18 @@ use ExeQue\Qr\Filters\ByRole;
 use ExeQue\Qr\Filters\Compound;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
+use ExeQue\Qr\Filters\EyeEcho;
+use ExeQue\Qr\Filters\EyeFlip;
+use ExeQue\Qr\Filters\EyeJitter;
+use ExeQue\Qr\Filters\EyeMix;
 use ExeQue\Qr\Filters\EyePaint;
+use ExeQue\Qr\Filters\EyePalette;
+use ExeQue\Qr\Filters\EyeSample;
+use ExeQue\Qr\Filters\EyeShade;
 use ExeQue\Qr\Filters\EyeSize;
+use ExeQue\Qr\Filters\EyeStretch;
 use ExeQue\Qr\Filters\EyeTilt;
+use ExeQue\Qr\Filters\EyeTwist;
 use ExeQue\Qr\Filters\GradientFill;
 use ExeQue\Qr\Filters\InRegion;
 use ExeQue\Qr\Filters\Jitter;
@@ -49,6 +58,15 @@ enum Filter: string implements ProvidesQrFilter
     case EyeTilt = 'eye-tilt';
     case EyeSize = 'eye-size';
     case EyePaint = 'eye-paint';
+    case EyeMix = 'eye-mix';
+    case EyePalette = 'eye-palette';
+    case EyeShade = 'eye-shade';
+    case EyeJitter = 'eye-jitter';
+    case EyeTwist = 'eye-twist';
+    case EyeSample = 'eye-sample';
+    case EyeEcho = 'eye-echo';
+    case EyeStretch = 'eye-stretch';
+    case EyeFlip = 'eye-flip';
     case Compound = 'compound';
 
     /**
@@ -76,6 +94,15 @@ enum Filter: string implements ProvidesQrFilter
             self::EyeTilt => EyeTilt::class,
             self::EyeSize => EyeSize::class,
             self::EyePaint => EyePaint::class,
+            self::EyeMix => EyeMix::class,
+            self::EyePalette => EyePalette::class,
+            self::EyeShade => EyeShade::class,
+            self::EyeJitter => EyeJitter::class,
+            self::EyeTwist => EyeTwist::class,
+            self::EyeSample => EyeSample::class,
+            self::EyeEcho => EyeEcho::class,
+            self::EyeStretch => EyeStretch::class,
+            self::EyeFlip => EyeFlip::class,
             self::Compound => Compound::class,
         };
     }
@@ -86,7 +113,7 @@ enum Filter: string implements ProvidesQrFilter
      */
     public function qrFilter(): NamedFilter
     {
-        if (in_array($this, [self::MixedShape, self::Palette, self::GradientFill, self::ByRole, self::Region, self::Compound], true)) {
+        if (in_array($this, [self::MixedShape, self::Palette, self::EyePalette, self::GradientFill, self::ByRole, self::Region, self::Compound], true)) {
             throw InvalidFilterException::needsOptions($this->value);
         }
 

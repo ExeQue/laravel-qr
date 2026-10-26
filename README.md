@@ -16,7 +16,7 @@
 
 Customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back.
 
-| 30 | 14 | 20 | 17 | 15 | 5 |
+| 30 | 14 | 20 | 17 | 24 | 5 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | module shapes | outer eyes | inner eyes | eye presets | filters | gradients |
 
@@ -51,7 +51,8 @@ Qr::url('https://example.com/e/ABCD1234')
   attribution written into the file.
 - **Blade** - `<x-qr :content="$url" />`, and icons of every shape for style pickers.
 - **Reading** - `Qr::read()` reads codes from images, with the package's own decoder or zxing.
-- **Caching**, a **testing fake**, **events**, a **Monocle** lens, and **artisan** commands.
+- **Caching**, a **testing fake**, **events**, a **Monocle** lens, **artisan** commands, and a
+  [Laravel Boost](docs/installation.md#laravel-boost) skill for AI agents.
 
 Every built-in shape is checked with a real decoder, as SVG and as PNG.
 

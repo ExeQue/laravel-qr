@@ -17,14 +17,24 @@ final class EyeSize implements EyeFilter, NamedFilter
 {
     use Scoped;
 
+    /**
+     * @param float|array{float, float} $inner The inner part's size as a share, or a range to pick from per corner.
+     */
     public function __construct(
-        private float $inner = 0.85,
+        private float|array $inner = 0.85,
+        private int $seed = 0,
     ) {
     }
 
     public function eye(EyeContext $eye, EyeStyle $style): EyeStyle
     {
-        return $this->appliesToEye($eye) ? $style->withInner($style->inner->scaleBy($this->inner)) : $style;
+        if (! $this->appliesToEye($eye)) {
+            return $style;
+        }
+
+        $size = is_array($this->inner) ? $eye->random($this->inner[0], $this->inner[1], "{$this->name()}:{$this->seed}") : $this->inner;
+
+        return $style->withInner($style->inner->scaleBy($size));
     }
 
     public function name(): string
@@ -34,6 +44,6 @@ final class EyeSize implements EyeFilter, NamedFilter
 
     public function options(): array
     {
-        return ['inner' => $this->inner, ...$this->scope()];
+        return ['inner' => $this->inner, 'seed' => $this->seed, ...$this->scope()];
     }
 }
