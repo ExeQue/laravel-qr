@@ -7,6 +7,7 @@ export default defineConfig({
   description: 'QR codes for Laravel.',
   base: '/laravel-qr/',
   lastUpdated: true,
+  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/laravel-qr/logo.svg' }]],
   cleanUrls: true,
 
   srcExclude: [
@@ -35,6 +36,7 @@ export default defineConfig({
   },
 
   themeConfig: {
+    logo: '/logo.svg',
     nav: [
       { text: 'Documentation', link: '/docs/' },
       { text: 'Packagist', link: 'https://packagist.org/packages/exeque/laravel-qr' },
