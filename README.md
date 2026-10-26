@@ -66,6 +66,14 @@ place of any of the package's services. See [Extending](docs/extending.md).
 
 ```bash
 composer require exeque/laravel-qr
+
+# Recommended
+pecl install imagick                            # PNG, JPEG and WebP (or your system's package, such as php8.5-imagick)
+apk add imagemagick-svg                         # SVG logos on raster codes: Alpine
+apt install libmagickcore-6.q16-7-extra         # SVG logos on raster codes: Ubuntu 24.04 (Debian 13 has it)
+php artisan qr:install --svg                    # the zxing reader, reading SVG too
+composer require enshrined/svg-sanitize         # a dedicated SVG logo sanitizer
+composer require --dev exeque/laravel-monocle   # see the codes each request rendered
 ```
 
 PHP 8.5 and Laravel 13. SVG needs nothing more.
