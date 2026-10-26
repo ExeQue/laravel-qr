@@ -11,6 +11,7 @@ use ExeQue\Qr\Builders\PendingQr;
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Encoder\Enums\Role;
 use ExeQue\Qr\Exceptions\QrExceptionInterface;
+use ExeQue\Qr\Exceptions\ScanSafetyException;
 use ExeQue\Qr\Facades\Qr;
 use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
@@ -25,6 +26,7 @@ use ExeQue\Qr\Rendering\ScanSafety;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -161,6 +163,14 @@ class Playground extends Component
 
     public bool $checkScan = true;
 
+    /**
+     * The last code drawn, shown while the settings cannot draw one.
+     *
+     * @var array<string, mixed>
+     */
+    #[Locked]
+    public array $last = [];
+
     public function mount(): void
     {
         $this->paint = self::paintSpec('#1c1917');
@@ -253,6 +263,7 @@ class Playground extends Component
             'properties' => array_map(fn (Property $property): string => $property->value, Property::cases()),
             'logos' => array_map(basename(...), glob(dirname(__DIR__, 2).'/resources/logos/*') ?: []),
             'php' => null,
+            'warning' => null,
         ];
 
         try {
@@ -262,30 +273,46 @@ class Playground extends Component
         }
 
         try {
-            $code = $this->code();
-            $output = match ($this->format) {
-                'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
-                'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-                'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-                default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver),
-            };
-            $scene = $code->scene();
-
-            $data = [
-                ...$data,
-                'code' => $this->format === 'svg' ? $output->contents() : null,
-                'image' => $this->format === 'svg' ? null : $output->toDataUri(),
-                'bytes' => strlen($output->contents()),
-                'modules' => $scene->size - 2 * $scene->margin,
-                'adjustments' => array_map(fn (GuardAdjustment $adjustment): string => trim("{$adjustment->guard}: {$adjustment->detail}"), $scene->adjustments),
-                'milliseconds' => round((hrtime(true) - $started) / 1e6, 1),
-                'scans' => $this->checkScan ? $this->scans($code) : null,
-            ];
+            $data = [...$data, ...$this->draw($this->code(), $started)];
+        } catch (ScanSafetyException $exception) {
+            // Drawn anyway, without the guards: the playground is for seeing what a style does.
+            $data = [...$data, ...$this->draw($this->code()->scanSafety(ScanSafety::off()), $started)];
+            $data['warning'] = $exception->getMessage().' Drawn without the scan guards, so it may not scan.';
         } catch (QrExceptionInterface|TypeError|ValueError|InvalidArgumentException $exception) {
-            $data['error'] = $exception->getMessage();
+            $data = [...$data, ...$this->last, 'error' => $exception->getMessage()];
+        }
+
+        if ($data['error'] === null) {
+            $this->last = array_intersect_key($data, array_flip(['code', 'image', 'bytes', 'modules', 'adjustments', 'milliseconds', 'scans']));
         }
 
         return view('livewire.playground', $data);
+    }
+
+    /**
+     * The code drawn in the format asked for, and what there is to say about it.
+     *
+     * @return array<string, mixed>
+     */
+    private function draw(PendingQr $code, int $started): array
+    {
+        $output = match ($this->format) {
+            'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
+            'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver),
+        };
+        $scene = $code->scene();
+
+        return [
+            'code' => $this->format === 'svg' ? $output->contents() : null,
+            'image' => $this->format === 'svg' ? null : $output->toDataUri(),
+            'bytes' => strlen($output->contents()),
+            'modules' => $scene->size - 2 * $scene->margin,
+            'adjustments' => array_map(fn (GuardAdjustment $adjustment): string => trim("{$adjustment->guard}: {$adjustment->detail}"), $scene->adjustments),
+            'milliseconds' => round((hrtime(true) - $started) / 1e6, 1),
+            'scans' => $this->checkScan ? $this->scans($code) : null,
+        ];
     }
 
     private function code(): PendingQr

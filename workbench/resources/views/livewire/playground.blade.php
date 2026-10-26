@@ -254,8 +254,12 @@
 
     <div class="stage">
         @if ($error)
-            <div class="notice error">{{ $error }}</div>
-        @else
+            <div class="notice error">{{ $error }}{{ ($code ?? null) || ($image ?? null) ? ' Showing the last code that could be drawn.' : '' }}</div>
+        @endif
+        @if ($warning)
+            <div class="notice warning">{{ $warning }}</div>
+        @endif
+        @if (($code ?? null) || ($image ?? null))
             <div class="code" wire:loading.class="loading">
                 @if ($code)
                     {!! $code !!}
