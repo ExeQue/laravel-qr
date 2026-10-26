@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use ExeQue\Qr\Facades\Qr;
+use ExeQue\Qr\Registries\FilterRegistry;
+use ExeQue\Qr\Registries\ModuleRegistry;
+
+covers(ModuleRegistry::class, FilterRegistry::class);
 
 it('counts the built-in parts in the README as the package has them', function (): void {
     $readme = (string) file_get_contents(dirname(__DIR__, 2).'/README.md');
