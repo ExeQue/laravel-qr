@@ -97,6 +97,9 @@ Use a named style or color the application already has before writing a new one.
   (`->errorCorrection('H')`) for a larger logo.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
 - In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $url)`.
+- Validate a style from a form with `StyleRule` (`'style' => StyleRule::defaults()`, or
+  `...StyleRule::defaults()->for('style')`), and turn it into a style with `$request->qrStyle('style')`; never pass
+  request input to `Style::fromArray()`.
 - Register shapes, filters and styles of the application in a service provider, or as plain values in
   `config/qr.php`; `php artisan qr:check` builds every one and lists problems.
 
@@ -114,6 +117,7 @@ Read the one that fits before going further than the steps above; each is the pa
 - `references/logos.md` - sources, sizes (`'auto'`), cleared shapes, plates
 - `references/scan-safety.md` - the guards and their limits
 - `references/blade.md` - the components
+- `references/validation.md` - `StyleRule` for styles from forms: fields, `Allow`, `PaintRule`, `scannable()`, `toStyle()`
 - `references/reading.md` - `Qr::read()`, decoders, `qr:install`
 - `references/caching.md`, `references/testing.md` - caching, and `Qr::fake()` with its assertions
 - `references/configuration.md` - every config key

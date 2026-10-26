@@ -57,6 +57,7 @@ export default defineConfig({
           { text: 'Output', link: '/docs/output' },
           { text: 'Styling', link: '/docs/styling' },
           { text: 'Blade', link: '/docs/blade' },
+          { text: 'Validating input', link: '/docs/validation' },
         ],
       },
       {

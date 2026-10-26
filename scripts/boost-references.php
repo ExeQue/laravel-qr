@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 const REFERENCE_PAGES = [
     'getting-started', 'content', 'output', 'styling', 'modules', 'eyes', 'colors', 'gradients', 'filters',
-    'logos', 'scan-safety', 'blade', 'reading', 'caching', 'testing', 'configuration', 'extending',
+    'logos', 'scan-safety', 'blade', 'validation', 'reading', 'caching', 'testing', 'configuration', 'extending',
 ];
 
 /**

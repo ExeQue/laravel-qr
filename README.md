@@ -50,6 +50,7 @@ Qr::url('https://example.com/e/ABCD1234')
 - **Output** - SVG, PNG, JPEG and WebP; saved, stored, downloaded, streamed or returned as a response; with
   attribution written into the file.
 - **Blade** - `<x-qr :content="$url" />`, and icons of every shape for style pickers.
+- **Validation** - `StyleRule` checks a style from a form, field by field, and turns it into a style.
 - **Reading** - `Qr::read()` reads codes from images, with the package's own decoder or zxing.
 - **Caching**, a **testing fake**, **events**, a **Monocle** lens, **artisan** commands, and a
   [Laravel Boost](docs/installation.md#laravel-boost) skill for AI agents.

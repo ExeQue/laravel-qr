@@ -198,6 +198,31 @@ parts change with `withOuter()` and `withInner()`.
 `name()` and `options()` must rebuild the filter: `new Checkerboard(...$filter->options())`. Use `$cell->random()` for
 anything random, never `rand()`, so a code looks the same every time.
 
+## Option rules
+
+When a [StyleRule](validation.md) takes a shape's or filter's options from input, it checks them by the class's rules.
+A class's constructor types give rules of their own (a float is numeric, an int an integer, a bool a boolean, a backed
+enum one of its values); a class that takes lists, or wants ranges, states its rules with `HasOptionRules`:
+
+```php
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+
+final class Checkerboard implements HasOptionRules, ModuleFilter, NamedFilter
+{
+    public static function optionRules(): array
+    {
+        return [
+            'opacity' => ['sometimes', 'numeric', 'between:0,1'],
+        ];
+    }
+
+    // ...
+}
+```
+
+What the constructor throws for an option, such as an `InvalidOptionException` for a value out of range, becomes an
+error on that option. To find rules some other way, bind your own `ResolvesOptionRules` in place of the package's.
+
 ## Gradients
 
 A gradient implements `Gradient`: `colorAt($x, $y)` for a point of its box (0 to 1 both ways) and `stops()`. To be

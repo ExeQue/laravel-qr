@@ -15,6 +15,7 @@
 - [Logos](logos.md) - A logo in the middle of a code
 - [Scan safety](scan-safety.md) - The guards that keep styled codes readable
 - [Blade](blade.md) - Components for codes and shape icons
+- [Validating input](validation.md) - Styles from forms, checked and turned into styles
 - [Shape icons](icons.md) - Shapes on their own, for pickers and settings screens
 - [Reading codes](reading.md) - Reading the code in an image
 - [Caching](caching.md) - Writing each code once
@@ -38,5 +39,6 @@
 | Random rotation, size, color per module | [Filters](filters.md) |
 | `<x-qr::code>` | [Blade](blade.md) |
 | `Qr::read()` | [Reading codes](reading.md) |
+| Validating a style from a form | [Validating input](validation.md) |
 | Turning the scan guards off | [Scan safety](scan-safety.md#turning-guards-off) |
 | `Qr::fake()` | [Testing](testing.md) |
