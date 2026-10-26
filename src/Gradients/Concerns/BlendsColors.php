@@ -33,7 +33,7 @@ trait BlendsColors
     }
 
     /**
-     * The space to blend in, and for polar spaces which way round the hues go.
+     * The space to blend in, and for polar spaces which way around the hues go.
      */
     public function in(ColorSpace $space, HueInterpolation $hueInterpolation = HueInterpolation::Shorter): static
     {

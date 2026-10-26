@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Filters;
 
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Filters\Concerns\AppliesProperty;
 use ExeQue\Qr\Filters\Concerns\Scoped;
 use ExeQue\Qr\Filters\Contracts\ModuleFilter;
@@ -16,7 +17,7 @@ use ExeQue\Qr\Validation\Rules\Options;
 use Illuminate\Validation\Rule;
 
 /**
- * Varies a property from a center outwards: `$inner` there, `$outer` at the farthest corner.
+ * Varies a property from a center outward: `$inner` there, `$outer` at the farthest corner.
  */
 final class Radial implements ModuleFilter, NamedFilter, HasOptionRules
 {
@@ -26,7 +27,7 @@ final class Radial implements ModuleFilter, NamedFilter, HasOptionRules
     private Property $property;
 
     /**
-     * @param array{float, float} $center A point of the symbol, 0-1 on both axes.
+     * @param array<array-key, mixed> $center A point of the symbol, 0-1 on both axes: `[x, y]`.
      */
     public function __construct(
         Property|string $property = Property::Size,
@@ -36,6 +37,10 @@ final class Radial implements ModuleFilter, NamedFilter, HasOptionRules
     ) {
         $this->property = $property instanceof Property ? $property : Property::from($property);
         // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        if (! array_is_list($center) || count($center) !== 2 || ! array_all($center, fn (mixed $number): bool => is_numeric($number))) {
+            throw InvalidOptionException::notAList(self::class, 'center', 2);
+        }
+
         $this->center = array_map(floatval(...), $center);
     }
 

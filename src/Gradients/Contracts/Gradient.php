@@ -11,7 +11,7 @@ use ExeQue\Qr\Gradients\ColorStop;
 interface Gradient extends Paint
 {
     /**
-     * The color at a point of the gradient's box, 0-1 on both axes, y downwards.
+     * The color at a point of the gradient's box, 0-1 on both axes, y downward.
      */
     public function colorAt(float $x, float $y): Color;
 

@@ -173,7 +173,7 @@ describe('reading back', function (): void {
             ->withMargin(3)
             ->withPaint(new Hex('#1c1917'))
             ->withBackground(new Hex('#fff7ed'))
-            ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotate(5))
+            ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotation(5))
             ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c'))->withSize(0.95))->withInner($eye->inner->withOpacity(0.8)))
             ->withFilters(new MixedOpacity(min: 0.85), new EyeTilt());
 

@@ -23,7 +23,7 @@ class RenderCodeRequest extends FormRequest
         return [
             'content' => ['required', 'string', 'max:2000'],
             'format' => ['sometimes', 'in:svg,png,jpeg,webp'],
-            'size' => ['sometimes', 'integer', 'between:64,2048'],
+            'size' => ['sometimes', 'integer', 'between:64,1024'],
             ...StyleRule::defaults()->for('style'),
         ];
     }

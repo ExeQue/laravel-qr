@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Geometry;
 
 /**
- * Closed figures for shapes, drawn clockwise about a middle point, in modules (y grows downwards).
+ * Closed figures for shapes, drawn clockwise about a middle point, in modules (y grows downward).
  */
 final class Figures
 {
@@ -30,7 +30,7 @@ final class Figures
     }
 
     /**
-     * An upright heart, 3.4 units tall before `$scale`. `$shift` moves the drawing towards its point
+     * An upright heart, 3.4 units tall before `$scale`. `$shift` moves the drawing toward its point
      * before it is scaled, so its weight sits on the middle; `$lean` turns it, in degrees.
      */
     public static function heart(float $x, float $y, float $scale, float $lean = 0.0, float $shift = 0.0): Path
@@ -120,7 +120,7 @@ final class Figures
     }
 
     /**
-     * One outline round a heart circle and `$petals` petal circles, `$reach` from the middle, the first up:
+     * One outline around a heart circle and `$petals` petal circles, `$reach` from the middle, the first up:
      * along each of 72 rays the edge is the farthest of the circles.
      */
     public static function flower(float $x, float $y, float $petal, float $reach, float $heart, int $petals = 6): Path
@@ -173,7 +173,7 @@ final class Figures
     }
 
     /**
-     * A four-pointed sparkle: points on the axes, `$radius` out, its sides curving in towards the
+     * A four-pointed sparkle: points on the axes, `$radius` out, its sides curving in toward the
      * middle; `$pinch` (0 to 1) is how full the sides stay.
      */
     public static function sparkle(float $x, float $y, float $radius, float $pinch): Path
@@ -204,7 +204,7 @@ final class Figures
     }
 
     /**
-     * Four leaves round a middle: circles of `$leaf` set `$offset` out on the diagonals, and one of
+     * Four leaves around a middle: circles of `$leaf` set `$offset` out on the diagonals, and one of
      * `$heart` in the middle, drawn together.
      */
     public static function clover(float $x, float $y, float $offset, float $leaf, float $heart): Path

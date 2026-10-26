@@ -47,8 +47,14 @@ final readonly class Bitmap
         try {
             $image = new Imagick();
             $image->pingImageBlob($bytes);
+            $pixels = 0;
 
-            if ($image->getImageWidth() * $image->getImageHeight() > self::MAX_PIXELS) {
+            // Reading decodes every frame of an animation, so they count together.
+            foreach ($image as $frame) {
+                $pixels += $frame->getImageWidth() * $frame->getImageHeight();
+            }
+
+            if ($pixels > self::MAX_PIXELS) {
                 throw UnreadableCodeException::unreadableImage();
             }
 

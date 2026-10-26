@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Filters;
 
 use ExeQue\Qr\Filters\Concerns\Scoped;
+use ExeQue\Qr\Filters\Concerns\TakesRanges;
 use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
@@ -19,6 +20,7 @@ use ExeQue\Qr\Validation\Rules\Options;
 final class EyeSize implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
+    use TakesRanges;
 
     /**
      * @param float|array{float, float} $inner The inner part's size as a share, or a range to pick from per corner.
@@ -28,7 +30,7 @@ final class EyeSize implements EyeFilter, NamedFilter, HasOptionRules
         private int $seed = 0,
     ) {
         // Numbers from a form are strings; a range of them is not converted on the way in.
-        $this->inner = is_array($inner) ? array_map(floatval(...), $inner) : $inner;
+        $this->inner = self::range('inner', $inner);
     }
 
     public function eye(EyeContext $eye, EyeStyle $style): EyeStyle

@@ -37,7 +37,7 @@ The pictures show the top-left eye close up, with the modules beside it.
 | `hexagon-standing` | `OuterEyes\Hexagon` | `standing` true | the same, flat sides left and right, points up and down |
 | `leaf` | `OuterEyes\Rounded` | `outer` [3, 0, 3, 0], `hole` [2, 0, 2, 0] | two opposite corners round |
 | `drop` | `OuterEyes\Rounded` | `outer` [3, 3, 3, 0], `hole` [2, 2, 2, 0] | three corners round, one pointed |
-| `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides round a soft hole |
+| `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides around a soft hole |
 | `dotted-ring` | `OuterEyes\DottedRing` | `diameter` 1.0 (0.8 to 1) | a dot on each of the ring's 24 modules |
 
 `OuterEyes\Rounded` takes one radius for every corner, or four: top-right, bottom-right, bottom-left, top-left. Its
@@ -127,7 +127,7 @@ use ExeQue\Qr\Rendering\Enums\Corner;
 Qr::url($url)
     ->eyes(Eye::Rounded)
     ->eye(Corner::TopLeft, Eye::Heart, paint: '#be123c')
-    ->eye(Corner::BottomLeft, rotate: 90);
+    ->eye(Corner::BottomLeft, rotation: 90);
 ```
 
 The [`eye-tilt`](https://exeque.github.io/laravel-qr/docs/filters#eye-tilt), [`eye-size`](https://exeque.github.io/laravel-qr/docs/filters#eye-size) and [`eye-paint`](https://exeque.github.io/laravel-qr/docs/filters#eye-paint)

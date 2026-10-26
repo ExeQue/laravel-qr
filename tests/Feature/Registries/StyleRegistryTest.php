@@ -149,7 +149,7 @@ describe('extending', function (): void {
         $eye = Style::default()->eye(Corner::TopLeft);
         $base = Style::default()
             ->withPaint(new Hex('#1c1917'))
-            ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c')))->withInner($eye->inner->withRotate(10)))
+            ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c')))->withInner($eye->inner->withRotation(10)))
             ->withFilter(new MixedOpacity())
             ->withLogo(new LogoStyle(Logo::fromFile(dirname(__DIR__, 2).'/Fixtures/logos/badge.svg')));
         $over = Style::default()

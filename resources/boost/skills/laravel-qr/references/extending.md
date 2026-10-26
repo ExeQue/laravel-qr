@@ -89,7 +89,7 @@ final readonly class PillModule implements Configurable, ModuleShape
 | `random($min, $max, $purpose)` | a number that is the same for this module every time |
 | `logo` | the region the code's logo clears, if it has one |
 
-Shapes are drawn clockwise (y grows downwards); a hole is drawn the other way round. `Path` and `RoundedRect` build
+Shapes are drawn clockwise (y grows downward); a hole is drawn the other way around. `Path` and `RoundedRect` build
 outlines:
 
 ```php
@@ -191,7 +191,7 @@ Qr::filters()->register('checkerboard', Checkerboard::class);
 Qr::url($url)->filter('checkerboard', opacity: 0.5);
 ```
 
-`ModuleStyle` has `withShape()`, `withPaint()`, `withRotate()`, `withSize()`, `withOffset()`, `withSkew()`,
+`ModuleStyle` has `withShape()`, `withPaint()`, `withRotation()`, `withSize()`, `withOffset()`, `withSkew()`,
 `withOpacity()` and `withSkip()`, and relative `rotateBy()`, `scaleBy()`, `offsetBy()` and `fadeBy()`. An eye filter
 gets an `EyeContext` (the corner, the symbol's size, a stable `random()`) and an `EyeStyle`, whose `outer` and `inner`
 parts change with `withOuter()` and `withInner()`.

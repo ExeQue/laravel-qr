@@ -52,7 +52,7 @@ describe('the driver', function (): void {
     });
 
     it('refuses a driver it does not know', function (): void {
-        expect(fn () => Driver::resolve('vips'))->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"driver" is one of auto, imagick, gd, vips given.');
+        expect(fn () => Driver::resolve('vips'))->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"driver" must be one of auto, imagick, gd; "vips" given.');
     });
 });
 

@@ -15,7 +15,7 @@ final class LinearGradient implements SerializableGradient
     use HasStops;
 
     /**
-     * Degrees as CSS has them: 0 runs upwards, 90 to the right, 180 (the default) downwards.
+     * Degrees as CSS has them: 0 runs upward, 90 to the right, 180 (the default) downward.
      */
     public private(set) float $angle = 180.0;
 

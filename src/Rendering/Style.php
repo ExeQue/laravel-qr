@@ -145,7 +145,7 @@ final readonly class Style implements Arrayable, JsonSerializable
     /**
      * Turns the top-right eye a quarter clockwise and the bottom-left one a
      * quarter back, on top of any turn they have, so a corner drawn top-left on
-     * the shape points outwards on every eye.
+     * the shape points outward on every eye.
      */
     public function mirrored(): self
     {

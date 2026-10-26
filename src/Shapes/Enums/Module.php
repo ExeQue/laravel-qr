@@ -60,7 +60,7 @@ enum Module: string implements ProvidesQrModule
     case Sparkles = 'sparkles';
     case Crosses = 'crosses';
     case Clovers = 'clovers';
-    case Pills = 'pills';
+    case PillsVertical = 'pills-vertical';
     case PillsHorizontal = 'pills-horizontal';
     case BricksHorizontal = 'bricks-horizontal';
     case BricksVertical = 'bricks-vertical';
@@ -97,7 +97,7 @@ enum Module: string implements ProvidesQrModule
             self::Sparkles => Sparkle::class,
             self::Crosses => Cross::class,
             self::Clovers => Clover::class,
-            self::Pills, self::PillsHorizontal => Pill::class,
+            self::PillsVertical, self::PillsHorizontal => Pill::class,
             self::BricksHorizontal, self::BricksVertical => Brick::class,
             self::Sketch => Sketch::class,
             self::LinesVertical, self::LinesHorizontal => Lines::class,

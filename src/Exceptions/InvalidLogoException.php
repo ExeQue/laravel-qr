@@ -69,6 +69,11 @@ final class InvalidLogoException extends InvalidArgumentException implements QrE
         return new self("A logo may have at most {$max} pixels; this one is {$width} by {$height}.");
     }
 
+    public static function tooManyPixels(int $pixels, int $max): self
+    {
+        return new self("A logo may have at most {$max} pixels in all its frames; this one has {$pixels}.");
+    }
+
     public static function notLocal(string $path): self
     {
         return new self("A logo is read from a local file, not from \"{$path}\": logos are never fetched from elsewhere.");

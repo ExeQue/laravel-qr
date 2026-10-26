@@ -29,7 +29,7 @@ final readonly class NativeDecoder implements Decoder
         $bitmap = Bitmap::fromImage($image);
         $failure = null;
 
-        // The cheap global threshold first; then one that follows uneven light; each the other way round too.
+        // The cheap global threshold first; then one that follows uneven light; each the other way around too.
         foreach ([fn (): array => $bitmap->global(), fn (): array => $bitmap->local()] as $threshold) {
             $dark = $threshold();
 

@@ -18,7 +18,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
-    StyleRule::useDefaults(fn (): StyleRule => StyleRule::everything());
+    StyleRule::useDefaults(null);
 });
 
 describe('the render API', function (): void {

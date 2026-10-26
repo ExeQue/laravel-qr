@@ -81,10 +81,13 @@ final class StyleInput
             'eyes' => self::eyesOf($style),
             'background' => Normalizer::value($style->background) === Normalizer::value($default->background) ? false : Normalizer::value($style->background),
             'margin' => $style->margin === $default->margin ? false : $style->margin,
-            'filters' => array_map(fn (NamedFilter $filter): array => array_filter([
-                'name' => app(FilterRegistry::class)->has($filter->name()) ? $filter->name() : throw InvalidStyleException::notInput("filter {$filter->name()}"),
-                'options' => self::named($filter->options()),
-            ]), $style->filters()) ?: false,
+            'filters' => array_map(fn (array $filter): array => array_filter([
+                'name' => app(FilterRegistry::class)->has($filter['name']) ? $filter['name'] : throw InvalidStyleException::notInput("filter {$filter['name']}"),
+                'options' => self::named($filter['options']),
+            ]), array_merge(...array_map(
+                fn (NamedFilter $filter): array => self::unwrapped(['name' => $filter->name(), 'options' => $filter->options()]),
+                $style->filters(),
+            ))) ?: false,
             'logo' => $style->logo === null ? false : array_filter([
                 'size' => $style->logo->size ?? 'auto',
                 'padding' => $style->logo->padding,
@@ -114,7 +117,7 @@ final class StyleInput
         }
 
         if (isset($input['rotation'])) {
-            $modules = $modules->withRotate((float) $input['rotation']);
+            $modules = $modules->withRotation((float) $input['rotation']);
         }
 
         return isset($input['opacity']) ? $modules->withOpacity((float) $input['opacity']) : $modules;
@@ -160,7 +163,7 @@ final class StyleInput
         }
 
         if (isset($input['rotation'])) {
-            $part = $part->withRotate((float) $input['rotation']);
+            $part = $part->withRotation((float) $input['rotation']);
         }
 
         return isset($input['opacity']) ? $part->withOpacity((float) $input['opacity']) : $part;
@@ -199,6 +202,10 @@ final class StyleInput
      */
     private static function modulesOf(ModuleStyle $modules, ModuleStyle $default): array
     {
+        if ([$modules->offsetX, $modules->offsetY, $modules->skewX, $modules->skewY, $modules->skip] !== [0.0, 0.0, 0.0, 0.0, false]) {
+            throw InvalidStyleException::notInput("modules' offset, skew or skip");
+        }
+
         return array_filter([
             ...($modules->shape == $default->shape ? [] : self::shapeOf($modules->shape, app(ModuleRegistry::class), 'module shape')),
             'paint' => Normalizer::value($modules->paint) === Normalizer::value($default->paint) ? null : Normalizer::value($modules->paint),
@@ -300,6 +307,56 @@ final class StyleInput
         $name = self::nameOfClass($registry, $shape::class) ?? throw InvalidStyleException::notInput($what);
 
         return ['shape' => $name, 'options' => $shape instanceof Configurable ? (array) Normalizer::value($shape->options()) : []];
+    }
+
+    /**
+     * A filter as input gives filters: one that wraps others as the filters it wraps, each with its
+     * roles, region or corners as their own scope.
+     *
+     * @param array{name: string, options: array<array-key, mixed>} $filter
+     *
+     * @return list<array{name: string, options: array<array-key, mixed>}>
+     */
+    private static function unwrapped(array $filter): array
+    {
+        $options = $filter['options'];
+        $scope = array_intersect_key($options, array_flip(['only', 'in', 'corners']));
+
+        $inner = match ($filter['name']) {
+            'by-role' => [self::scoped((array) $options['filter'], ['only' => $options['roles']])],
+            'region' => [self::scoped((array) $options['filter'], ['in' => $options['region']])],
+            'compound' => array_map(fn (mixed $child): array => self::scoped((array) $child, $scope), (array) $options['filters']),
+            default => null,
+        };
+
+        if ($inner === null) {
+            return [$filter];
+        }
+
+        return array_merge(...array_map(self::unwrapped(...), $inner));
+    }
+
+    /**
+     * A filter with a scope added to its own: roles both allow, the one region it can have, corners both allow.
+     *
+     * @param array<array-key, mixed> $filter
+     * @param array<array-key, mixed> $scope
+     *
+     * @return array{name: string, options: array<array-key, mixed>}
+     */
+    private static function scoped(array $filter, array $scope): array
+    {
+        $options = (array) ($filter['options'] ?? []);
+
+        foreach ($scope as $key => $value) {
+            $options[$key] = match (true) {
+                ! isset($options[$key]) => $value,
+                $key === 'in' => throw InvalidStyleException::notInput('filter in two regions'),
+                default => array_values(array_intersect((array) $options[$key], (array) $value)),
+            };
+        }
+
+        return ['name' => (string) ($filter['name'] ?? ''), 'options' => $options];
     }
 
     /**

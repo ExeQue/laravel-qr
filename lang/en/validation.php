@@ -5,7 +5,6 @@ declare(strict_types=1);
 return [
     'array' => 'The :attribute field must be an array.',
     'unknown_keys' => 'The :attribute field has unknown keys: :keys.',
-    'unknown_option' => 'The :attribute option is not one this takes.',
     'numbers' => 'The :attribute field must be a number from :min to :max, or a list of :count of them.',
     'preset' => 'The :attribute field is not an eye preset that may be chosen.',
     'region' => 'The :attribute field must be a region: a rect, rounded rect or circle by its numbers, up to 256 cells, or the logo.',
@@ -17,6 +16,14 @@ return [
         'inner' => 'The :attribute field is not an inner eye that may be chosen.',
         'entry' => 'The :attribute field must be a shape: its name, or its name and options.',
         'no_options' => 'The :attribute field may name a shape, but not give its options.',
+    ],
+
+    'option' => [
+        'unknown' => 'The :attribute option is not one this takes.',
+        'range' => 'The :attribute field must be from :min to :max.',
+        'choice' => 'The :attribute field must be one of :values.',
+        'list' => 'The :attribute field must be a number or a list of :count numbers.',
+        'invalid' => 'The :attribute field holds options that cannot be used together.',
     ],
 
     'filter' => [

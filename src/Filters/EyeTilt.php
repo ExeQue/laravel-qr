@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Filters;
 
 use ExeQue\Qr\Filters\Concerns\Scoped;
+use ExeQue\Qr\Filters\Concerns\TakesRanges;
 use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
@@ -20,6 +21,7 @@ use ExeQue\Qr\Validation\Rules\Options;
 final class EyeTilt implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
+    use TakesRanges;
 
     /**
      * @param float|array{float, float} $outer Degrees, or a range to pick from per corner.
@@ -31,8 +33,8 @@ final class EyeTilt implements EyeFilter, NamedFilter, HasOptionRules
         private int $seed = 0,
     ) {
         // Numbers from a form are strings; a range of them is not converted on the way in.
-        $this->outer = is_array($outer) ? array_map(floatval(...), $outer) : $outer;
-        $this->inner = is_array($inner) ? array_map(floatval(...), $inner) : $inner;
+        $this->outer = self::range('outer', $outer);
+        $this->inner = self::range('inner', $inner);
     }
 
     public function eye(EyeContext $eye, EyeStyle $style): EyeStyle

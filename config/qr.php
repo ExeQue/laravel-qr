@@ -19,7 +19,7 @@ return [
         'error_correction' => ExeQue\Qr\Encoder\Enums\ErrorCorrection::Medium,
         'margin' => 4,
         'size' => 600,
-        'foreground' => '#000000',
+        'paint' => '#000000',
         'background' => '#ffffff',
         'module' => ExeQue\Qr\Shapes\Enums\Module::Square,
         'eye' => ExeQue\Qr\Shapes\Enums\Eye::Square,
@@ -102,10 +102,11 @@ return [
     // else GD. GD needs no ImageMagick, but cannot draw SVG logos.
     'raster' => [
         'driver' => env('QR_RASTER_DRIVER', 'auto'),
+        // A resolution written into PNG, JPEG and WebP files, for print.
+        'dpi' => null,
     ],
 
     'png' => [
-        'dpi' => null,
         // 0-9: how hard PNGs are packed; higher is smaller and slower, the image the same.
         'compression_level' => 6,
     ],
@@ -139,9 +140,6 @@ return [
 
     'logos' => [
         'sanitizer' => ExeQue\Qr\Logos\Sanitizers\AutoSvgSanitizer::class,
-    ],
-
-    'logo' => [
         // A code with a logo gets error correction High, unless it sets its own.
         'auto_error_correction' => true,
     ],

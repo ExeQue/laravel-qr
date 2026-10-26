@@ -56,7 +56,7 @@ final class ModulesBuilder
 
     public function rotate(float $degrees): self
     {
-        return $this->with($this->style->withRotate($degrees));
+        return $this->with($this->style->withRotation($degrees));
     }
 
     public function toModuleStyle(): ModuleStyle

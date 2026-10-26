@@ -9,7 +9,7 @@ use ExeQue\Qr\Gradients\Concerns\HasStops;
 use ExeQue\Qr\Gradients\Contracts\SerializableGradient;
 
 /**
- * Colors sweeping round a center, clockwise from a start angle, as CSS's `conic-gradient`.
+ * Colors sweeping around a center, clockwise from a start angle, as CSS's `conic-gradient`.
  */
 final class ConicGradient implements SerializableGradient
 {
@@ -49,7 +49,7 @@ final class ConicGradient implements SerializableGradient
 
     private function position(float $x, float $y): float
     {
-        // Clockwise from straight up, with y downwards.
+        // Clockwise from straight up, with y downward.
         $angle = rad2deg(atan2($x - $this->center[0], $this->center[1] - $y));
 
         return Convert::normalizeHue($angle - $this->startAngle) / 360;

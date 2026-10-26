@@ -132,6 +132,16 @@ describe('caching', function (): void {
         expect(CountingWriter::$writes)->toBe(4);
     });
 
+    it('keeps raster output apart by the configured driver', function (): void {
+        $code = Qr::url('https://example.com/driver')->logo(dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', shape: 'alpha');
+
+        config()->set('qr.raster.driver', 'gd');
+        $gd = $code->png(200)->contents();
+        config()->set('qr.raster.driver', 'imagick');
+
+        expect($code->png(200)->contents())->not->toBe($gd);
+    })->skip(! extension_loaded('imagick') || ! extension_loaded('gd'), 'Both drivers are needed.');
+
     it('forgets one code, or every code', function (): void {
         config()->set('qr.cache.enabled', true);
         $code = Qr::make(PIPELINE_URL)->margin(3);

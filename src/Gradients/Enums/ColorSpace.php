@@ -17,7 +17,7 @@ enum ColorSpace: string
     case Hsl = 'hsl';
 
     /**
-     * Whether the space has a hue, which blends round the color wheel.
+     * Whether the space has a hue, which blends around the color wheel.
      */
     public function isPolar(): bool
     {

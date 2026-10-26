@@ -19,12 +19,12 @@ final readonly class Lines implements Configurable, ModuleShape
     use HasOptions;
 
     /**
-     * @param bool $vertical Lines down the code; across it when false.
      * @param float $width Of each line, in modules, from 0.2 to 1.
+     * @param bool $vertical Lines down the code; across it when false.
      */
     public function __construct(
-        public bool $vertical = true,
         public float $width = 0.72,
+        public bool $vertical = true,
     ) {
         self::within('width', $width, 0.2, 1.0);
     }

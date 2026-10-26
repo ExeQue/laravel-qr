@@ -310,7 +310,7 @@ final class FinderLocator
         usort($pairs, fn (array $p, array $q): int => $q[0] <=> $p[0]);
         [, $topLeft, $one, $two] = $pairs[0];
 
-        // With y growing downwards, top right then bottom left turns clockwise from the top left.
+        // With y growing downward, top right then bottom left turns clockwise from the top left.
         $cross = ($one[0] - $topLeft[0]) * ($two[1] - $topLeft[1]) - ($one[1] - $topLeft[1]) * ($two[0] - $topLeft[0]);
         [$topRight, $bottomLeft] = $cross > 0 ? [$one, $two] : [$two, $one];
 

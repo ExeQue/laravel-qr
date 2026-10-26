@@ -108,7 +108,7 @@ final readonly class Path
     }
 
     /**
-     * The same outline drawn the other way round, for holes.
+     * The same outline drawn the other way around, for holes.
      */
     public function reversed(): self
     {

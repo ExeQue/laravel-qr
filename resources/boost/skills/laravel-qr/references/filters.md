@@ -90,7 +90,7 @@ wavelength: 8, angle: 0, phase: 0)`; the wavelength in modules, the angle the di
 
 ### radial
 
-Size or opacity changing from the middle outwards. `Radial(property: 'size', inner: 1.0, outer: 0.8, center: [0.5,
+Size or opacity changing from the middle outward. `Radial(property: 'size', inner: 1.0, outer: 0.8, center: [0.5,
 0.5])`; the values at the middle and at the corners, and the middle as a point of the code (0 to 1 both ways).
 
 ## Eye filters
@@ -180,6 +180,7 @@ Regions are in modules, from the top-left of the code (its margin left out):
 | `Region::circle($centerX, $centerY, $radius)` | a circle about a point |
 | `Region::cells([[$column, $row], ...])` | single modules |
 | `Region::logo()` | the area the code's logo clears |
+| `Region::fromArray($data)` | a region as `toArray()` gives it, such as `['kind' => 'circle', 'x' => 5, 'y' => 5, 'radius' => 3]` |
 
 The same can be written as filters that wrap another:
 

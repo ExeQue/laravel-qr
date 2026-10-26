@@ -93,8 +93,9 @@ final class SvgIds
         }
 
         // Comments and quoted strings could hide braces from the rules matched below.
-        // A selector that starts with a sibling combinator would reach past the logo once scoped.
-        if (preg_match('/[@\\\\"\']|\/\*|(^|[{},])\s*[~+]/', $css) === 1 || substr_count($css, '{') !== substr_count($css, '}')) {
+        // A selector that starts with a sibling combinator would reach past the logo once scoped, and a
+        // rule nested in another would leave the outer one unscoped.
+        if (preg_match('/[@\\\\"\']|\/\*|(^|[{},])\s*[~+]|\{[^}]*\{/', $css) === 1 || substr_count($css, '{') !== substr_count($css, '}')) {
             $style->parentNode?->removeChild($style);
 
             return;

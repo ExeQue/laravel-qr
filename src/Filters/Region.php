@@ -77,6 +77,11 @@ final readonly class Region implements Arrayable
             ? ['cells' => array_map(strval(...), (array) ($data['cells'] ?? []))]
             : array_map(floatval(...), $data);
 
+        // A rounded rectangle's corners are no rounder than half its shorter side, as rounded() makes them.
+        if ($kind === 'rounded') {
+            $values['radius'] = min((float) ($data['radius'] ?? 0), (float) ($data['width'] ?? 0) / 2, (float) ($data['height'] ?? 0) / 2);
+        }
+
         return new self($kind, $values);
     }
 

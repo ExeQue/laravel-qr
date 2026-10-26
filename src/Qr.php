@@ -119,7 +119,7 @@ final class Qr
             // Fluent when() without a callback: the proxy it returns is beyond PHPStan's inference.
             // @phpstan-ignore argument.templateType
             ->when(isset($defaults['margin']))->margin((int) ($defaults['margin'] ?? 4))
-            ->when(isset($defaults['foreground']))->paint($defaults['foreground'] ?? null)
+            ->when(isset($defaults['paint']))->paint($defaults['paint'] ?? null)
             ->when(array_key_exists('background', $defaults))->background($defaults['background'] ?? null)
             ->when(isset($defaults['module']))->modules($defaults['module'] ?? null)
             ->when(isset($defaults['eye']))->eyes($defaults['eye'] ?? null);

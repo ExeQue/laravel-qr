@@ -21,6 +21,6 @@ class WorkbenchServiceProvider extends ServiceProvider
         StyleRule::useDefaults(fn (): StyleRule => StyleRule::everything()->scannable());
 
         // An API outside the web group: JSON in, a code out, no session or CSRF token.
-        Route::post('/api/codes', RenderCodeController::class);
+        Route::post('/api/codes', RenderCodeController::class)->middleware('throttle:30,1');
     }
 }

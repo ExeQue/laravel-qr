@@ -12,7 +12,7 @@ use ExeQue\Qr\Shapes\Contracts\Configurable;
 use ExeQue\Qr\Shapes\Contracts\ModuleShape;
 
 /**
- * A flower: petal circles round a heart circle, as one outline.
+ * A flower: petal circles around a heart circle, as one outline.
  */
 final readonly class Flower implements Configurable, ModuleShape
 {

@@ -187,7 +187,7 @@ describe('modules', function (): void {
                 'style.modules.options.radius' => ['The style.modules.options.radius field must be between 0 and 0.2.'],
             ])
             ->and(styleErrors(['modules' => ['shape' => 'rounded', 'options' => ['side' => 2]]], $rule))->toBe([
-                'style.modules.options.side' => ['ExeQue\Qr\Shapes\Modules\Rounded\'s "side" must be from 0.1 to 1, 2 given.'],
+                'style.modules.options.side' => ['The style.modules.options.side field must be from 0.1 to 1.'],
             ])
             ->and(styleErrors(['modules' => ['shape' => 'leaves', 'options' => ['point' => 'up']]], $rule))->toHaveKey('style.modules.options.point')
             ->and(styleErrors(['modules' => ['options' => ['radius' => 0.1]]], $rule))->toBe(['style.modules.shape' => ['The style.modules.shape field is required when style.modules.options is present.']])
@@ -199,7 +199,7 @@ describe('modules', function (): void {
         Qr::modules()->register('failing', fn (): never => throw new RuntimeException('It cannot be drawn.'));
 
         expect(styleErrors(['modules' => ['shape' => 'failing', 'options' => []]], StyleRule::make()->modules(options: true)))->toBe([
-            'style.modules.options' => ['It cannot be drawn.'],
+            'style.modules.options' => ['The style.modules.options field holds options that cannot be used together.'],
         ]);
     });
 });
@@ -310,7 +310,7 @@ describe('filters', function (): void {
         'not allowed' => [['hearts'], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field is not a module shape that may be chosen.']]],
         'unknown' => [['tulips'], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field is not a module shape that may be chosen.']]],
         'beyond the style\'s range' => [[['shape' => 'rounded', 'options' => ['radius' => 0.3]]], ['style.filters.0.options.shapes.0.options.radius' => ['The style.filters.0.options.shapes.0.options.radius field must be between 0 and 0.2.']]],
-        'bad option' => [[['shape' => 'rounded', 'options' => ['side' => 2]]], ['style.filters.0.options.shapes.0.options.side' => ['ExeQue\Qr\Shapes\Modules\Rounded\'s "side" must be from 0.1 to 1, 2 given.']]],
+        'bad option' => [[['shape' => 'rounded', 'options' => ['side' => 2]]], ['style.filters.0.options.shapes.0.options.side' => ['The style.filters.0.options.shapes.0.options.side field must be from 0.1 to 1.']]],
         'unknown option' => [[['shape' => 'rounded', 'options' => ['curl' => 1]]], ['style.filters.0.options.shapes.0.options.curl' => ['The style.filters.0.options.shapes.0.options.curl option is not one this takes.']]],
         'extra key' => [[['shape' => 'rounded', 'size' => 1]], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field must be a shape: its name, or its name and options.']]],
         'options not a list' => [[['shape' => 'rounded', 'options' => 'round']], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field must be a shape: its name, or its name and options.']]],
@@ -343,7 +343,7 @@ describe('filters', function (): void {
 
         expect(styleErrors(['filters' => [['name' => 'ranged', 'options' => ['amount' => 0.5]]]], StyleRule::make()->filters()))->toBe([])
             ->and(styleErrors(['filters' => [['name' => 'ranged', 'options' => ['amount' => 2]]]], StyleRule::make()->filters()))->toHaveKey('style.filters.0.options.amount')
-            ->and(styleErrors(['filters' => [['name' => 'failing']]], StyleRule::make()->filters()))->toBe(['style.filters.0.options' => ['It cannot be made.']]);
+            ->and(styleErrors(['filters' => [['name' => 'failing']]], StyleRule::make()->filters()))->toBe(['style.filters.0.options' => ['The style.filters.0.options field holds options that cannot be used together.']]);
     });
 
     it('takes every built-in filter with its defaults, and with the options its docs show', function (Filter $filter, array $options): void {
@@ -404,7 +404,7 @@ describe('scannable', function (): void {
 
         expect(styleErrors(['logo' => ['size' => 0.25]], $rule))->toBe([]);
 
-        config(['qr.logo.auto_error_correction' => false]);
+        config(['qr.logos.auto_error_correction' => false]);
 
         expect(styleErrors(['logo' => ['size' => 0.25]], $rule))->toHaveKey('style.logo.size');
     });
@@ -440,7 +440,7 @@ describe('as one rule', function (): void {
         expect(array_keys(StyleRule::defaults()->for('style')))->toBe(['style', 'style.margin'])
             ->and(array_keys(Qr::rule()->for('style')))->toBe(['style', 'style.margin']);
 
-        StyleRule::useDefaults(fn (): StyleRule => StyleRule::everything());
+        StyleRule::useDefaults(null);
     });
 
     it('checks a style under a nested or wildcard attribute', function (): void {

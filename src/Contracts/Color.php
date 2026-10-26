@@ -41,7 +41,7 @@ interface Color extends Paint
     public function darken(float $percent): self;
 
     /**
-     * The hue turned by `$degrees` round the OKLCH color wheel, lightness and chroma kept.
+     * The hue turned by `$degrees` around the OKLCH color wheel, lightness and chroma kept.
      */
     public function shift(float $degrees): self;
 

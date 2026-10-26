@@ -105,10 +105,10 @@ $style = StyleRule::toStyle($request->validated('style'), base: 'brand');
 Every field is optional; what is left out stays as the base has it. Shapes, presets and filters are named as their
 registries know them, the application's own included. A paint is a CSS color, a gradient as its stored array
 (`['kind' => 'linear', 'stops' => [['color' => '#be123c', 'position' => 0], ...]]`, two stops at least), or, where
-`PaintRule::layers()` allows them, layers of either.
+`PaintRule::layers()` allows them, layers of either: `['layers' => [['paint' => '#be123c'], ['paint' => $gradient,
+'opacity' => 0.5]]]`.
 
-The input names settings as a stored style does (`rotation`, `plateRadius`), where the builder's methods are verbs
-and short names (`->rotate()`, `->plate($paint, radius: 1)`). It is not `Style::toArray()`'s format: eyes are shared
+Settings go by the names a stored style has: `rotation`, `scaleX`, `scaleY`, `opacity`, `plateRadius`. Eyes are shared
 or set apart under `eyes.corners`, and no background is `null`.
 
 A corner set apart takes a preset or parts and a paint, as the shared settings do, and keeps what it leaves out from
@@ -138,7 +138,9 @@ StyleRule::everything()->only('modules', 'eyes');
 | `filters(filters, max)` | `filters` | every filter, at most 8 |
 | `logo(size, padding, shapes, plate, plateRadius, position)` | `logo` | 0.05 to 0.3 or `'auto'`, 0 to 4, every shape, any color or none, 0 to 4; `position` refused unless given a range |
 
-Ranges are `[min, max]`; `false` refuses a setting within an allowed field, such as `modules(opacity: false)`.
+Ranges are `[min, max]`. `false` refuses a setting within an allowed field: `rotation`, `size` and `opacity` of the
+modules and eye parts, the eye `presets`, and the logo's `size`, `padding`, `plate`, `plateRadius` and `position`,
+such as `modules(opacity: false)`.
 
 ## Lists
 
@@ -232,6 +234,7 @@ Set the application's rules once, and use them everywhere:
 ```php
 // AppServiceProvider::boot()
 StyleRule::useDefaults(fn () => StyleRule::everything()->except('margin')->scannable());
+StyleRule::useDefaults(null);   // back to everything()
 
 // Elsewhere
 StyleRule::defaults();

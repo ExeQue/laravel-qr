@@ -89,7 +89,7 @@ A logo may clear only part of what the error correction can restore; `qr.scan_sa
 much. A logo larger than that throws a `ScanSafetyException` that says how many modules it clears and how many it
 may, or only warns with `on_violation` set to `warn`. Larger codes, and error correction `H`, allow larger logos.
 
-`qr.logo.auto_error_correction` (on by default) raises codes with a logo to `H`; set it to `false`, or set a level
+`qr.logos.auto_error_correction` (on by default) raises codes with a logo to `H`; set it to `false`, or set a level
 on the code, to choose for yourself.
 
 ## SVG logos are sanitized

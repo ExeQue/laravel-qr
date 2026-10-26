@@ -18,8 +18,8 @@ see it.
 | `min_contrast` | 3.0 | the least WCAG contrast of any drawn color against the background |
 | `max_logo_share` | 0.6 | the share of what the error correction can restore that a logo may clear |
 
-Most guards quietly clamp. Too little contrast and too large a logo cannot be clamped, so they throw a
-`ScanSafetyException` that says what is wrong, or only warn:
+Most guards clamp what they hold. Too little contrast and too large a logo throw a `ScanSafetyException` that says
+what is wrong, or only warn:
 
 ```php
 // config/qr.php

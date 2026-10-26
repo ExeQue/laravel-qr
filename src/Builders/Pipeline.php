@@ -19,6 +19,7 @@ use ExeQue\Qr\Rendering\Scene;
 use ExeQue\Qr\Writers\BufferedOutput;
 use ExeQue\Qr\Writers\Contracts\Fakeable;
 use ExeQue\Qr\Writers\Contracts\Output;
+use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use ExeQue\Qr\Writers\StreamFactory;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -188,7 +189,8 @@ final class Pipeline
      */
     private function identity(PendingQr $code, string $format, array $options): string
     {
-        return hash('xxh128', serialize([$code->identity(), $format, self::plain($options)]));
+        // The configured raster driver too: GD and Imagick draw raster formats a little differently.
+        return hash('xxh128', serialize([$code->identity(), $format, self::plain($options), $format === 'svg' ? null : Driver::resolve($options['driver'] ?? null)->value]));
     }
 
     /**

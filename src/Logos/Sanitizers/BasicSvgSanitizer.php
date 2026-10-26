@@ -153,7 +153,7 @@ final class BasicSvgSanitizer implements SvgSanitizer
         $value = (string) $text->nodeValue;
 
         // Comments and quoted strings could hide braces from the scoping the sheet gets when inlined.
-        if ($parent->localName === 'style' && (self::hasUnsafeReference($value) || preg_match('/[@"\']|\/\*/', $value) === 1)) {
+        if ($parent->localName === 'style' && (self::hasUnsafeReference($value) || preg_match('/[@"\']|\/\*|\{[^}]*\{/', $value) === 1)) {
             $parent->removeChild($text);
 
             return;

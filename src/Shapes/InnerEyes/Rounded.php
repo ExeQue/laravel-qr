@@ -15,7 +15,7 @@ use ExeQue\Qr\Validation\Rules\Numbers;
 
 /**
  * A block with rounded corners: one radius for every corner, or four, top-right, bottom-right,
- * bottom-left, top-left. At 1.5 all round, a circle.
+ * bottom-left, top-left. At 1.5 all around, a circle.
  */
 final readonly class Rounded implements Configurable, Directional, InnerEyeShape, HasOptionRules
 {
@@ -32,7 +32,7 @@ final readonly class Rounded implements Configurable, Directional, InnerEyeShape
     public function __construct(float|array $radius = 0.7)
     {
         // Numbers from a form are strings; a list of them is not converted on the way in.
-        $this->radius = is_array($radius) ? array_map(floatval(...), $radius) : $radius;
+        $this->radius = self::corners('radius', $radius, 0.0, 1.5);
     }
 
     public static function optionRules(): array

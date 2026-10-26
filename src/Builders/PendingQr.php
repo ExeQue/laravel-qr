@@ -274,7 +274,7 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
     private function raster(string $format, ?int $size, array $options): Rendered
     {
         return $this->format($format, ...[
-            'dpi' => $this->config->get('qr.png.dpi'),
+            'dpi' => $this->config->get('qr.raster.dpi'),
             ...($format === 'png' ? ['compressionLevel' => (int) $this->config->get('qr.png.compression_level', 6)] : []),
             ...$options,
             'size' => $size ?? (int) $this->config->get('qr.defaults.size', 600),
@@ -291,7 +291,7 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
             return $this->errorCorrection;
         }
 
-        if ($this->style->logo !== null && (bool) $this->config->get('qr.logo.auto_error_correction', true)) {
+        if ($this->style->logo !== null && (bool) $this->config->get('qr.logos.auto_error_correction', true)) {
             return ErrorCorrection::High;
         }
 

@@ -296,7 +296,12 @@ describe('large logos', function (): void {
 
     it('refuses a GIF whose frame is larger than its canvas says', function (): void {
         Logo::fromFile(fixture('oversized-frame.gif'));
-    })->throws(InvalidLogoException::class, 'this one is 6000 by 6000')
+    })->throws(InvalidLogoException::class, 'pixels in all its frames; this one has 36000000.')
+        ->skip(! extension_loaded('imagick'), 'Imagick reads the frames.');
+
+    it('refuses an animated GIF whose frames have too many pixels together', function (): void {
+        Logo::fromBytes(manyFrames());
+    })->throws(InvalidLogoException::class, 'pixels in all its frames')
         ->skip(! extension_loaded('imagick'), 'Imagick reads the frames.');
 
     it('refuses a GIF whose frames cannot be read', function (): void {

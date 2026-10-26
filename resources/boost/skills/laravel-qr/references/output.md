@@ -92,7 +92,7 @@ $png->contents();       // the bytes
 $png->chunks(8192);     // the bytes in pieces, for streaming
 $png->toResource();     // a new PHP stream with the bytes, at its start; close it yourself
 $png->toStream();       // a new PSR-7 stream with the bytes
-$png->detach();         // the code's own stream, handed over; the output cannot be read afterwards
+$png->detach();         // the code's own stream, handed over; the output cannot be read afterward
 $png->toBase64();
 $png->toBase64Url();    // URL-safe, without padding
 $png->toDataUri();      // data:image/png;base64,...

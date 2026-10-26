@@ -64,8 +64,8 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `flowers` | `stars` | `snowflakes` | `hexagons` |
 | ![octagons](images/modules/octagons.png) | ![leaves](images/modules/leaves.png) | ![drops](images/modules/drops.png) | ![sparkles](images/modules/sparkles.png) |
 | `octagons` | `leaves` | `drops` | `sparkles` |
-| ![crosses](images/modules/crosses.png) | ![clovers](images/modules/clovers.png) | ![pills](images/modules/pills.png) | ![bricks-horizontal](images/modules/bricks-horizontal.png) |
-| `crosses` | `clovers` | `pills` | `bricks-horizontal` |
+| ![crosses](images/modules/crosses.png) | ![clovers](images/modules/clovers.png) | ![pills-vertical](images/modules/pills-vertical.png) | ![bricks-horizontal](images/modules/bricks-horizontal.png) |
+| `crosses` | `clovers` | `pills-vertical` | `bricks-horizontal` |
 | ![pills-horizontal](images/modules/pills-horizontal.png) | ![bricks-vertical](images/modules/bricks-vertical.png) | ![hexagons-standing](images/modules/hexagons-standing.png) | ![sketch](images/modules/sketch.png) |
 | `pills-horizontal` | `bricks-vertical` | `hexagons-standing` | `sketch` |
 
@@ -86,14 +86,15 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `sparkles` | `Modules\Sparkle` | `radius` 0.56 (0.2 to 0.6), `pinch` 0.32 (0.1 to 1): a four-pointed sparkle |
 | `crosses` | `Modules\Cross` | `width` 0.4 (0.1 to 1): a plus |
 | `clovers` | `Modules\Clover` | a four-leaf clover |
-| `pills` | `Modules\Pill` | `width` 0.6 (0.2 to 1), `vertical` true: a pill standing up |
+| `pills-vertical` | `Modules\Pill` | `width` 0.6 (0.2 to 1), `vertical` true: a pill standing up |
 | `pills-horizontal` | `Modules\Pill` | the same, `vertical` false: a pill lying down |
 | `bricks-horizontal` | `Modules\Brick` | `height` 0.76 (0.3 to 1), `vertical` false: rows read as courses of bricks |
 | `bricks-vertical` | `Modules\Brick` | the same, `vertical` true: columns read as courses |
 | `sketch` | `Modules\Sketch` | `wobble` 0.06 (0 to 0.1): a square drawn by hand, each its own way |
 
-`point` picks the pointed corner of drops and leaves: `top-left`, `top-right`, `bottom-right`, `bottom-left`, or
-`random` for a corner picked for each module from its place, the same on every render. Another `seed` gives `random`
+`point` picks the pointed corner: a drop takes `top-left`, `top-right`, `bottom-right` or `bottom-left`, a leaf
+`top-left` or `top-right` (each pointing at the corner across from it too); either takes `random` for a corner picked
+for each module from its place, the same on every render. Another `seed` gives `random`
 other corners:
 
 ```php

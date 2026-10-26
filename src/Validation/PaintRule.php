@@ -19,6 +19,11 @@ use Throwable;
 final readonly class PaintRule implements ValidationRule
 {
     /**
+     * The largest number a gradient's geometry takes: its angle, center, radius or points.
+     */
+    private const int MAX_NUMBER = 1000;
+
+    /**
      * Run on empty strings and nulls too, which Laravel otherwise passes.
      */
     public bool $implicit;
@@ -167,8 +172,10 @@ final readonly class PaintRule implements ValidationRule
 
         try {
             $stored = app(GradientRegistry::class)->dehydrate(Hydrate::gradient($value));
-        } catch (Throwable $exception) {
+        } catch (QrExceptionInterface $exception) {
             return self::message('gradient', ['reason' => $exception->getMessage()]);
+        } catch (Throwable) {
+            return self::message('gradient_keys');
         }
 
         return self::fits($value, $stored) ? null : self::message('gradient_keys');
@@ -220,7 +227,7 @@ final readonly class PaintRule implements ValidationRule
         return match (true) {
             is_array($stored) && is_array($input) => array_diff_key($input, $stored) === []
                 && array_all($input, fn (mixed $value, int|string $key): bool => self::fits($value, $stored[$key])),
-            is_int($stored), is_float($stored) => is_numeric($input) && is_finite((float) $input),
+            is_int($stored), is_float($stored) => is_numeric($input) && abs((float) $input) <= self::MAX_NUMBER,
             is_string($stored) => is_string($input),
             default => $input === $stored,
         };

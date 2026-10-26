@@ -13,7 +13,7 @@ What every code starts from.
 | `error_correction` | `ErrorCorrection::Medium` | an enum case or `L`, `M`, `Q`, `H` |
 | `margin` | 4 | modules of quiet zone |
 | `size` | 600 | pixels, for PNG, JPEG and WebP without a size |
-| `foreground` | `#000000` | any color |
+| `paint` | `#000000` | any color or gradient |
 | `background` | `#ffffff` | any color, or `null` for transparent |
 | `module` | `Module::Square` | a module shape: name, enum case or class |
 | `eye` | `Eye::Square` | an eye preset |
@@ -62,7 +62,7 @@ list). The published config holds `author`, `copyright` and `url`; add any of th
 |---|---|---|
 | `svg.precision` | 3 | decimals in path data |
 | `svg.xml_declaration` | `false` | start SVG files with `<?xml ...?>` |
-| `png.dpi` | `null` | a resolution written into PNG, JPEG and WebP files |
+| `raster.dpi` | `null` | a resolution written into PNG, JPEG and WebP files |
 | `png.compression_level` | 6 | 0 to 9: how hard PNGs are packed; higher is smaller and slower |
 | `raster.driver` | `auto` (`QR_RASTER_DRIVER`) | what draws PNG, JPEG and WebP: `imagick`, `gd`, or `auto` for Imagick when it is loaded |
 
@@ -77,12 +77,12 @@ instance or an array. See [Colors](colors.md#names-of-your-own).
 |---|---|---|
 | `max_memory` | 2 MB (`QR_STREAM_MAX_MEMORY`) | bytes an output keeps in memory before moving to a temporary file |
 
-## logos and logo
+## logos
 
 | Key | Default | |
 |---|---|---|
 | `logos.sanitizer` | `AutoSvgSanitizer` | the class that sanitizes SVG logos: enshrined/svg-sanitize when installed, the package's own allowlist otherwise |
-| `logo.auto_error_correction` | `true` | raise codes with a logo to error correction `H` |
+| `logos.auto_error_correction` | `true` | raise codes with a logo to error correction `H` |
 
 ## reading
 

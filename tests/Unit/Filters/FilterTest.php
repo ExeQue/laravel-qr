@@ -197,7 +197,7 @@ describe('stacking', function (): void {
     });
 
     it('wraps a closure, cacheable only when named', function (): void {
-        $closure = fn (ModuleContext $cell, ModuleStyle $style): ModuleStyle => $cell->row % 2 === 0 ? $style->withRotate(45) : $style;
+        $closure = fn (ModuleContext $cell, ModuleStyle $style): ModuleStyle => $cell->row % 2 === 0 ? $style->withRotation(45) : $style;
         $named = new ClosureFilter($closure, 'stripes');
         $anonymous = new ClosureFilter($closure);
 
@@ -271,8 +271,18 @@ describe('scope', function (): void {
             ->and(Region::circle(5, 5, 2)->contains(6, 6))->toBeTrue()
             ->and(Region::circle(5, 5, 2)->contains(7, 7))->toBeFalse()
             ->and(Region::cells([[3, 4]])->contains(3.5, 4.5))->toBeTrue()
-            ->and(Region::cells([[3, 4]])->contains(4.5, 4.5))->toBeFalse();
+            ->and(Region::cells([[3, 4]])->contains(4.5, 4.5))->toBeFalse()
+            ->and(Region::fromArray(['kind' => 'rounded', 'x' => 0, 'y' => 0, 'width' => 4, 'height' => 4, 'radius' => 10])->contains(2, 2))->toBeTrue()
+            ->and(Region::fromArray(['kind' => 'rounded', 'x' => 0, 'y' => 0, 'width' => 4, 'height' => 4, 'radius' => 10])->toArray())->toBe(Region::rounded(0, 0, 4, 4, 10)->toArray());
     });
+
+    it('takes a range or a center only as two numbers', function (callable $make, string $message): void {
+        expect($make)->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, $message);
+    })->with([
+        [fn () => new EyeTilt(outer: [5]), '"outer" must be a number or a list of 2 numbers.'],
+        [fn () => new EyeSize(inner: ['a' => 0.8, 'b' => 1.0]), '"inner" must be a number or a list of 2 numbers.'],
+        [fn () => new Radial(center: [0.5]), '"center" must be a number or a list of 2 numbers.'],
+    ]);
 
     it('takes only named module filters in a region', function (): void {
         new InRegion(Region::circle(1, 1, 1), new class () implements ModuleFilter {
@@ -325,7 +335,7 @@ describe('built-in filters', function (): void {
     });
 
     it('steps relative to what is set', function (): void {
-        $style = Style::default()->modules->withRotate(10)->rotateBy(5)->withSize(0.8)->scaleBy(0.5, 2)->withOffset(0.1, 0)->offsetBy(0.1, 0.1)->withOpacity(0.8)->fadeBy(0.5);
+        $style = Style::default()->modules->withRotation(10)->rotateBy(5)->withSize(0.8)->scaleBy(0.5, 2)->withOffset(0.1, 0)->offsetBy(0.1, 0.1)->withOpacity(0.8)->fadeBy(0.5);
         $eye = Style::default()->eye(Corner::TopLeft)->rotateBy(10);
 
         expect([$style->rotation, $style->scaleX, $style->scaleY, $style->offsetX, $style->offsetY, $style->opacity])->toEqualWithDelta([15, 0.4, 1.6, 0.2, 0.1, 0.4], 0.0001)

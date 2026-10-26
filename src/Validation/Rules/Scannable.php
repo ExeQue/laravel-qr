@@ -54,7 +54,7 @@ final readonly class Scannable implements ValidationRule
             $default = config('qr.defaults.error_correction', ErrorCorrection::Medium);
             $level = match (true) {
                 // As a code is drawn: raised for a logo, unless that is turned off.
-                $style->logo !== null && (bool) config('qr.logo.auto_error_correction', true) => ErrorCorrection::High,
+                $style->logo !== null && (bool) config('qr.logos.auto_error_correction', true) => ErrorCorrection::High,
                 $default instanceof ErrorCorrection => $default,
                 default => ErrorCorrection::from((string) $default),
             };

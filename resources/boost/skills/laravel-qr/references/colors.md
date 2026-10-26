@@ -35,7 +35,7 @@ $color = Color::make($anyForm);              // a string, an array or a color
 
 Oklch::from($color);   // the same color in another space
 $color->toRgba();      // sRGB, brought into gamut
-$color->toHex();       // #be123c
+$color->toHex();       // #rrggbb
 $color->toCss();       // in its own notation
 $color->alpha();
 $color->withAlpha(0.5);

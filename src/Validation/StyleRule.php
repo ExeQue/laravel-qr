@@ -86,13 +86,14 @@ final readonly class StyleRule implements ValidationRule
     }
 
     /**
-     * Sets the application's rules, such as in a service provider, with a callback that makes them.
+     * Sets the application's rules, such as in a service provider, with a callback that makes them;
+     * null goes back to everything().
      *
-     * @param Closure(): self $callback
+     * @param (Closure(): self)|null $callback
      */
-    public static function useDefaults(Closure $callback): void
+    public static function useDefaults(?Closure $callback): void
     {
-        self::stored($callback);
+        self::stored($callback, set: true);
     }
 
     /**
@@ -395,17 +396,17 @@ final readonly class StyleRule implements ValidationRule
     }
 
     /**
-     * Holds the callback that makes the application's rules, setting it when given one.
+     * Holds the callback that makes the application's rules, setting it when told to.
      *
      * @param (Closure(): self)|null $callback
      *
      * @return (Closure(): self)|null
      */
-    private static function stored(?Closure $callback = null): ?Closure
+    private static function stored(?Closure $callback = null, bool $set = false): ?Closure
     {
         static $stored = null;
 
-        if ($callback !== null) {
+        if ($set) {
             $stored = $callback;
         }
 

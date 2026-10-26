@@ -44,8 +44,8 @@ final readonly class Rounded implements Configurable, Directional, OuterEyeShape
     public function __construct(float|array $outer = 1.9, float|array $hole = 0.9)
     {
         // Numbers from a form are strings; a list of them is not converted on the way in.
-        $this->outer = $outer = is_array($outer) ? array_map(floatval(...), $outer) : $outer;
-        $this->hole = $hole = is_array($hole) ? array_map(floatval(...), $hole) : $hole;
+        $this->outer = $outer = self::corners('outer', $outer, 0.0, 3.5);
+        $this->hole = $hole = self::corners('hole', $hole, 0.0, 2.5);
         $outers = is_array($outer) ? $outer : [$outer, $outer, $outer, $outer];
         $holes = is_array($hole) ? $hole : [$hole, $hole, $hole, $hole];
 

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Validation\Rules;
 
+use ExeQue\Qr\Exceptions\InvalidOptionException;
+use ExeQue\Qr\Exceptions\QrExceptionInterface;
 use Illuminate\Contracts\Validation\Factory;
+use Throwable;
 
 /**
  * Checks the options of a shape or filter against their rules: no option the rules do
@@ -28,7 +31,7 @@ final class Options
         $problems = [];
 
         foreach (array_diff(array_map(strval(...), array_keys($options)), $known) as $unknown) {
-            $problems[$unknown] = (string) trans('qr::validation.unknown_option');
+            $problems[$unknown] = (string) trans('qr::validation.option.unknown');
         }
 
         $data = [];
@@ -40,6 +43,23 @@ final class Options
         }
 
         return $problems;
+    }
+
+    /**
+     * What a shape or filter refused when it was made, as messages by option ('' for the whole): worded
+     * for the form, an option's limits included, and never a PHP error's own text.
+     *
+     * @return array<string, string>
+     */
+    public static function refused(Throwable $exception): array
+    {
+        return match (true) {
+            $exception instanceof InvalidOptionException && $exception->problem !== null => [
+                $exception->option ?? '' => (string) trans("qr::validation.option.{$exception->problem}", $exception->limits),
+            ],
+            $exception instanceof QrExceptionInterface => ['' => $exception->getMessage()],
+            default => ['' => (string) trans('qr::validation.option.invalid')],
+        };
     }
 
     /**

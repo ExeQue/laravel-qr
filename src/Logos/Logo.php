@@ -139,16 +139,17 @@ final readonly class Logo
             throw InvalidLogoException::unreadable();
         }
 
-        // A GIF's header gives its canvas, which its frames may be larger than.
-        $sizes = match ($mimeType) {
-            'image/gif' => [$size, ...self::frames($bytes)],
-            default => [$size],
-        };
+        if ($size[0] * $size[1] > self::MAX_PIXELS) {
+            throw InvalidLogoException::tooLarge($size[0], $size[1], self::MAX_PIXELS);
+        }
 
-        foreach ($sizes as [$width, $height]) {
-            if ($width * $height > self::MAX_PIXELS) {
-                throw InvalidLogoException::tooLarge($width, $height, self::MAX_PIXELS);
-            }
+        // A GIF's header gives its canvas, which its frames may be larger than; and reading it decodes
+        // every frame, so they count together.
+        $frames = $mimeType === 'image/gif' ? self::frames($bytes) : [];
+        $pixels = array_sum(array_map(fn (array $frame): int => $frame[0] * $frame[1], $frames));
+
+        if ($pixels > self::MAX_PIXELS) {
+            throw InvalidLogoException::tooManyPixels($pixels, self::MAX_PIXELS);
         }
     }
 
@@ -207,7 +208,10 @@ final readonly class Logo
      */
     private static function svgSize(string $svg): array
     {
-        if (preg_match('/<svg[^>]*\sviewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"/i', $svg, $match) === 1 && (float) $match[1] > 0 && (float) $match[2] > 0) {
+        // Numbers as SVG writes them: 10, -2.5, .5, 2e2.
+        $number = '-?[\d.]+(?:e[-+]?\d+)?';
+
+        if (preg_match("/<svg[^>]*\\sviewBox=\"\\s*{$number}[\\s,]+{$number}[\\s,]+({$number})[\\s,]+({$number})\\s*\"/i", $svg, $match) === 1 && (float) $match[1] > 0 && (float) $match[2] > 0) {
             return [(float) $match[1], (float) $match[2]];
         }
 

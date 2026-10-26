@@ -44,7 +44,7 @@ describe('pointing shapes', function (): void {
     it('points a leaf only from a top corner, as the bottom ones draw the same leaves', function (Direction $point): void {
         new Leaf(point: $point);
     })->with([Direction::BottomRight, Direction::BottomLeft])
-        ->throws(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"point" is one of top-left, top-right, random');
+        ->throws(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"point" must be one of top-left, top-right, random');
 
     it('picks a corner for each module from its seed, the same on every render', function (): void {
         $drop = new Drop(point: Direction::Random);

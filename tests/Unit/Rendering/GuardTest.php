@@ -64,7 +64,7 @@ describe('modules', function (): void {
     });
 
     it('leaves rotation alone', function (): void {
-        expect(guards(guarded(Style::default()->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withRotate(45))))))->toBe([]);
+        expect(guards(guarded(Style::default()->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withRotation(45))))))->toBe([]);
     });
 
     it('skips data cells only within what the error correction can restore', function (ErrorCorrection $level): void {

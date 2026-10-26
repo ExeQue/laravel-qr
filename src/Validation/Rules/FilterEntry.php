@@ -6,7 +6,6 @@ namespace ExeQue\Qr\Validation\Rules;
 
 use Closure;
 use ExeQue\Qr\Encoder\Enums\Role;
-use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Filters\ByRole;
 use ExeQue\Qr\Filters\Compound;
 use ExeQue\Qr\Filters\InRegion;
@@ -115,10 +114,8 @@ final readonly class FilterEntry implements ValidationRule
 
         try {
             $registry->hydrate(['name' => $name, 'options' => $options]);
-        } catch (InvalidOptionException $exception) {
-            return [$exception->option ?? '' => $exception->getMessage()];
         } catch (Throwable $exception) {
-            return ['' => $exception->getMessage()];
+            return Options::refused($exception);
         }
 
         return [];

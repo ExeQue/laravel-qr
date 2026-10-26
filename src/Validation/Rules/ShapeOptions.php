@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Validation\Rules;
 
 use Closure;
-use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Validation\Contracts\ResolvesOptionRules;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -100,10 +99,8 @@ final class ShapeOptions implements DataAwareRule, ValidationRule
 
         try {
             $registry->get($name, $options);
-        } catch (InvalidOptionException $exception) {
-            return [$exception->option ?? '' => $exception->getMessage()];
         } catch (Throwable $exception) {
-            return ['' => $exception->getMessage()];
+            return Options::refused($exception);
         }
 
         return [];

@@ -93,7 +93,7 @@ describe('making codes', function (): void {
     ])->group('scan');
 
     it('starts from the config\'s defaults', function (): void {
-        config()->set('qr.defaults', ['margin' => 2, 'foreground' => '#1c1917', 'background' => null, 'error_correction' => 'Q', 'module' => 'square', 'eye' => Eye::Square]);
+        config()->set('qr.defaults', ['margin' => 2, 'paint' => '#1c1917', 'background' => null, 'error_correction' => 'Q', 'module' => 'square', 'eye' => Eye::Square]);
         Qr::styles()->register('wide', ['margin' => 6]);
 
         $code = Qr::make(BUILDER_URL);
@@ -143,11 +143,11 @@ describe('named settings', function (): void {
     it('says which values a named setting takes', function (callable $build, string $message): void {
         expect($build)->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, $message);
     })->with([
-        [fn () => Qr::make(BUILDER_URL)->errorCorrection('x'), '"level" is one of L, M, Q, H, x given.'],
-        [fn () => Qr::make(BUILDER_URL)->mask(9), '"mask" is one of 0, 1, 2, 3, 4, 5, 6, 7, 9 given.'],
-        [fn () => Qr::make(BUILDER_URL)->logo(logoFixture(), shape: 'oval'), '"shape" is one of square, rounded, circle, alpha, oval given.'],
-        [fn () => Qr::make(BUILDER_URL)->logo(fn (LogoBuilder $logo) => $logo->from(logoFixture())->shape('oval')), '"shape" is one of'],
-        [fn () => Qr::make(BUILDER_URL)->png(driver: 'foo'), '"driver" is one of auto, imagick, gd, foo given.'],
+        [fn () => Qr::make(BUILDER_URL)->errorCorrection('x'), '"level" must be one of L, M, Q, H; "x" given.'],
+        [fn () => Qr::make(BUILDER_URL)->mask(9), '"mask" must be one of 0, 1, 2, 3, 4, 5, 6, 7; "9" given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(logoFixture(), shape: 'oval'), '"shape" must be one of square, rounded, circle, alpha; "oval" given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(fn (LogoBuilder $logo) => $logo->from(logoFixture())->shape('oval')), '"shape" must be one of'],
+        [fn () => Qr::make(BUILDER_URL)->png(driver: 'foo'), '"driver" must be one of auto, imagick, gd; "foo" given.'],
     ]);
 });
 
@@ -220,7 +220,7 @@ describe('styling', function (): void {
                 ->bottomLeft(fn (EyeBuilder $eye): EyeBuilder => $eye->whole('square'))
                 ->mirrored())
             ->background(fn (BackgroundBuilder $background): BackgroundBuilder => $background->paint('#fff7ed'))
-            ->eye(Corner::BottomLeft, rotate: 10, paint: '#be123c', outer: 'square', inner: 'square', eye: Eye::Square)
+            ->eye(Corner::BottomLeft, rotation: 10, paint: '#be123c', outer: 'square', inner: 'square', eye: Eye::Square)
             ->eye(Corner::TopLeft, fn (EyeBuilder $eye): EyeBuilder => $eye->rotate(-3));
 
         $style = $code->toStyle();
@@ -328,7 +328,7 @@ describe('logos', function (): void {
     });
 
     it('keeps the error correction it was given, logo or not', function (): void {
-        config()->set('qr.logo.auto_error_correction', false);
+        config()->set('qr.logos.auto_error_correction', false);
 
         expect(Qr::make(BUILDER_URL)->errorCorrection('Q')->logo(logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Quartile)
             ->and(Qr::make(BUILDER_URL)->logo(logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Medium);
@@ -357,7 +357,7 @@ describe('output', function (): void {
 
     it('passes writer options on, over the config\'s', function (): void {
         config()->set('qr.svg.precision', 1);
-        config()->set('qr.png.dpi', 300);
+        config()->set('qr.raster.dpi', 300);
         config()->set('qr.defaults.size', 240);
 
         $image = new Imagick();

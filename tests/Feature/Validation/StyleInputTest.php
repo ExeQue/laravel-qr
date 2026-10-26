@@ -30,7 +30,7 @@ use Livewire\Form;
 use RuntimeException;
 use SplFileInfo;
 
-covers(StyleInput::class, StyleRule::class, InteractsWithQrStyle::class, InvalidStyleException::class);
+covers(StyleInput::class, StyleRule::class, InteractsWithQrStyle::class, InvalidStyleException::class, \ExeQue\Qr\Builders\Concerns\BuildsStyle::class);
 
 pest()->group('validation');
 
@@ -105,7 +105,7 @@ describe('to input', function (): void {
     });
 
     it('writes eyes by corner, parts where no preset fits', function (): void {
-        $style = Qr::style()->eyes(Eye::Leaf)->eye(Corner::TopLeft, outer: 'circle', rotate: 10)->eye(Corner::TopRight, outer: 'circle')->eye(Corner::BottomLeft, paint: '#be123c')->toStyle();
+        $style = Qr::style()->eyes(Eye::Leaf)->eye(Corner::TopLeft, outer: 'circle', rotation: 10)->eye(Corner::TopRight, outer: 'circle')->eye(Corner::BottomLeft, paint: '#be123c')->toStyle();
         $style = $style->withEye(Corner::TopRight, $style->eye(Corner::TopRight)->withOuter($style->eye(Corner::TopRight)->outer->withSize(0.95)->withOpacity(0.9)->withPaint(new Hex('#0f766e'))));
 
         expect(StyleRule::toPayload($style)['eyes'])->toBe(['corners' => [
@@ -124,7 +124,7 @@ describe('to input', function (): void {
             ->filter('mixed-rotation', min: -5, max: 5)
             ->filter(new MixedShape([Module::Square, Module::DotsMedium, new Rounded(radius: 0.1)]))
             ->toStyle();
-        $style = $style->withModules($style->modules->withRotate(10)->withSize(0.9, 0.8)->withOpacity(0.7));
+        $style = $style->withModules($style->modules->withRotation(10)->withSize(0.9, 0.8)->withOpacity(0.7));
         $payload = StyleRule::toPayload($style);
 
         expect($payload['modules'])->toBe(['shape' => 'dots-medium', 'paint' => '#1e1b4b', 'rotation' => 10.0, 'scaleX' => 0.9, 'scaleY' => 0.8, 'opacity' => 0.7])
@@ -160,6 +160,33 @@ describe('to input', function (): void {
 
         expect($outer[0])->toBe(['shape' => 'soft-square', 'options' => ['outer' => 3.0, 'hole' => 0.9]])
             ->and($outer[1])->toBe(['class' => $unknown::class, 'options' => []]);
+    });
+
+    it('writes filters that wrap others as the filters they wrap, with their scope', function (): void {
+        $style = Qr::style()
+            ->filter(new \ExeQue\Qr\Filters\ByRole(['timing'], new \ExeQue\Qr\Filters\MixedSize(min: 0.8)))
+            ->filter(new \ExeQue\Qr\Filters\InRegion(\ExeQue\Qr\Filters\Region::circle(5, 5, 3), new \ExeQue\Qr\Filters\MixedOpacity()))
+            ->filter(new \ExeQue\Qr\Filters\Compound(new \ExeQue\Qr\Filters\EyeTilt(), new \ExeQue\Qr\Filters\MixedRotation()->only(\ExeQue\Qr\Encoder\Enums\Role::Data, \ExeQue\Qr\Encoder\Enums\Role::Timing))->only(\ExeQue\Qr\Encoder\Enums\Role::Timing))
+            ->toStyle();
+        $filters = StyleRule::toPayload($style)['filters'];
+
+        expect(array_column($filters, 'name'))->toBe(['mixed-size', 'mixed-opacity', 'eye-tilt', 'mixed-rotation'])
+            ->and($filters[0]['options']['only'])->toBe(['timing'])
+            ->and($filters[1]['options']['in']['kind'])->toBe('circle')
+            ->and($filters[2]['options']['only'])->toBe(['timing'])
+            ->and($filters[3]['options']['only'])->toBe(['timing'])
+            ->and(\Illuminate\Support\Facades\Validator::make(['style' => StyleRule::toPayload($style)], StyleRule::everything()->for('style'))->errors()->toArray())->toBe([]);
+    });
+
+    it('refuses what the input has no field for', function (Style $style, string $message): void {
+        expect(fn () => StyleRule::toPayload($style))->toThrow(InvalidStyleException::class, $message);
+    })->with([
+        'a skew' => [fn () => Style::default()->withModules(Style::default()->modules->withSkew(10)), "modules' offset, skew or skip"],
+        'two regions' => [fn () => Style::default()->withFilters(new \ExeQue\Qr\Filters\InRegion(\ExeQue\Qr\Filters\Region::circle(5, 5, 3), new \ExeQue\Qr\Filters\MixedOpacity()->in(\ExeQue\Qr\Filters\Region::circle(1, 1, 1)))), 'filter in two regions'],
+    ]);
+
+    it('takes a corner by name', function (): void {
+        expect(Qr::style()->eye('top-right', outer: 'circle')->toStyle()->eye(Corner::TopRight)->outer->shape)->toEqual(Qr::outerEyes()->get('circle'));
     });
 
     it('writes a shape with options of its own by its class\'s name', function (): void {

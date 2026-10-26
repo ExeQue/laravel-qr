@@ -10,6 +10,7 @@ $decoded = Qr::read($request->file('photo'));
 $decoded->text;              // what the code holds
 $decoded->version;           // 1 to 40, when the decoder tells
 $decoded->errorCorrection;   // when the decoder tells
+$decoded->mask;              // the mask pattern, when the decoder tells
 $decoded->decoder;           // which decoder read it
 $decoded->bytes;             // the content byte for byte, for binary content; from the native decoder
 (string) $decoded;           // the text

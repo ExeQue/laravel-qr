@@ -155,15 +155,8 @@ final readonly class Writer implements Fakeable, WriterContract
 
         $image = new Imagick();
         $image->setBackgroundColor(new ImagickPixel('transparent'));
-
-        if ($style->logo->isSvg()) {
-            // Drawn at twice the size it is placed at, for sharp edges, whatever size the SVG says it has:
-            // ImageMagick draws an SVG's own units at 96 to the inch.
-            $density = 96 * 2 * max($width / self::svgWidth($style->logo), $height / self::svgHeight($style->logo));
-            $image->setResolution($density, $density);
-        }
-
-        $image->readImageBlob(self::readable($style->logo));
+        // An SVG is drawn at twice the size it is placed at, for sharp edges, whatever size it says it has.
+        $image->readImageBlob($style->logo->isSvg() ? self::sized(self::readable($style->logo), $style->logo, 2 * $width, 2 * $height) : self::readable($style->logo));
 
         $fit = min($width / $image->getImageWidth(), $height / $image->getImageHeight());
         [$imageWidth, $imageHeight] = [(int) max(1, round($image->getImageWidth() * $fit)), (int) max(1, round($image->getImageHeight() * $fit))];
@@ -184,19 +177,20 @@ final readonly class Writer implements Fakeable, WriterContract
      * The logo's bytes, when ImageMagick can read them: raster images always, SVG with its SVG support.
      */
     /**
-     * The width ImageMagick gives an SVG: its width attribute, else its viewBox's.
+     * An SVG with its own width and height set to fit `$width` by `$height` pixels, its viewBox kept for
+     * its proportions: so ImageMagick draws it that size, whatever units or size it gave.
      */
-    private static function svgWidth(Logo $logo): float
+    private static function sized(string $svg, Logo $logo, float $width, float $height): string
     {
-        return preg_match('/<svg[^>]*\swidth="([\d.]+)/i', $logo->contents, $match) === 1 && (float) $match[1] > 0 ? (float) $match[1] : $logo->width;
-    }
+        $fit = min($width / $logo->width, $height / $logo->height);
+        $size = sprintf(' width="%d" height="%d"', max(1, (int) round($logo->width * $fit)), max(1, (int) round($logo->height * $fit)));
 
-    /**
-     * The height ImageMagick gives an SVG: its height attribute, else its viewBox's.
-     */
-    private static function svgHeight(Logo $logo): float
-    {
-        return preg_match('/<svg[^>]*\sheight="([\d.]+)/i', $logo->contents, $match) === 1 && (float) $match[1] > 0 ? (float) $match[1] : $logo->height;
+        return (string) preg_replace_callback('/<svg\b[^>]*>/i', function (array $tag) use ($logo, $size): string {
+            $root = (string) preg_replace('/\s(width|height)\s*=\s*("[^"]*"|\'[^\']*\')/i', '', $tag[0]);
+            $root = preg_match('/\sviewBox\s*=/i', $root) === 1 ? $root : (string) preg_replace('/^<svg\b/i', "<svg viewBox=\"0 0 {$logo->width} {$logo->height}\"", $root);
+
+            return (string) preg_replace('/^<svg\b/i', '<svg'.$size, $root);
+        }, $svg, 1);
     }
 
     private static function readable(Logo $logo): string

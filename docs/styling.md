@@ -58,17 +58,21 @@ One corner, or each corner in turn:
 use ExeQue\Qr\Rendering\Enums\Corner;
 
 ->eye(Corner::TopLeft, Eye::Dot, paint: '#be123c')
-->eye(Corner::TopRight, outer: 'soft', inner: 'heart', rotate: 90)
+->eye(Corner::TopRight, outer: 'soft', inner: 'heart', rotation: 90)
 
 ->eyes(fn (EyesBuilder $eyes) => $eyes
     ->outer('rounded')
     ->inner('soft')
     ->paint('#be123c')
     ->topLeft(fn (EyeBuilder $eye) => $eye->innerPaint('#1e1b4b'))
-    ->each(fn (EyeBuilder $eye) => $eye->rotate(0)))
+    ->each(fn (EyeBuilder $eye) => $eye->rotate(0))
+    ->corner(Corner::BottomLeft, fn (EyeBuilder $eye) => $eye->outer('circle'))
+    ->mirrored())
 ```
 
-`EyeBuilder` has `whole()`, `outer()`, `inner()`, `rotate()`, `paint()`, `outerPaint()` and `innerPaint()`.
+`EyesBuilder` has `outer()`, `inner()`, `paint()`, `topLeft()`, `topRight()`, `bottomLeft()`, `each()`, `corner()` and
+`mirrored()`; `EyeBuilder` has `whole()`, `outer()`, `inner()`, `rotate()`, `paint()`, `outerPaint()` and
+`innerPaint()`.
 
 ## Paint and background
 
@@ -202,7 +206,7 @@ A style can be written down as plain data, for a database column or a settings f
 ```php
 $data = Qr::url($url)->modules('flowing-soft')->paint('#be123c')->toArray();   // only what differs from the defaults
 
-$style = Qr::styles()->hydrate($data);
+$style = Qr::styles()->hydrate($data);   // or Style::fromArray($data), the same
 Qr::url($url)->style($style)->svg();
 ```
 

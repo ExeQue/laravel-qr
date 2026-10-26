@@ -145,13 +145,14 @@ trait BuildsStyle
      * @param Paint|string|array<string, mixed>|null $paint
      */
     public function eye(
-        Corner $corner,
+        Corner|string $corner,
         ProvidesQrEye|Closure|string|null $eye = null,
         OuterEyeShape|ProvidesQrOuterEye|string|null $outer = null,
         InnerEyeShape|ProvidesQrInnerEye|string|null $inner = null,
-        ?float $rotate = null,
+        ?float $rotation = null,
         Paint|string|array|null $paint = null,
     ): static {
+        $corner = is_string($corner) ? Corner::from($corner) : $corner;
         $builder = new EyeBuilder($this->style->eye($corner), $this->resolve);
 
         $builder = match (true) {
@@ -162,7 +163,7 @@ trait BuildsStyle
                 ->when($eye !== null)->whole($eye)
                 ->when($outer !== null)->outer($outer)
                 ->when($inner !== null)->inner($inner)
-                ->when($rotate !== null)->rotate((float) $rotate)
+                ->when($rotation !== null)->rotate((float) $rotation)
                 ->when($paint !== null)->paint($paint),
         };
 
@@ -186,7 +187,7 @@ trait BuildsStyle
     }
 
     /**
-     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outwards on each.
+     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outward on each.
      */
     public function mirrored(): static
     {

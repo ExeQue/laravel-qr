@@ -78,6 +78,13 @@ describe('images', function (): void {
 
 });
 
+describe('animations', function (): void {
+    it('refuses an animated GIF whose frames have too many pixels together', function (): void {
+        Qr::read(manyFrames(), 'native');
+    })->throws(UnreadableCodeException::class)
+        ->skip(! extension_loaded('imagick'), 'Imagick reads the frames.');
+});
+
 describe('binary content', function (): void {
     it('gives binary content back byte for byte, and text as text', function (): void {
         $binary = "\x00\xFF\x80qr\xC3";
