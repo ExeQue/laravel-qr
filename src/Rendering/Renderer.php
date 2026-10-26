@@ -29,7 +29,7 @@ final readonly class Renderer
     {
         $guard = new Guard($safety, $matrix->errorCorrection, self::dataCells($matrix));
         $style = $style->withMargin($guard->margin($style->margin));
-        $knockout = $style->logo === null ? null : Knockout::for($matrix, $style->logo);
+        $knockout = $style->logo === null ? null : Knockout::for($matrix, $style->logo, $safety->maxLogoShare ?? 0.6);
 
         if ($knockout !== null) {
             $guard->logo($knockout, $matrix);

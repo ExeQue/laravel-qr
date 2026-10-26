@@ -14,7 +14,8 @@ use ExeQue\Qr\Logos\Enums\LogoShape;
 final readonly class LogoStyle
 {
     /**
-     * @param float $size The logo's width as a share of the symbol's, quiet zone not counted.
+     * @param float|null $size The logo's width as a share of the symbol's, quiet zone not counted; null for
+     *                        as large as the error correction can make up for, up to Knockout::AUTO_MAX.
      * @param int $padding Modules of clear space around the logo.
      * @param Paint|null $plate A backing behind the logo and its padding; none when null.
      * @param float $plateRadius The plate's corner radius, in modules, for a square or rounded shape.
@@ -23,7 +24,7 @@ final readonly class LogoStyle
      */
     public function __construct(
         public Logo $logo,
-        public float $size = 0.2,
+        public ?float $size = 0.2,
         public int $padding = 1,
         public LogoShape $shape = LogoShape::Square,
         public ?Paint $plate = null,
@@ -34,7 +35,7 @@ final readonly class LogoStyle
         self::checkPadding($padding);
     }
 
-    public function withSize(float $size): self
+    public function withSize(?float $size): self
     {
         self::checkSize($size);
 
@@ -66,9 +67,9 @@ final readonly class LogoStyle
         return clone($this, ['position' => $position]);
     }
 
-    private static function checkSize(float $size): void
+    private static function checkSize(?float $size): void
     {
-        if ($size <= 0 || $size > 1) {
+        if ($size !== null && ($size <= 0 || $size > 1)) {
             throw InvalidLogoException::sizeOutOfRange($size);
         }
     }

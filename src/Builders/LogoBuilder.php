@@ -53,9 +53,10 @@ final class LogoBuilder
     }
 
     /**
-     * The logo's width as a share of the symbol's.
+     * The logo's width as a share of the symbol's, or 'auto' for as large as the error correction
+     * can make up for.
      */
-    public function size(float $size): self
+    public function size(float|string $size): self
     {
         return $this->with(size: $size);
     }
@@ -98,6 +99,10 @@ final class LogoBuilder
     {
         if (isset($settings['shape']) && is_string($settings['shape'])) {
             $settings['shape'] = LogoShape::from($settings['shape']);
+        }
+
+        if (($settings['size'] ?? null) === 'auto') {
+            $settings['size'] = null;
         }
 
         if (isset($settings['plate'])) {

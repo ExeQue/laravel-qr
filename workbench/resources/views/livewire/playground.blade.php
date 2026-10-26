@@ -178,7 +178,10 @@
             </label>
             @error('upload')<div class="notice error">{{ $message }}</div>@enderror
             @if ($logo !== '')
-                <label>Size: {{ $logoSize }} <input type="range" min="0.05" max="0.4" step="0.01" wire:model.live="logoSize"></label>
+                <label class="inline"><input type="checkbox" wire:model.live="logoAuto"> As large as the error correction allows</label>
+                @unless ($logoAuto)
+                    <label>Size: {{ $logoSize }} <input type="range" min="0.05" max="0.4" step="0.01" wire:model.live="logoSize"></label>
+                @endunless
                 <div class="row">
                     <label>Padding, modules <input type="number" min="0" max="4" wire:model.live="logoPadding"></label>
                     <label>Shape

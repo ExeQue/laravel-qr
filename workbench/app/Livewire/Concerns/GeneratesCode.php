@@ -72,7 +72,7 @@ trait GeneratesCode
                 $this->logo === self::UPLOADED
                     ? "storage_path('app/".addcslashes($this->upload?->getClientOriginalName() ?? 'logo.png', "'\\")."')"
                     : "resource_path('logos/{$this->logo}')",
-                ...($this->logoSize !== 0.2 ? ['size: '.self::literal($this->logoSize)] : []),
+                ...($this->logoAuto ? ["size: 'auto'"] : ($this->logoSize !== 0.2 ? ['size: '.self::literal($this->logoSize)] : [])),
                 ...($this->logoPadding !== 1 ? ["padding: {$this->logoPadding}"] : []),
                 ...($this->logoShape !== 'square' ? ['shape: '.self::literal($this->logoShape)] : []),
                 ...($this->logoPlated ? ['plate: '.$this->paintPhp($this->logoPlate, $imports, '    ')] : []),

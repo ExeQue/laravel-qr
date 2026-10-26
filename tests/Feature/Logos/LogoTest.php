@@ -257,3 +257,50 @@ describe('HEIF and AVIF logos', function (): void {
             ->and(InvalidLogoException::heifNeedsImageMagick('HEIF')->getMessage())->toContain("ImageMagick's HEIF support (libheif)");
     });
 });
+
+describe('an automatic size', function (): void {
+    it('grows the logo as far as the error correction can make up for, and no further', function (): void {
+        $size = fn (string $level): float => (float) \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')
+            ->errorCorrection($level)->logo(fixture('ellipse.png'), size: 'auto')->scene()->logo->style->size;
+
+        expect($size('L'))->toBeLessThan($size('M'))
+            ->and($size('M'))->toBeLessThan($size('H'))
+            ->and($size('H'))->toBeLessThanOrEqual(\ExeQue\Qr\Logos\Knockout::AUTO_MAX)
+            ->and($size('L'))->toBeGreaterThanOrEqual(0.05);
+    });
+
+    it('stays within the budget for square, wide and round logos, whatever is cleared', function (string $logo, string $shape): void {
+        $png = function (bool $round): string {
+            $image = imagecreatetruecolor(200, 200);
+            imagesavealpha($image, true);
+            imagealphablending($image, false);
+            imagefill($image, 0, 0, $round ? 0x7F000000 : 0xBE123C);
+            $round && imagefilledellipse($image, 100, 100, 200, 200, 0x1E1B4B);
+            ob_start();
+            imagepng($image);
+
+            return 'data:image/png;base64,'.base64_encode((string) ob_get_clean());
+        };
+        $source = match ($logo) {
+            'square' => $png(false),
+            'round' => $png(true),
+            default => fixture('ellipse.png'),
+        };
+        $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('M')->logo($source, size: 'auto', shape: $shape);
+        $knockout = \ExeQue\Qr\Logos\Knockout::for($code->matrix(), $code->scene()->logo->style);
+
+        expect($knockout->clearedDataCells)->toBeLessThanOrEqual(\ExeQue\Qr\Logos\Knockout::budget($code->matrix(), 0.6))
+            ->and($code->scene()->logo->style->size)->toBeGreaterThan(0.15)
+            ->and(\ExeQue\Qr\Facades\Qr::read($code->png(500)->contents())->text)->toBe('https://example.com/e/ABCD1234');
+    })->with(['square', 'wide', 'round'])->with(['square', 'rounded', 'circle', 'alpha']);
+
+    it('keeps the code readable, and is stored as auto', function (): void {
+        $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('Q')
+            ->logo(fn (\ExeQue\Qr\Builders\LogoBuilder $logo) => $logo->from(fixture('ellipse.png'))->size('auto'));
+        $style = $code->toStyle();
+
+        expect(\ExeQue\Qr\Facades\Qr::read($code->png(500)->contents())->text)->toBe('https://example.com/e/ABCD1234')
+            ->and($style->toArray()['logo']['size'])->toBe('auto')
+            ->and(\ExeQue\Qr\Rendering\Style::fromArray([...$style->toArray(), 'logo' => [...$style->toArray()['logo'], 'source' => fixture('ellipse.png')]])->logo->size)->toBeNull();
+    });
+});

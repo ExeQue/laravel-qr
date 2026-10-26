@@ -61,7 +61,7 @@ final readonly class Scene
             $box = implode(' ', array_map(fn (float $value): string => Number::format($value), $this->logo->box));
 
             $lines[] = '';
-            $lines[] = "logo {$style->logo->mimeType} ".substr($style->logo->hash, 0, 8)." box {$box} size ".Number::format($style->size)
+            $lines[] = "logo {$style->logo->mimeType} ".substr($style->logo->hash, 0, 8)." box {$box} size ".Number::format((float) $style->size)
                 ." {$style->shape->value} padding {$style->padding} plate ".($style->plate === null ? 'none' : self::describe($style->plate));
         }
 

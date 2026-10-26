@@ -53,7 +53,7 @@ Logos are read from files, disks, bytes and data URIs only.
 
 | Option | Default | |
 |---|---|---|
-| `size` | 0.2 | the logo's width as a share of the code's |
+| `size` | 0.2 | the logo's width as a share of the code's, or `'auto'` |
 | `padding` | 1 | modules of clear space round it |
 | `shape` | `square` | the cleared area: `square`, `rounded`, `circle`, or `alpha` (only under the logo's visible pixels) |
 | `plate` | none | a backing behind the logo and its padding: any color or gradient |
@@ -68,6 +68,14 @@ Logos are read from files, disks, bytes and data URIs only.
     ->size(0.25)
     ->shape('circle')
     ->plate('#fde68a', radius: 2))
+```
+
+With `size: 'auto'`, the logo is as large as the error correction can make up for: it clears no more data modules
+than the scan guards allow (`max_logo_share` of what the error correction level can restore), and no more than 30 %
+of the code's width. Higher error correction gives a larger logo:
+
+```php
+Qr::url($url)->errorCorrection('H')->logo($path, size: 'auto');
 ```
 
 The logo keeps its proportions inside its box. A logo, placed or centered, must stay clear of the finder, timing,

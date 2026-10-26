@@ -212,7 +212,7 @@ final readonly class StyleSerializer
     {
         return array_filter([
             'hash' => $logo->logo->hash,
-            'size' => $logo->size,
+            'size' => $logo->size ?? 'auto',
             'padding' => $logo->padding,
             'shape' => $logo->shape->value,
             'plate' => $logo->plate === null ? null : Normalizer::value($logo->plate),
@@ -232,7 +232,7 @@ final readonly class StyleSerializer
 
         return $style->withLogo(new LogoStyle(
             $logo,
-            (float) ($data['size'] ?? 0.2),
+            ($data['size'] ?? 0.2) === 'auto' ? null : (float) ($data['size'] ?? 0.2),
             (int) ($data['padding'] ?? 1),
             LogoShape::from((string) ($data['shape'] ?? LogoShape::Square->value)),
             isset($data['plate']) ? Hydrate::paint($data['plate']) : null,

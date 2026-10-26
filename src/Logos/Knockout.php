@@ -23,6 +23,11 @@ use Imagick;
  */
 final readonly class Knockout
 {
+    // An automatic size stays within these, of the symbol's width: larger logos crowd the code.
+    public const float AUTO_MAX = 0.3;
+
+    private const float AUTO_MIN = 0.05;
+
     // A centered logo shrinks by this much at a time while it covers a function pattern.
     private const float SHRINK = 0.95;
 
@@ -40,8 +45,16 @@ final readonly class Knockout
     ) {
     }
 
-    public static function for(Matrix $matrix, LogoStyle $style): self
+    /**
+     * @param float $maxShare For a logo sized automatically: the share of what the error correction can
+     *                        restore that it may clear.
+     */
+    public static function for(Matrix $matrix, LogoStyle $style, float $maxShare = 0.6): self
     {
+        if ($style->size === null) {
+            $style = $style->withSize(max(self::AUTO_MIN, min(self::AUTO_MAX, self::maxSize($matrix, $style, $maxShare))));
+        }
+
         while (true) {
             $knockout = self::place($matrix, $style);
 
@@ -53,7 +66,7 @@ final readonly class Knockout
                 throw InvalidLogoException::coversFunctionPatterns();
             }
 
-            $style = $style->withSize($style->size * self::SHRINK);
+            $style = $style->withSize((float) $style->size * self::SHRINK);
         }
     }
 
@@ -70,7 +83,7 @@ final readonly class Knockout
             $size = ($low + $high) / 2;
             $knockout = self::for($matrix, $style->withSize($size));
 
-            $knockout->clearedDataCells <= self::budget($matrix, $maxShare) && $knockout->style->size >= $size * 0.999
+            $knockout->clearedDataCells <= self::budget($matrix, $maxShare) && (float) $knockout->style->size >= $size * 0.999
                 ? $low = $size
                 : $high = $size;
         }
@@ -105,7 +118,7 @@ final readonly class Knockout
 
     private static function place(Matrix $matrix, LogoStyle $style): self
     {
-        $width = $style->size * $matrix->size;
+        $width = (float) $style->size * $matrix->size;
         $height = $width / $style->logo->aspectRatio();
         [$x, $y] = $style->position ?? [($matrix->size - $width) / 2, ($matrix->size - $height) / 2];
         $padding = $style->padding;

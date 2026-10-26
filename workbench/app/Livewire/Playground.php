@@ -123,6 +123,8 @@ class Playground extends Component
 
     public float $logoSize = 0.2;
 
+    public bool $logoAuto = false;
+
     public int $logoPadding = 1;
 
     public string $logoShape = 'square';
@@ -349,7 +351,7 @@ class Playground extends Component
                 $this->logo === self::UPLOADED && $this->upload !== null
                     ? Logo::fromBytes($this->upload->get())
                     : dirname(__DIR__, 2)."/resources/logos/{$this->logo}",
-                size: $this->logoSize,
+                size: $this->logoAuto ? 'auto' : $this->logoSize,
                 padding: $this->logoPadding,
                 shape: $this->logoShape,
                 plate: $this->logoPlated ? $this->paintOf($this->logoPlate) : null,
