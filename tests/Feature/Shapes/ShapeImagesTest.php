@@ -27,7 +27,10 @@ function shapeImages(): iterable
     }
 }
 
-it('looks as it did', function (string $method, BackedEnum $shape): void {
-    expect(Qr::make('https://example.com/e/ABCD1234')->{$method}($shape)->png(600)->contents())
-        ->toMatchImageSnapshot("shapes/{$method}-{$shape->value}");
-})->with(shapeImages(...))->group('visual');
+describe('shape images', function (): void {
+    it('looks as it did', function (string $method, BackedEnum $shape): void {
+        expect(Qr::make('https://example.com/e/ABCD1234')->{$method}($shape)->png(600)->contents())
+            ->toMatchImageSnapshot("shapes/{$method}-{$shape->value}");
+    })->with(shapeImages(...))->group('visual');
+
+});

@@ -165,23 +165,23 @@ describe('reading back', function (): void {
             ->and(fn () => \ExeQue\Qr\Support\Hydrate::shape('dots-medium', \ExeQue\Qr\Filters\Contracts\NamedFilter::class))->toThrow(\ExeQue\Qr\Exceptions\InvalidStyleException::class);
     });
 
-});
 
-it('reads back a whole design', function (): void {
-    $eye = Style::default()->eye(Corner::TopLeft);
-    $style = Style::default()
-        ->mirrored()
-        ->withMargin(3)
-        ->withPaint(new Hex('#1c1917'))
-        ->withBackground(new Hex('#fff7ed'))
-        ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotate(5))
-        ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c'))->withSize(0.95))->withInner($eye->inner->withOpacity(0.8)))
-        ->withFilters(new MixedOpacity(min: 0.85), new EyeTilt());
+    it('reads back a whole design', function (): void {
+        $eye = Style::default()->eye(Corner::TopLeft);
+        $style = Style::default()
+            ->mirrored()
+            ->withMargin(3)
+            ->withPaint(new Hex('#1c1917'))
+            ->withBackground(new Hex('#fff7ed'))
+            ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotate(5))
+            ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c'))->withSize(0.95))->withInner($eye->inner->withOpacity(0.8)))
+            ->withFilters(new MixedOpacity(min: 0.85), new EyeTilt());
 
-    expect(roundTrip($style)->toArray())->toBe($style->toArray())
-        ->and(roundTrip($style)->equals($style))->toBeTrue()
-        ->and(renders(roundTrip($style)))->toBe(renders($style))
-        ->and($style->toArray())->toMatchSnapshot();
+        expect(roundTrip($style)->toArray())->toBe($style->toArray())
+            ->and(roundTrip($style)->equals($style))->toBeTrue()
+            ->and(renders(roundTrip($style)))->toBe(renders($style))
+            ->and($style->toArray())->toMatchSnapshot();
+    });
 });
 
 describe('invalid input', function (): void {

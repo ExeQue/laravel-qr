@@ -71,10 +71,6 @@ dataset('payloads', [
     'text' => [fn (): PendingQr => Qr::text('anything at all')],
 ]);
 
-it('encodes each kind of content to its format', function (PendingQr $code): void {
-    expect($code->text())->toMatchSnapshot();
-})->with('payloads');
-
 describe('formats', function (): void {
     it('scans as what it encodes', function (PendingQr $code): void {
         expect($code->png(600))->toDecodeAs($code->text());
@@ -98,6 +94,10 @@ describe('formats', function (): void {
             ->toContain('FN:Alex Morgan')->toContain('TEL:+4512345678')->toContain('EMAIL:alex@example.com')->toContain('ORG:Acme')
             ->and(Qr::event('Party', $start, location: 'Home')->text())->toContain('SUMMARY:Party')->toContain('DTSTART:20261024T150000Z')->toContain('LOCATION:Home');
     });
+
+    it('encodes each kind of content to its format', function (PendingQr $code): void {
+        expect($code->text())->toMatchSnapshot();
+    })->with('payloads');
 });
 
 describe('escaping', function (): void {

@@ -53,17 +53,20 @@ dataset('versions', range(1, 40));
 dataset('levels', ErrorCorrection::cases());
 dataset('modes', Mode::cases());
 
-it('decodes at every version, level and mode', function (int $version, ErrorCorrection $level, Mode $mode): void {
-    $content = fullContent($mode, $version, $level);
-    $matrix = new Encoder()->encode($content, $level);
+describe('round trips', function (): void {
+    it('decodes at every version, level and mode', function (int $version, ErrorCorrection $level, Mode $mode): void {
+        $content = fullContent($mode, $version, $level);
+        $matrix = new Encoder()->encode($content, $level);
 
-    expect($matrix->version)->toBe($version)
-        ->and($matrix)->toDecodeAs($content);
-})->with('versions')->with('levels')->with('modes')->group('scan');
+        expect($matrix->version)->toBe($version)
+            ->and($matrix)->toDecodeAs($content);
+    })->with('versions')->with('levels')->with('modes')->group('scan');
 
-it('decodes text beyond ASCII', function (string $content): void {
-    expect(new Encoder()->encode($content))->toDecodeAs($content);
-})->with([
-    'within ISO-8859-1' => 'Smørrebrød på Ærø',
-    'beyond ISO-8859-1' => 'Hello 👋 こんにちは',
-])->group('scan');
+    it('decodes text beyond ASCII', function (string $content): void {
+        expect(new Encoder()->encode($content))->toDecodeAs($content);
+    })->with([
+        'within ISO-8859-1' => 'Smørrebrød på Ærø',
+        'beyond ISO-8859-1' => 'Hello 👋 こんにちは',
+    ])->group('scan');
+
+});

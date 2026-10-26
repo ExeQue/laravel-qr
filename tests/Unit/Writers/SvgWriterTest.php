@@ -96,27 +96,27 @@ describe('output', function (): void {
         expect($svg)->toContain('fill="rgb(')->not->toContain('cmyk(');
     });
 
-});
 
-it('snapshots every option', function (Options $options, ?Style $style): void {
-    expect(svg($style, $options))->toMatchSnapshot();
-})->with([
-    'default' => [new Options(), null],
-    'transparent, sized' => [new Options(size: 300), fn () => Style::default()->withBackground(null)],
-    'pixels, precision 1' => [new Options(size: 100, pixels: true, precision: 1), null],
-    'current color' => [new Options(currentColor: true), fn () => Style::default()->withEye(Corner::TopRight, Style::default()->eye(Corner::TopRight)->withPaint(new Hex('#be123c')))],
-    'symbol, declaration' => [new Options(xmlDeclaration: true, symbol: 'code-1'), null],
-    'css notation' => [new Options(colorNotation: ColorNotation::Css), fn () => Style::default()->withPaint(new Oklch(0.45, 0.2, 293, 0.9))->withBackground(LinearGradient::make('#ffffff', 'oklch(95% 0.02 293)')->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
-    'linear, canvas box, reflect' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->box(GradientBox::Canvas)->spread(Spread::Reflect)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
-    'radial, ellipse with focal' => [new Options(), fn () => Style::default()->withPaint(RadialGradient::make('#be123c', '#1e1b4b')->radius(0.5, 0.3)->focal(0.4, 0.5)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
-    'gradient in each eye' => [new Options(), fn () => Style::default()->withEyes(Style::default()->eye(Corner::TopLeft)->withPaint(RadialGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Shape)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb)))],
-    'per module' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c', '#1e1b4b')->sampling(Sampling::PerModule)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
-    'per module in each shape, gradient background' => [new Options(), fn () => Style::default()->withPaint(ConicGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Shape))->withBackground(ConicGradient::make('#ffffff', '#eeeeee'))],
-    'canvas box per module' => [new Options(), fn () => Style::default()->withPaint(ConicGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Canvas))],
-    'faded, translucent' => [new Options(), fn () => Style::default()->withPaint(new Hex('#00000080'))->withModules(Style::default()->withPaint(new Hex('#00000080'))->modules->withOpacity(0.5))],
-    'current color paint' => [new Options(), fn () => Style::default()->withPaint(new Named('currentColor'))],
-    'translucent gradient' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c80', '#1e1b4b')->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
-]);
+    it('snapshots every option', function (Options $options, ?Style $style): void {
+        expect(svg($style, $options))->toMatchSnapshot();
+    })->with([
+        'default' => [new Options(), null],
+        'transparent, sized' => [new Options(size: 300), fn () => Style::default()->withBackground(null)],
+        'pixels, precision 1' => [new Options(size: 100, pixels: true, precision: 1), null],
+        'current color' => [new Options(currentColor: true), fn () => Style::default()->withEye(Corner::TopRight, Style::default()->eye(Corner::TopRight)->withPaint(new Hex('#be123c')))],
+        'symbol, declaration' => [new Options(xmlDeclaration: true, symbol: 'code-1'), null],
+        'css notation' => [new Options(colorNotation: ColorNotation::Css), fn () => Style::default()->withPaint(new Oklch(0.45, 0.2, 293, 0.9))->withBackground(LinearGradient::make('#ffffff', 'oklch(95% 0.02 293)')->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
+        'linear, canvas box, reflect' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->box(GradientBox::Canvas)->spread(Spread::Reflect)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
+        'radial, ellipse with focal' => [new Options(), fn () => Style::default()->withPaint(RadialGradient::make('#be123c', '#1e1b4b')->radius(0.5, 0.3)->focal(0.4, 0.5)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
+        'gradient in each eye' => [new Options(), fn () => Style::default()->withEyes(Style::default()->eye(Corner::TopLeft)->withPaint(RadialGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Shape)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb)))],
+        'per module' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c', '#1e1b4b')->sampling(Sampling::PerModule)->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
+        'per module in each shape, gradient background' => [new Options(), fn () => Style::default()->withPaint(ConicGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Shape))->withBackground(ConicGradient::make('#ffffff', '#eeeeee'))],
+        'canvas box per module' => [new Options(), fn () => Style::default()->withPaint(ConicGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Canvas))],
+        'faded, translucent' => [new Options(), fn () => Style::default()->withPaint(new Hex('#00000080'))->withModules(Style::default()->withPaint(new Hex('#00000080'))->modules->withOpacity(0.5))],
+        'current color paint' => [new Options(), fn () => Style::default()->withPaint(new Named('currentColor'))],
+        'translucent gradient' => [new Options(), fn () => Style::default()->withPaint(LinearGradient::make('#be123c80', '#1e1b4b')->in(\ExeQue\Qr\Gradients\Enums\ColorSpace::Srgb))],
+    ]);
+});
 
 describe('refusals', function (): void {
     it('refuses options that do not fit together', function (callable $options, string $message): void {

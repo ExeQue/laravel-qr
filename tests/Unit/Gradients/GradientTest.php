@@ -323,17 +323,20 @@ describe('mesh', function (): void {
     ])->throws(InvalidGradientException::class, 'A mesh gradient needs at least two rows of at least two colors, every row as long.');
 });
 
-it('keeps its settings on copies', function (): void {
-    $gradient = LinearGradient::make('red', 'blue');
-    $changed = $gradient->box(GradientBox::Shape)->sampling(Sampling::PerModule)->in(ColorSpace::Oklch, HueInterpolation::Longer);
+describe('copies', function (): void {
+    it('keeps its settings on copies', function (): void {
+        $gradient = LinearGradient::make('red', 'blue');
+        $changed = $gradient->box(GradientBox::Shape)->sampling(Sampling::PerModule)->in(ColorSpace::Oklch, HueInterpolation::Longer);
 
-    expect($gradient->box)->toBe(GradientBox::Code)
-        ->and($gradient->sampling)->toBe(Sampling::Continuous)
-        ->and($gradient->space)->toBe(ColorSpace::Oklab)
-        ->and($changed->box)->toBe(GradientBox::Shape)
-        ->and($changed->sampling)->toBe(Sampling::PerModule)
-        ->and($changed->space)->toBe(ColorSpace::Oklch)
-        ->and($changed->hueInterpolation)->toBe(HueInterpolation::Longer)
-        ->and(ColorSpace::Oklch->isPolar())->toBeTrue()
-        ->and(ColorSpace::Oklab->isPolar())->toBeFalse();
+        expect($gradient->box)->toBe(GradientBox::Code)
+            ->and($gradient->sampling)->toBe(Sampling::Continuous)
+            ->and($gradient->space)->toBe(ColorSpace::Oklab)
+            ->and($changed->box)->toBe(GradientBox::Shape)
+            ->and($changed->sampling)->toBe(Sampling::PerModule)
+            ->and($changed->space)->toBe(ColorSpace::Oklch)
+            ->and($changed->hueInterpolation)->toBe(HueInterpolation::Longer)
+            ->and(ColorSpace::Oklch->isPolar())->toBeTrue()
+            ->and(ColorSpace::Oklab->isPolar())->toBeFalse();
+    });
+
 });

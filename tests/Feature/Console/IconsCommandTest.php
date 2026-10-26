@@ -34,53 +34,56 @@ afterEach(function (): void {
     File::deleteDirectory($this->directory);
 });
 
-it('keeps the shipped icons in step with the shapes', function (): void {
-    $this->artisan('qr:icons', ['--built-in' => true, '--path' => $this->directory])->assertSuccessful();
+describe('the icons command', function (): void {
+    it('keeps the shipped icons in step with the shapes', function (): void {
+        $this->artisan('qr:icons', ['--built-in' => true, '--path' => $this->directory])->assertSuccessful();
 
-    $shipped = dirname(__DIR__, 3).'/resources/icons';
-    $files = iterator_to_array(Finder::create()->files()->in($shipped)->name('*.svg'), false);
+        $shipped = dirname(__DIR__, 3).'/resources/icons';
+        $files = iterator_to_array(Finder::create()->files()->in($shipped)->name('*.svg'), false);
 
-    expect($files)->not->toBeEmpty()
-        ->and(iterator_count(Finder::create()->files()->in($this->directory)))->toBe(count($files));
+        expect($files)->not->toBeEmpty()
+            ->and(iterator_count(Finder::create()->files()->in($this->directory)))->toBe(count($files));
 
-    foreach ($files as $file) {
-        expect(file_get_contents("{$this->directory}/{$file->getRelativePathname()}"))
-            ->toBe($file->getContents(), "resources/icons/{$file->getRelativePathname()} is out of date: run composer icons.");
-    }
-});
+        foreach ($files as $file) {
+            expect(file_get_contents("{$this->directory}/{$file->getRelativePathname()}"))
+                ->toBe($file->getContents(), "resources/icons/{$file->getRelativePathname()} is out of date: run composer icons.");
+        }
+    });
 
-it('writes icons of the application\'s own shapes only', function (): void {
-    Qr::modules()->register('diamond', DiamondModule::class);
-    Qr::modules()->register('square', fn (): ModuleShape => new Square());
-    Qr::outerEyes()->register('own-square', \ExeQue\Qr\Shapes\OuterEyes\Square::class);
+    it('writes icons of the application\'s own shapes only', function (): void {
+        Qr::modules()->register('diamond', DiamondModule::class);
+        Qr::modules()->register('square', fn (): ModuleShape => new Square());
+        Qr::outerEyes()->register('own-square', \ExeQue\Qr\Shapes\OuterEyes\Square::class);
 
-    $this->artisan('qr:icons', ['--path' => $this->directory])
-        ->expectsOutputToContain('3 QR code shape icons written')
-        ->assertSuccessful();
+        $this->artisan('qr:icons', ['--path' => $this->directory])
+            ->expectsOutputToContain('3 QR code shape icons written')
+            ->assertSuccessful();
 
-    expect(file_get_contents("{$this->directory}/modules/diamond.svg"))->toContain('viewBox="0 0 3 3"')
-        ->and("{$this->directory}/modules/square.svg")->toBeFile()
-        ->and("{$this->directory}/outer-eyes/own-square.svg")->toBeFile()
-        ->and("{$this->directory}/eyes")->not->toBeDirectory()
-        ->and(Qr::modules()->isBuiltIn('square'))->toBeFalse()
-        ->and(Qr::innerEyes()->isBuiltIn('square'))->toBeTrue()
-        ->and(Qr::innerEyes()->isBuiltIn('nope'))->toBeFalse();
-});
+        expect(file_get_contents("{$this->directory}/modules/diamond.svg"))->toContain('viewBox="0 0 3 3"')
+            ->and("{$this->directory}/modules/square.svg")->toBeFile()
+            ->and("{$this->directory}/outer-eyes/own-square.svg")->toBeFile()
+            ->and("{$this->directory}/eyes")->not->toBeDirectory()
+            ->and(Qr::modules()->isBuiltIn('square'))->toBeFalse()
+            ->and(Qr::innerEyes()->isBuiltIn('square'))->toBeTrue()
+            ->and(Qr::innerEyes()->isBuiltIn('nope'))->toBeFalse();
+    });
 
-it('writes to resources/svg/qr by default', function (): void {
-    Qr::modules()->register('diamond', DiamondModule::class);
-    $this->directory = resource_path('svg');
+    it('writes to resources/svg/qr by default', function (): void {
+        Qr::modules()->register('diamond', DiamondModule::class);
+        $this->directory = resource_path('svg');
 
-    $this->artisan('qr:icons')->assertSuccessful();
+        $this->artisan('qr:icons')->assertSuccessful();
 
-    expect("{$this->directory}/qr/modules/diamond.svg")->toBeFile();
-});
+        expect("{$this->directory}/qr/modules/diamond.svg")->toBeFile();
+    });
 
-it('keeps icon files inside the directory, whatever the name', function (): void {
-    Qr::modules()->register('../up/and away', DiamondModule::class);
+    it('keeps icon files inside the directory, whatever the name', function (): void {
+        Qr::modules()->register('../up/and away', DiamondModule::class);
 
-    $this->artisan('qr:icons', ['--path' => $this->directory])->assertSuccessful();
+        $this->artisan('qr:icons', ['--path' => $this->directory])->assertSuccessful();
 
-    expect("{$this->directory}/modules/up-and-away.svg")->toBeFile()
-        ->and(Qr::writers()->isBuiltIn('svg'))->toBeTrue();
+        expect("{$this->directory}/modules/up-and-away.svg")->toBeFile()
+            ->and(Qr::writers()->isBuiltIn('svg'))->toBeTrue();
+    });
+
 });

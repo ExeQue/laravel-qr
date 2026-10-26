@@ -10,6 +10,11 @@ use ExeQue\Qr\QrServiceProvider;
 
 covers(QrServiceProvider::class, Qr::class);
 
-it('resolves the facade to the manager', function (): void {
-    expect(Qr::getFacadeRoot())->toBeInstanceOf(QrManager::class);
+pest()->group('provider');
+
+describe('the service provider', function (): void {
+    it('resolves the facade to the manager', function (): void {
+        expect(Qr::getFacadeRoot())->toBeInstanceOf(QrManager::class);
+    });
+
 });

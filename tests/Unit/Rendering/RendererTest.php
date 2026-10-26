@@ -183,16 +183,6 @@ describe('modules', function (): void {
     });
 });
 
-it('describes the scene for snapshots', function (): void {
-    $style = Style::default()->mirrored()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(45))->withBackground(null);
-
-    expect(scene($style))->toMatchSnapshot();
-});
-
-it('snapshots the default scene', function (): void {
-    expect(scene())->toMatchSnapshot();
-});
-
 describe('scenes', function (): void {
     it('describes paints of other kinds by class', function (): void {
         $paint = new class () implements \ExeQue\Qr\Contracts\Paint {};
@@ -204,4 +194,14 @@ describe('scenes', function (): void {
         expect(scene()->toSnapshot())->toBe(scene()->toSnapshot());
     });
 
+
+    it('describes the scene for snapshots', function (): void {
+        $style = Style::default()->mirrored()->withPaint(LinearGradient::make('#be123c', '#7c3aed')->angle(45))->withBackground(null);
+
+        expect(scene($style))->toMatchSnapshot();
+    });
+
+    it('snapshots the default scene', function (): void {
+        expect(scene())->toMatchSnapshot();
+    });
 });

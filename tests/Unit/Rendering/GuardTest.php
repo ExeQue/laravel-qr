@@ -181,13 +181,16 @@ describe('contrast', function (): void {
     });
 });
 
-it('is all off when turned off', function (): void {
-    $scene = guarded(Style::default()->withMargin(0)->withPaint(new Hex('#eeeeee'))->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withOffset(1, 1)->withSkip())), safety: ScanSafety::off());
+describe('overall', function (): void {
+    it('is all off when turned off', function (): void {
+        $scene = guarded(Style::default()->withMargin(0)->withPaint(new Hex('#eeeeee'))->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withOffset(1, 1)->withSkip())), safety: ScanSafety::off());
 
-    expect($scene->adjustments)->toBe([])
-        ->and($scene->margin)->toBe(0);
-});
+        expect($scene->adjustments)->toBe([])
+            ->and($scene->margin)->toBe(0);
+    });
 
-it('reports what it did in the snapshot', function (): void {
-    expect(guarded(Style::default()->withMargin(1)->withFilter(new EyeTilt(outer: 20))))->toMatchSnapshot();
+    it('reports what it did in the snapshot', function (): void {
+        expect(guarded(Style::default()->withMargin(1)->withFilter(new EyeTilt(outer: 20))))->toMatchSnapshot();
+    });
+
 });

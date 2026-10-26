@@ -238,17 +238,17 @@ describe('drawing', function (): void {
         expect($style->size)->toBe(0.2)
             ->and([$changed->size, $changed->padding, $changed->shape, $changed->plateRadius, $changed->position])->toBe([0.3, 2, LogoShape::Circle, 1.0, [10, 10]]);
     });
+
+    it('snapshots the SVG with each kind of logo', function (string $file, LogoShape $shape, bool $inline): void {
+        $scene = withLogo(new LogoStyle(Logo::fromFile(fixture($file)), 0.22, shape: $shape, plate: new Hex('#ffffff')));
+
+        expect(new SvgWriter(new SvgOptions(inlineSvgLogos: $inline))->write($scene))->toMatchSnapshot();
+    })->with([
+        'png, square' => ['ellipse.png', LogoShape::Square, true],
+        'svg, circle, inlined' => ['badge.svg', LogoShape::Circle, true],
+        'svg, rounded, as an image' => ['badge.svg', LogoShape::Rounded, false],
+    ]);
 });
-
-it('snapshots the SVG with each kind of logo', function (string $file, LogoShape $shape, bool $inline): void {
-    $scene = withLogo(new LogoStyle(Logo::fromFile(fixture($file)), 0.22, shape: $shape, plate: new Hex('#ffffff')));
-
-    expect(new SvgWriter(new SvgOptions(inlineSvgLogos: $inline))->write($scene))->toMatchSnapshot();
-})->with([
-    'png, square' => ['ellipse.png', LogoShape::Square, true],
-    'svg, circle, inlined' => ['badge.svg', LogoShape::Circle, true],
-    'svg, rounded, as an image' => ['badge.svg', LogoShape::Rounded, false],
-]);
 
 describe('HEIF and AVIF logos', function (): void {
     it('turns them into PNG, so every writer and browser can show them', function (string $file): void {

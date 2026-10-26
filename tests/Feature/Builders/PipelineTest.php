@@ -283,21 +283,24 @@ describe('caching', function (): void {
 
 })->group('cache');
 
-it('tells what it does', function (): void {
-    Event::fake();
-    config()->set('qr.cache.enabled', true);
+describe('events', function (): void {
+    it('tells what it does', function (): void {
+        Event::fake();
+        config()->set('qr.cache.enabled', true);
 
-    Qr::make(PIPELINE_URL)->margin(1)->format('count');
-    app()->forgetScopedInstances();
-    Qr::make(PIPELINE_URL)->margin(1)->format('count');
+        Qr::make(PIPELINE_URL)->margin(1)->format('count');
+        app()->forgetScopedInstances();
+        Qr::make(PIPELINE_URL)->margin(1)->format('count');
 
-    Event::assertDispatched(QrRendering::class, 2);
-    Event::assertDispatched(QrCacheMissed::class, 1);
-    Event::assertDispatched(QrCacheHit::class, 1);
-    Event::assertDispatched(QrGuardApplied::class, fn (QrGuardApplied $event): bool => $event->adjustment->guard === 'margin');
-    Event::assertDispatched(QrRendered::class, fn (QrRendered $event): bool => ! $event->cached
-        && $event->version === 3
-        && $event->modules === 29
-        && array_keys($event->milliseconds) === ['encode', 'render', 'write', 'total']);
-    Event::assertDispatched(QrRendered::class, fn (QrRendered $event): bool => $event->cached && array_keys($event->milliseconds) === ['total']);
+        Event::assertDispatched(QrRendering::class, 2);
+        Event::assertDispatched(QrCacheMissed::class, 1);
+        Event::assertDispatched(QrCacheHit::class, 1);
+        Event::assertDispatched(QrGuardApplied::class, fn (QrGuardApplied $event): bool => $event->adjustment->guard === 'margin');
+        Event::assertDispatched(QrRendered::class, fn (QrRendered $event): bool => ! $event->cached
+            && $event->version === 3
+            && $event->modules === 29
+            && array_keys($event->milliseconds) === ['encode', 'render', 'write', 'total']);
+        Event::assertDispatched(QrRendered::class, fn (QrRendered $event): bool => $event->cached && array_keys($event->milliseconds) === ['total']);
+    });
+
 });

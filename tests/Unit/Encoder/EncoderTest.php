@@ -166,17 +166,18 @@ describe('matrix', function (): void {
     it('encodes the same content the same way every time', function (): void {
         expect(new Encoder()->encode('https://example.com')->toSnapshot())->toBe(new Encoder()->encode('https://example.com')->toSnapshot());
     });
-});
 
-it('snapshots the matrix', function (string $content, ErrorCorrection $level, int $minVersion, ?Mask $mask): void {
-    expect(new Encoder()->encode($content, $level, $minVersion, $mask))->toMatchSnapshot();
-})->with([
-    'numeric-m' => ['01234567', ErrorCorrection::Medium, 1, null],
-    'alphanumeric-q' => ['HELLO WORLD', ErrorCorrection::Quartile, 1, null],
-    'url-m' => ['https://example.com/e/ABCD1234', ErrorCorrection::Medium, 1, null],
-    'url-h-v7' => ['https://example.com/e/ABCD1234', ErrorCorrection::High, 7, null],
-    'latin-l' => ['Smørrebrød', ErrorCorrection::Low, 1, null],
-    'emoji-m' => ['Hello 👋', ErrorCorrection::Medium, 1, null],
-    'alphanumeric-q-mask5' => ['HELLO WORLD', ErrorCorrection::Quartile, 1, Mask::Pattern5],
-    'alphanumeric-l-v14-mask2' => ['HELLO WORLD', ErrorCorrection::Low, 14, Mask::Pattern2],
-]);
+    it('snapshots the matrix', function (string $content, ErrorCorrection $level, int $minVersion, ?Mask $mask): void {
+        expect(new Encoder()->encode($content, $level, $minVersion, $mask))->toMatchSnapshot();
+    })->with([
+        'numeric-m' => ['01234567', ErrorCorrection::Medium, 1, null],
+        'alphanumeric-q' => ['HELLO WORLD', ErrorCorrection::Quartile, 1, null],
+        'url-m' => ['https://example.com/e/ABCD1234', ErrorCorrection::Medium, 1, null],
+        'url-h-v7' => ['https://example.com/e/ABCD1234', ErrorCorrection::High, 7, null],
+        'latin-l' => ['Smørrebrød', ErrorCorrection::Low, 1, null],
+        'emoji-m' => ['Hello 👋', ErrorCorrection::Medium, 1, null],
+        'alphanumeric-q-mask5' => ['HELLO WORLD', ErrorCorrection::Quartile, 1, Mask::Pattern5],
+        'alphanumeric-l-v14-mask2' => ['HELLO WORLD', ErrorCorrection::Low, 14, Mask::Pattern2],
+    ]);
+
+});

@@ -131,10 +131,6 @@ dataset('filters', [
     'compound' => [fn () => new Compound(new MixedOpacity(min: 0.8), new EyeTilt())],
 ]);
 
-it('snapshots every filter', function (ModuleFilter|EyeFilter $filter): void {
-    expect(filtered($filter))->toMatchSnapshot();
-})->with('filters');
-
 describe('every filter', function (): void {
     it('renders the same every time', function (ModuleFilter|EyeFilter $filter): void {
         expect(filtered($filter)->toSnapshot())->toBe(filtered($filter)->toSnapshot());
@@ -151,6 +147,10 @@ describe('every filter', function (): void {
 
         expect($filter->name())->toMatch('/^[a-z-]+$/')
             ->and(json_decode((string) json_encode($options), true))->toEqual($options);
+    })->with('filters');
+
+    it('snapshots every filter', function (ModuleFilter|EyeFilter $filter): void {
+        expect(filtered($filter))->toMatchSnapshot();
     })->with('filters');
 });
 
