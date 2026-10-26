@@ -31,6 +31,11 @@ final class InvalidStyleException extends InvalidArgumentException implements Qr
         return new self("The margin is at least 0 modules, {$margin} given.");
     }
 
+    public static function notPlain(string $method, mixed $value): self
+    {
+        return new self('A style in config keeps plain values only, to survive the config cache: '.get_debug_type($value)." given to {$method}(). Give a gradient as its array, and shapes and filters by their names.");
+    }
+
     public static function noLayers(): self
     {
         return new self('A layered paint needs at least one layer.');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Rendering;
 
+use ExeQue\Qr\Builders\PendingStyle;
 use ExeQue\Qr\Colors\Contrast;
 use ExeQue\Qr\Colors\Hex;
 use ExeQue\Qr\Contracts\Paint;
@@ -42,6 +43,15 @@ final readonly class Style implements Arrayable, JsonSerializable
         public ?LogoStyle $logo = null,
     ) {
         self::checkMargin($margin);
+    }
+
+    /**
+     * A style described with the style builder's methods and built when it is first used, as
+     * a named style in config/qr.php: Style::make()->modules('dots-medium')->paint('#1e1b4b').
+     */
+    public static function make(): PendingStyle
+    {
+        return PendingStyle::make();
     }
 
     /**

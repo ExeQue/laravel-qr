@@ -131,8 +131,20 @@ or describe it in `config/qr.php`, where only plain values may go, so it survive
 ],
 ```
 
-To use the style builder from config, name a class that implements `ProvidesQrStyle`; a class name survives the
-config cache where a closure would not:
+To use the style builder's methods in config, start with `Style::make()`. It keeps the calls as plain values, so they
+survive `php artisan config:cache`, and builds the style when it is first used; give a gradient as its array, and
+shapes and filters by their names:
+
+```php
+use ExeQue\Qr\Rendering\Style;
+
+'styles' => [
+    'brand' => Style::make()->modules('dots-medium')->eyes('rounded')->paint('#1e1b4b')->margin(2),
+    'wedding' => ['extends' => 'brand', 'modules' => ['paint' => '#be123c']],
+],
+```
+
+Or name a class that implements `ProvidesQrStyle`, for a style that needs code to build:
 
 ```php
 use ExeQue\Qr\Facades\Qr;

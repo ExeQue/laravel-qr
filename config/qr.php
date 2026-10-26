@@ -255,17 +255,17 @@ return [
     | building on others with 'extends'; or an enum class implementing
     | ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle, every case under its value.
     | Shapes, filters and gradients go by their registered names, colors by
-    | any notation or a name from 'colors'. A class name works too: one that
-    | implements ProvidesQrStyle, for a style made with the style builder.
-    | Use one with ->style('brand').
+    | any notation or a name from 'colors'. Style::make() takes the style
+    | builder's methods, kept as plain values and built when first used. A
+    | class implementing ProvidesQrStyle works too. Use one with ->style('brand').
     |
     */
 
     'styles' => [
-        // A class whose qrStyle() builds the style, as Qr::style()->modules('dots-medium')->...->toStyle():
-        // 'brand' => App\Qr\BrandStyle::class,
-        // Or the style as plain values:
-        // 'brand' => [
+        // With the style builder's methods, built when the style is first used:
+        // 'brand' => ExeQue\Qr\Rendering\Style::make()->modules('dots-medium')->eyes('rounded')->paint('brand')->margin(2),
+        // Or as plain values:
+        // 'classic' => [
         //     'modules' => ['shape' => 'dots-medium', 'paint' => 'brand'],
         //     'eyes' => [
         //         'top-left' => ['outer' => ['shape' => 'rounded'], 'inner' => ['shape' => 'circle']],
@@ -275,6 +275,9 @@ return [
         //     'background' => 'paper',
         //     'margin' => 2,
         // ],
+        // Or a class implementing ProvidesQrStyle:
+        // 'event' => App\Qr\EventStyle::class,
+        // Building on others:
         // 'launch' => [
         //     'extends' => 'brand',
         //     'modules' => ['paint' => [
