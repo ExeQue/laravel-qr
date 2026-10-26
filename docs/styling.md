@@ -132,8 +132,7 @@ or describe it in `config/qr.php`, where only plain values may go, so it survive
 ```
 
 To use the style builder's methods in config, start with `Style::make()`. It keeps the calls as plain values, so they
-survive `php artisan config:cache`, and builds the style when it is first used; give a gradient as its array, and
-shapes and filters by their names:
+survive `php artisan config:cache`, and builds the style when it is first used:
 
 ```php
 use ExeQue\Qr\Rendering\Style;
@@ -143,6 +142,20 @@ use ExeQue\Qr\Rendering\Style;
     'wedding' => ['extends' => 'brand', 'modules' => ['paint' => '#be123c']],
 ],
 ```
+
+What it takes, as config must survive the cache:
+
+- the style methods: `modules()`, `paint()`, `background()`, `eyes()`, `eye()`, `outer()`, `inner()`, `mirrored()`,
+  `filter()`, `filters()`, `withoutFilter()`, `logo()`, `margin()` and `style()`; not `toStyle()`, `for()` or the
+  code's own settings such as `errorCorrection()`, which belong to each code;
+- as arguments, text, numbers, booleans, arrays, enum cases and color classes (`Hex::make(...)`, `Oklch::make(...)`);
+- shapes, filters and gradients by their names or arrays: `modules('dots-medium', diameter: 0.7)`,
+  `filter('mixed-rotation', min: -10, max: 10)`, `paint(['kind' => 'linear', 'angle' => 135, 'stops' => [...]])`;
+- a logo by its path or data URI.
+
+Gradient and shape objects, closures, and builder closures such as `eyes(fn (EyesBuilder $eyes) => ...)` cannot be
+cached, and `Style::make()` refuses them at once with what to give instead. A style that needs them belongs in a
+class, or in a service provider.
 
 Or name a class that implements `ProvidesQrStyle`, for a style that needs code to build:
 

@@ -258,8 +258,10 @@ return [
     | ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle, every case under its value.
     | Shapes, filters and gradients go by their registered names, colors by
     | any notation or a name from 'colors'. Style::make() takes the style
-    | builder's methods, kept as plain values and built when first used. A
-    | class implementing ProvidesQrStyle works too. Use one with ->style('brand').
+    | builder's methods, kept as plain values and built when first used:
+    | text, numbers, arrays, enums and color classes, a gradient as its
+    | array, no objects or closures otherwise (see docs/styling.md). A class
+    | implementing ProvidesQrStyle works too. Use one with ->style('brand').
     |
     */
 

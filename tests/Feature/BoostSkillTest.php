@@ -26,3 +26,17 @@ it('renders the Boost skill with the names this application has', function (): v
         ->toContain('`round-corner` (outer [0, 0, 0, 3.5]; hole [0, 0, 0, 2.5])')->toContain('`pill` (vertical true)')
         ->toContain('<x-qr :content="$url" class="size-40" />');
 });
+
+it('carries the documentation as its references, as the docs say it now', function (): void {
+    require_once dirname(__DIR__, 2).'/scripts/boost-references.php';
+
+    $references = dirname(__DIR__, 2).'/resources/boost/skills/laravel-qr/references';
+    $carried = array_map(file_get_contents(...), array_combine(array_map(basename(...), glob("{$references}/*.md") ?: []), glob("{$references}/*.md") ?: []));
+
+    $expected = boostReferences(dirname(__DIR__, 2));
+    ksort($carried);
+    ksort($expected);
+
+    expect($carried)->toBe($expected, 'The skill references drifted from the docs: run composer boost:references.')
+        ->and(implode('', $carried))->not->toContain('](images/');
+});

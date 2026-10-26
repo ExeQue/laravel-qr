@@ -100,4 +100,23 @@ Use a named style or color the application already has before writing a new one.
 - Register shapes, filters and styles of the application in a service provider, or as plain values in
   `config/qr.php`; `php artisan qr:check` builds every one and lists problems.
 
+## References
+
+Read the one that fits before going further than the steps above; each is the package's documentation page.
+
+- `references/getting-started.md` - first codes in every format
+- `references/content.md` - links, Wi-Fi, contact cards, events and their escaping
+- `references/output.md` - formats, drivers (Imagick, GD), size, quality, compression, saving, streaming
+- `references/styling.md` - the style builder, named styles, merging
+- `references/modules.md`, `references/eyes.md` - every shape and its options
+- `references/colors.md`, `references/gradients.md` - color notations and names, gradients and layered paints
+- `references/filters.md` - every filter, its options and scope
+- `references/logos.md` - sources, sizes (`'auto'`), cleared shapes, plates
+- `references/scan-safety.md` - the guards and their limits
+- `references/blade.md` - the components
+- `references/reading.md` - `Qr::read()`, decoders, `qr:install`
+- `references/caching.md`, `references/testing.md` - caching, and `Qr::fake()` with its assertions
+- `references/configuration.md` - every config key
+- `references/extending.md` - shapes, filters, payloads, writers and decoders of the application's own
+
 The full documentation is at https://exeque.github.io/laravel-qr/.
