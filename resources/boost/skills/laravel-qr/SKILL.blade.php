@@ -68,7 +68,8 @@ out of the code; `->mirrored()` turns the rest the same way.
 
 - Scan guards run after styling: low contrast or a logo that is too large throws a `ScanSafetyException` naming the
   problem. Fix the style rather than turning guards off; `->scanSafety(ScanSafety::off())` is a last resort.
-- Check that a styled code still reads with `Qr::read($rendered)->text`.
+- Check that a styled code still reads with `Qr::read($rendered)->text`; `Qr::read()` also takes an uploaded file.
+  `php artisan qr:install` installs zxing-wasm for the zxing reader with the application's package manager.
 - PNG, JPEG and WebP need the Imagick extension; SVG needs nothing.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
 - In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $url)`.

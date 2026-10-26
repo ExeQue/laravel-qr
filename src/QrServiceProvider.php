@@ -10,6 +10,7 @@ use ExeQue\Qr\Colors\ColorNames;
 use ExeQue\Qr\Console\CheckCommand;
 use ExeQue\Qr\Console\ClearCommand;
 use ExeQue\Qr\Console\IconsCommand;
+use ExeQue\Qr\Console\InstallCommand;
 use ExeQue\Qr\Decoding\StackDecoder;
 use ExeQue\Qr\Decoding\ZxingDecoder;
 use ExeQue\Qr\Logos\Contracts\SvgSanitizer;
@@ -114,7 +115,7 @@ final class QrServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
             $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
-            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class]);
+            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
         }
     }
 }

@@ -52,7 +52,13 @@ turned or seen at a gentle angle. For photos of large, dense codes at a steep an
 
 ## Setting up zxing
 
-zxing runs in Node with the application's own packages:
+zxing runs in Node with the application's own packages. `qr:install` adds them with your package manager:
+
+```bash
+php artisan qr:install
+```
+
+Or by hand:
 
 ```bash
 npm install zxing-wasm               # PNG, JPEG, WebP, GIF
