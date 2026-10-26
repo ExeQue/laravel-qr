@@ -24,14 +24,14 @@ final class ColorNames
     public function __construct(array $colors = [])
     {
         foreach ($colors as $name => $color) {
-            $this->define($name, $color);
+            $this->register($name, $color);
         }
     }
 
     /**
      * @param ColorContract|string|array<string, mixed> $color Taken as it is now; a name given here is resolved straight away.
      */
-    public function define(string $name, ColorContract|string|array $color): void
+    public function register(string $name, ColorContract|string|array $color): void
     {
         $name = strtolower(trim($name));
 
@@ -61,6 +61,14 @@ final class ColorNames
     public function get(string $name): ?ColorContract
     {
         return $this->colors[strtolower(trim($name))] ?? null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function names(): array
+    {
+        return array_keys($this->all());
     }
 
     /**

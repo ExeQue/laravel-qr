@@ -165,12 +165,10 @@ final class QrServiceProvider extends ServiceProvider
      */
     private function console(): void
     {
-        if (! $this->app->runningInConsole()) {
-            return;
+        if ($this->app->runningInConsole()) {
+            $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
+            $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
+            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
         }
-
-        $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
-        $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
-        $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
     }
 }

@@ -11,6 +11,7 @@ use ExeQue\Qr\Builders\Pipeline;
 use ExeQue\Qr\Builders\Rendered;
 use ExeQue\Qr\Builders\Resolve;
 use ExeQue\Qr\Builders\StyleBuilder;
+use ExeQue\Qr\Colors\ColorNames;
 use ExeQue\Qr\Decoding\Decoded;
 use ExeQue\Qr\Exceptions\ResolveException;
 use ExeQue\Qr\Exceptions\UnreadableCodeException;
@@ -289,5 +290,13 @@ final class Qr
     public function styles(): StyleRegistry
     {
         return $this->container->make(StyleRegistry::class);
+    }
+
+    /**
+     * The color names of the application, next to the CSS names.
+     */
+    public function colors(): ColorNames
+    {
+        return $this->container->make(ColorNames::class);
     }
 }

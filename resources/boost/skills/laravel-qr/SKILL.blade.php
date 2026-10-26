@@ -82,7 +82,7 @@ Use a named style or color the application already has before writing a new one.
   never as gradient objects or closures (colors may be color classes). `'extends' => 'brand'` builds on another style. A class implementing
   `ProvidesQrStyle` works too, for a style that needs code.
 - Or in a service provider: `Qr::styles()->register('brand', fn () => Qr::style()->modules('dots-medium'))` and
-  `app(ColorNames::class)->define('brand', '#be123c')`.
+  `Qr::colors()->register('brand', '#be123c')`.
 - Use a style with `->style('brand')`, or `<x-qr :content="$url" style="brand" />` in Blade.
 @endverbatim
 

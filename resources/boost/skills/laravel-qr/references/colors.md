@@ -74,10 +74,10 @@ Define names once, in `config/qr.php`:
 or in a service provider:
 
 ```php
-use ExeQue\Qr\Colors\ColorNames;
-
-app(ColorNames::class)->define('brand', '#be123c');
+Qr::colors()->register('brand', '#be123c');
 ```
+
+`Qr::colors()` also tells what is there: `names()`, `has('brand')`, `get('brand')` and `all()`.
 
 and use them like CSS names, anywhere: `->paint('brand')`. A name keeps its color's alpha. In SVG output a name of
 your own is written as the color itself, since only your application knows it.
