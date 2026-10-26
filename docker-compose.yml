@@ -1,0 +1,33 @@
+# Without lerd: `docker compose run --rm composer install`, then
+# `docker compose up serve` and open http://localhost:8000.
+services:
+    php:
+        build:
+            context: ./docker
+        volumes:
+            - .:/var/www/html
+        environment:
+            - XDEBUG_MODE=coverage
+    composer:
+        extends:
+            service: php
+        volumes:
+            - .:/var/www/html
+            - ~/.cache/composer:/.composer/cache
+        entrypoint: [ "composer" ]
+    testbench:
+        extends:
+            service: php
+        volumes:
+            - .:/var/www/html
+        entrypoint: [ "vendor/bin/testbench" ]
+    serve:
+        extends:
+            service: php
+        volumes:
+            - .:/var/www/html
+        environment:
+            - COMPOSER_HOME=/tmp/composer
+        ports:
+            - "8000:8000"
+        entrypoint: [ "composer", "serve" ]

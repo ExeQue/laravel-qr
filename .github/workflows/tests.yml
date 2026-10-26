@@ -1,0 +1,174 @@
+name: Tests
+
+on:
+  # Only main: pushes to it, and pull requests that target it - and only when
+  # something that can change the outcome of the suite changed.
+  push:
+    branches: [ "main" ]
+    paths: &code
+      - 'src/**'
+      - 'config/**'
+      - 'resources/**'
+      - 'tests/**'
+      - 'workbench/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'testbench.yaml'
+      - 'composer.json'
+      - 'phpunit.xml'
+      - 'pint.json'
+      - '.github/workflows/tests.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths: *code
+  workflow_dispatch:
+
+# Runs from maintainers start right away. Pull requests from outside
+# contributors wait for a maintainer to approve the run - that is a
+# repository setting ("Require approval for all external contributors").
+#
+# The suite reads no secret and writes nothing back.
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    name: Lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, intl, gd, exif, fileinfo
+          coverage: none
+
+      - name: Get the Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.5-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-8.5-composer-
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Check code formatting
+        run: composer lint:test
+
+      - name: Check type coverage
+        run: composer test:types
+
+      - name: Static analysis
+        run: composer analyse
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.5]
+        stability: [prefer-stable]
+
+    name: PHP-${{ matrix.php }} - ${{ matrix.stability }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: none
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Get the Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-composer-
+
+      - name: Install dependencies
+        run: |
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # zxing-cpp decodes the codes in the scan tests.
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Execute tests
+        run: vendor/bin/pest -p --ci
+
+  coverage:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    name: Coverage
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: pcov
+
+      - name: Get the Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.5-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-8.5-composer-
+
+      - name: Install dependencies
+        run: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # zxing-cpp decodes the codes in the scan tests.
+      - name: Install Node dependencies
+        run: npm ci
+
+      # Fails the build when line coverage drops below 100 %.
+      - name: Execute tests with coverage
+        run: vendor/bin/pest -p --ci --coverage --min=100

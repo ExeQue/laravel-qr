@@ -1,0 +1,47 @@
+{
+    "modules": {
+        "paint": "#1c1917",
+        "rotation": 5,
+        "opacity": 0.9
+    },
+    "eyes": {
+        "top-right": {
+            "outer": {
+                "paint": "#be123c",
+                "scaleX": 0.95,
+                "scaleY": 0.95
+            },
+            "inner": {
+                "opacity": 0.8
+            }
+        },
+        "bottom-left": {
+            "outer": {
+                "rotation": -90
+            },
+            "inner": {
+                "rotation": -90
+            }
+        }
+    },
+    "background": "#fff7ed",
+    "margin": 3,
+    "filters": [
+        {
+            "name": "mixed-opacity",
+            "options": {
+                "min": 0.85,
+                "max": 1,
+                "seed": 0
+            }
+        },
+        {
+            "name": "eye-tilt",
+            "options": {
+                "outer": 4,
+                "inner": -7,
+                "seed": 0
+            }
+        }
+    ]
+}

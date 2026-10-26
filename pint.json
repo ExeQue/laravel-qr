@@ -1,0 +1,19 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "declare_strict_types": true,
+        "global_namespace_import": {
+            "import_classes": true,
+            "import_constants": true,
+            "import_functions": true
+        },
+        "no_unused_imports": true,
+        "ordered_imports": true,
+        "multiline_promoted_properties": {
+            "minimum_number_of_parameters": 1
+        },
+        "new_expression_parentheses": {
+            "use_parentheses": false
+        }
+    }
+}

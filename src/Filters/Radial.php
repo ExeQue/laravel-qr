@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ExeQue\Qr\Filters;
+
+use ExeQue\Qr\Filters\Concerns\AppliesProperty;
+use ExeQue\Qr\Filters\Concerns\Scoped;
+use ExeQue\Qr\Filters\Contracts\ModuleFilter;
+use ExeQue\Qr\Filters\Contracts\NamedFilter;
+use ExeQue\Qr\Filters\Enums\Property;
+use ExeQue\Qr\Rendering\ModuleContext;
+use ExeQue\Qr\Rendering\ModuleStyle;
+
+/**
+ * Varies a property from a center outwards: `$inner` there, `$outer` at the farthest corner.
+ */
+final class Radial implements ModuleFilter, NamedFilter
+{
+    use AppliesProperty;
+    use Scoped;
+
+    private Property $property;
+
+    /**
+     * @param array{float, float} $center A point of the symbol, 0-1 on both axes.
+     */
+    public function __construct(
+        Property|string $property = Property::Size,
+        private float $inner = 1.0,
+        private float $outer = 0.8,
+        private array $center = [0.5, 0.5],
+    ) {
+        $this->property = $property instanceof Property ? $property : Property::from($property);
+    }
+
+    public function module(ModuleContext $cell, ModuleStyle $style): ModuleStyle
+    {
+        if (! $this->appliesTo($cell)) {
+            return $style;
+        }
+
+        [$centerX, $centerY] = [$this->center[0] * $cell->size, $this->center[1] * $cell->size];
+
+        // The farthest corner is the furthest any cell can be.
+        $reach = sqrt(max($centerX, $cell->size - $centerX) ** 2 + max($centerY, $cell->size - $centerY) ** 2);
+        $distance = sqrt(($cell->x - $centerX) ** 2 + ($cell->y - $centerY) ** 2) / $reach;
+
+        return $this->apply($this->property, $style, $this->inner + ($this->outer - $this->inner) * $distance);
+    }
+
+    public function name(): string
+    {
+        return 'radial';
+    }
+
+    public function options(): array
+    {
+        return ['property' => $this->property->value, 'inner' => $this->inner, 'outer' => $this->outer, 'center' => $this->center, ...$this->scope()];
+    }
+}

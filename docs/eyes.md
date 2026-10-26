@@ -1,0 +1,190 @@
+# Eyes
+
+The three finder patterns in the corners are how a scanner finds a code. Each eye is two parts: the **outer eye**, a
+ring seven modules across, and the **inner eye**, the 3×3 block in its middle. They are styled apart, or together as
+a preset.
+
+```php
+use ExeQue\Qr\Shapes\Enums\Eye;
+use ExeQue\Qr\Shapes\Enums\InnerEye;
+use ExeQue\Qr\Shapes\Enums\OuterEye;
+
+Qr::url($url)->eyes(Eye::Heart);                               // a preset
+Qr::url($url)->eyes(outer: OuterEye::Soft, inner: InnerEye::Circle);
+Qr::url($url)->outer('octagon')->inner('star');
+Qr::url($url)->outer(OuterEye::Octagon, cut: 1.5);             // a preset with an option changed
+```
+
+The pictures show the top-left eye close up, with the modules beside it.
+
+## Outer eyes
+
+|  |  |  |  |
+|---|---|---|---|
+| ![square](images/outer-eyes/square.png) | ![soft-square](images/outer-eyes/soft-square.png) | ![soft](images/outer-eyes/soft.png) | ![rounded](images/outer-eyes/rounded.png) |
+| `square` | `soft-square` | `soft` | `rounded` |
+| ![circle](images/outer-eyes/circle.png) | ![round-corner](images/outer-eyes/round-corner.png) | ![soft-round-corner](images/outer-eyes/soft-round-corner.png) | ![squircle](images/outer-eyes/squircle.png) |
+| `circle` | `round-corner` | `soft-round-corner` | `squircle` |
+| ![octagon](images/outer-eyes/octagon.png) | ![hexagon](images/outer-eyes/hexagon.png) | ![leaf](images/outer-eyes/leaf.png) | ![drop](images/outer-eyes/drop.png) |
+| `octagon` | `hexagon` | `leaf` | `drop` |
+| ![scalloped](images/outer-eyes/scalloped.png) | ![dotted-ring](images/outer-eyes/dotted-ring.png) | | |
+| `scalloped` | `dotted-ring` | | |
+
+| Name | Class | Options | |
+|---|---|---|---|
+| `square` | `OuterEyes\Square` | — | the standard ring |
+| `soft-square` | `OuterEyes\Rounded` | `outer` 0.6, `hole` 0.3 |  |
+| `soft` | `OuterEyes\Rounded` | `outer` 1.9, `hole` 0.9 |  |
+| `rounded` | `OuterEyes\Rounded` | `outer` 2.7, `hole` 1.7 |  |
+| `circle` | `OuterEyes\Rounded` | `outer` 3.5, `hole` 2.5 | a round ring |
+| `round-corner` | `OuterEyes\Rounded` | `outer` [0, 0, 0, 3.5], `hole` [0, 0, 0, 2.5] | one round corner, three sharp |
+| `soft-round-corner` | `OuterEyes\Rounded` | `outer` [1.9, 1.9, 1.9, 3.5], `hole` [0.9, 0.9, 0.9, 2.5] | one round corner, three soft |
+| `squircle` | `OuterEyes\Squircle` | — | a square with soft, full sides |
+| `octagon` | `OuterEyes\Octagon` | `cut` 1.7, `holeCut` 1.3 | corners cut off |
+| `hexagon` | `OuterEyes\Hexagon` | — | a regular hexagon, flat top and bottom; its points reach into the light border round the eye |
+| `leaf` | `OuterEyes\Rounded` | `outer` [3, 0, 3, 0], `hole` [2, 0, 2, 0] | two opposite corners round |
+| `drop` | `OuterEyes\Rounded` | `outer` [3, 3, 3, 0], `hole` [2, 2, 2, 0] | three corners round, one pointed |
+| `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides round a soft hole |
+| `dotted-ring` | `OuterEyes\DottedRing` | `diameter` 1.0 (0.8 to 1) | a dot on each of the ring's 24 modules |
+
+`OuterEyes\Rounded` takes one radius for every corner, or four: top-right, bottom-right, bottom-left, top-left. Its
+hole must stay rounded enough that it does not poke through the ring; a radius pair that would is refused.
+
+## Inner eyes
+
+Shown inside the square outer eye.
+
+|  |  |  |  |
+|---|---|---|---|
+| ![square](images/inner-eyes/square.png) | ![soft-square](images/inner-eyes/soft-square.png) | ![soft](images/inner-eyes/soft.png) | ![circle](images/inner-eyes/circle.png) |
+| `square` | `soft-square` | `soft` | `circle` |
+| ![round-corner](images/inner-eyes/round-corner.png) | ![soft-round-corner](images/inner-eyes/soft-round-corner.png) | ![squircle](images/inner-eyes/squircle.png) | ![heart](images/inner-eyes/heart.png) |
+| `round-corner` | `soft-round-corner` | `squircle` | `heart` |
+| ![star](images/inner-eyes/star.png) | ![flower](images/inner-eyes/flower.png) | ![diamond](images/inner-eyes/diamond.png) | ![hexagon](images/inner-eyes/hexagon.png) |
+| `star` | `flower` | `diamond` | `hexagon` |
+| ![octagon](images/inner-eyes/octagon.png) | ![leaf](images/inner-eyes/leaf.png) | ![drop](images/inner-eyes/drop.png) | ![sparkle](images/inner-eyes/sparkle.png) |
+| `octagon` | `leaf` | `drop` | `sparkle` |
+| ![clover](images/inner-eyes/clover.png) | ![cross](images/inner-eyes/cross.png) | ![pill](images/inner-eyes/pill.png) | ![blob](images/inner-eyes/blob.png) |
+| `clover` | `cross` | `pill` | `blob` |
+
+| Name | Class | Options |
+|---|---|---|
+| `square` | `InnerEyes\Square` | — |
+| `soft-square` | `InnerEyes\Rounded` | `radius` 0.5 |
+| `soft` | `InnerEyes\Rounded` | `radius` 0.7 |
+| `circle` | `InnerEyes\Rounded` | `radius` 1.5 |
+| `round-corner` | `InnerEyes\Rounded` | `radius` [0, 0, 0, 1.5] |
+| `soft-round-corner` | `InnerEyes\Rounded` | `radius` [0.7, 0.7, 0.7, 1.5] |
+| `squircle` | `InnerEyes\Squircle` | — |
+| `heart` | `InnerEyes\Heart` | — |
+| `star` | `InnerEyes\Star` | — |
+| `flower` | `InnerEyes\Flower` | — |
+| `diamond` | `InnerEyes\Diamond` | — |
+| `hexagon` | `InnerEyes\Hexagon` | — |
+| `octagon` | `InnerEyes\Octagon` | `cut` 0.88 |
+| `leaf` | `InnerEyes\Rounded` | `radius` [1.3, 0, 1.3, 0] |
+| `drop` | `InnerEyes\Rounded` | `radius` [1.3, 1.3, 1.3, 0] |
+| `sparkle` | `InnerEyes\Sparkle` | — a full four-pointed sparkle |
+| `clover` | `InnerEyes\Clover` | — |
+| `cross` | `InnerEyes\Cross` | — a plus with broad bars |
+| `pill` | `InnerEyes\Pill` | — standing up |
+| `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
+
+The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
+still measures about three modules.
+
+## Presets
+
+|  |  |  |  |
+|---|---|---|---|
+| ![square](images/eyes/square.png) | ![round](images/eyes/round.png) | ![round-corner](images/eyes/round-corner.png) | ![soft-square](images/eyes/soft-square.png) |
+| `square` | `round` | `round-corner` | `soft-square` |
+| ![dot](images/eyes/dot.png) | ![rounded](images/eyes/rounded.png) | ![mix](images/eyes/mix.png) | ![heart](images/eyes/heart.png) |
+| `dot` | `rounded` | `mix` | `heart` |
+| ![soft-round-corner](images/eyes/soft-round-corner.png) | ![squircle](images/eyes/squircle.png) | ![hexagon](images/eyes/hexagon.png) | ![octagon](images/eyes/octagon.png) |
+| `soft-round-corner` | `squircle` | `hexagon` | `octagon` |
+| ![leaf](images/eyes/leaf.png) | ![drop](images/eyes/drop.png) | ![sparkle](images/eyes/sparkle.png) | ![scalloped](images/eyes/scalloped.png) |
+| `leaf` | `drop` | `sparkle` | `scalloped` |
+| ![organic](images/eyes/organic.png) | | | |
+| `organic` | | | |
+
+| Preset | Outer | Inner |
+|---|---|---|
+| `square` | `square` | `square` |
+| `round` | `square` | `circle` |
+| `round-corner` | `round-corner` | `round-corner` |
+| `soft-square` | `soft-square` | `soft-square` |
+| `dot` | `circle` | `circle` |
+| `rounded` | `soft` | `soft` |
+| `mix` | `rounded` | `soft` |
+| `heart` | `soft-round-corner` | `heart` |
+| `soft-round-corner` | `soft-round-corner` | `soft-round-corner` |
+| `squircle` | `squircle` | `squircle` |
+| `hexagon` | `hexagon` | `hexagon` |
+| `octagon` | `octagon` | `octagon` |
+| `leaf` | `leaf` | `leaf` |
+| `drop` | `drop` | `drop` |
+| `sparkle` | `soft` | `sparkle` |
+| `scalloped` | `scalloped` | `circle` |
+| `organic` | `soft` | `blob` |
+
+`Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
+
+## Mirrored
+
+Eyes are drawn as they are on every corner. Shapes with one distinct corner - `round-corner`, `soft-round-corner`,
+`heart` - look best turned so that corner points out of the code on all three eyes. `mirrored()` turns the top-right
+eye a quarter clockwise and the bottom-left a quarter back:
+
+| | |
+|---|---|
+| ![As drawn](images/eyes/round-corner-plain.png) | ![Mirrored](images/eyes/round-corner-mirrored.png) |
+| as drawn | `->mirrored()` |
+
+```php
+Qr::url($url)->eyes(Eye::RoundCorner)->mirrored();
+```
+
+Symmetric eyes look the same either way.
+
+## One corner at a time
+
+```php
+use ExeQue\Qr\Rendering\Enums\Corner;
+
+Qr::url($url)
+    ->eyes(Eye::Rounded)
+    ->eye(Corner::TopLeft, Eye::Heart, paint: '#be123c')
+    ->eye(Corner::BottomLeft, rotate: 90);
+```
+
+![Eyes in their own color](images/colors/eyes.png)
+
+The [`eye-tilt`](filters.md#eye-tilt), [`eye-size`](filters.md#eye-size) and [`eye-paint`](filters.md#eye-paint)
+filters change eyes too. The [scan guards](scan-safety.md) keep an outer eye about seven modules wide, and warn about
+turns that are not quarter turns, which distort the pattern scanners look for.
+
+## Every preset on a code
+
+![square](images/eyes/square-code.png)
+![round](images/eyes/round-code.png)
+![round-corner](images/eyes/round-corner-code.png)
+![soft-square](images/eyes/soft-square-code.png)
+![dot](images/eyes/dot-code.png)
+![rounded](images/eyes/rounded-code.png)
+![mix](images/eyes/mix-code.png)
+![heart](images/eyes/heart-code.png)
+![soft-round-corner](images/eyes/soft-round-corner-code.png)
+![squircle](images/eyes/squircle-code.png)
+![hexagon](images/eyes/hexagon-code.png)
+![octagon](images/eyes/octagon-code.png)
+![leaf](images/eyes/leaf-code.png)
+![drop](images/eyes/drop-code.png)
+![sparkle](images/eyes/sparkle-code.png)
+![scalloped](images/eyes/scalloped-code.png)
+![organic](images/eyes/organic-code.png)
+
+## Eyes of your own
+
+An outer eye implements `ExeQue\Qr\Shapes\Contracts\OuterEyeShape`, an inner eye `InnerEyeShape`. See
+[Extending](extending.md#eye-shapes) for the geometry they must keep to.

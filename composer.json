@@ -1,0 +1,91 @@
+{
+    "name": "exeque/laravel-qr",
+    "description": "QR codes for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "keywords": [
+        "laravel",
+        "qr",
+        "qrcode"
+    ],
+    "authors": [
+        {
+            "name": "Morten Harders",
+            "email": "mmh@harders-it.dk"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "ext-mbstring": "*",
+        "guzzlehttp/psr7": "^2.9 || ^3.0",
+        "laravel/framework": "^13.0",
+        "psr/http-message": "^2.0"
+    },
+    "require-dev": {
+        "enshrined/svg-sanitize": "^1.1",
+        "exeque/laravel-monocle": "^0.12",
+        "larastan/larastan": "^3.13",
+        "laravel/pint": "^1.21",
+        "livewire/livewire": "^4.4",
+        "orchestra/testbench": "^11.3",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0"
+    },
+    "suggest": {
+        "ext-imagick": "Required to write PNG, JPEG and WebP codes, and to place raster logos.",
+        "enshrined/svg-sanitize": "Sanitizes SVG logos with a dedicated sanitizer instead of the package's own.",
+        "exeque/laravel-monocle": "Shows the codes each request rendered, with timings and advice, in the Monocle profiler."
+    },
+    "autoload": {
+        "psr-4": {
+            "ExeQue\\Qr\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ExeQue\\Qr\\QrServiceProvider"
+            ],
+            "aliases": {
+                "Qr": "ExeQue\\Qr\\Facades\\Qr"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest -p",
+        "lint": "vendor/bin/pint -p",
+        "lint:test": "vendor/bin/pint -p --test",
+        "icons": "@php vendor/bin/testbench qr:icons --built-in --path=resources/icons",
+        "pre-commit": [
+            "@composer lint",
+            "@composer analyse",
+            "@composer test"
+        ],
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "test:coverage": "vendor/bin/pest -p --coverage --min=100",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php vendor/bin/testbench serve --ansi --host=0.0.0.0 --port=8000"
+        ],
+        "test:types": "vendor/bin/pest --type-coverage --min=100",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G"
+    }
+}

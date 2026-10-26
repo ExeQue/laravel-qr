@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Morgan;Alex;;;
+FN:Alex Morgan
+ORG:Acme\, Inc.
+TITLE:Host
+TEL;TYPE=CELL:+4512345678
+TEL:+4587654321
+EMAIL:alex@example.com
+URL:https://example.com
+ADR;TYPE=HOME:;;Main Street 1;Copenhagen;;1000;Denmark
+NOTE:Line one\nLine two\; with\, punctuation and a backslash \\ that runs o
+ n long enough to need folding æøå
+END:VCARD

@@ -1,0 +1,349 @@
+canvas 37, margin 4, background #ffffff
+
+outer-eye top-left Square translate(7.5 7.5) #000000
+inner-eye top-left Square translate(7.5 7.5) #000000
+outer-eye top-right Square translate(29.5 7.5) #000000
+inner-eye top-right Square translate(29.5 7.5) #000000
+outer-eye bottom-left Square translate(7.5 29.5) #000000
+inner-eye bottom-left Square translate(7.5 29.5) #000000
+module 8,0 format Square translate(12.5 4.5) oklch(45% 0.2 293)
+module 9,0 data Square translate(13.5 4.5) #be123c
+module 13,0 data Square translate(17.5 4.5) oklch(45% 0.2 293)
+module 14,0 data Square translate(18.5 4.5) #be123c
+module 15,0 data Square translate(19.5 4.5) #0f766e
+module 16,0 data Square translate(20.5 4.5) #0f766e
+module 19,0 data Square translate(23.5 4.5) #0f766e
+module 20,0 data Square translate(24.5 4.5) oklch(45% 0.2 293)
+module 8,1 format Square translate(12.5 5.5) #0f766e
+module 10,1 data Square translate(14.5 5.5) #be123c
+module 12,1 data Square translate(16.5 5.5) oklch(45% 0.2 293)
+module 13,1 data Square translate(17.5 5.5) #0f766e
+module 17,1 data Square translate(21.5 5.5) oklch(45% 0.2 293)
+module 19,1 data Square translate(23.5 5.5) oklch(45% 0.2 293)
+module 20,1 data Square translate(24.5 5.5) oklch(45% 0.2 293)
+module 8,2 format Square translate(12.5 6.5) #be123c
+module 10,2 data Square translate(14.5 6.5) oklch(45% 0.2 293)
+module 11,2 data Square translate(15.5 6.5) #be123c
+module 13,2 data Square translate(17.5 6.5) #be123c
+module 14,2 data Square translate(18.5 6.5) oklch(45% 0.2 293)
+module 20,2 data Square translate(24.5 6.5) #0f766e
+module 8,3 format Square translate(12.5 7.5) #0f766e
+module 10,3 data Square translate(14.5 7.5) #be123c
+module 12,3 data Square translate(16.5 7.5) #be123c
+module 13,3 data Square translate(17.5 7.5) oklch(45% 0.2 293)
+module 14,3 data Square translate(18.5 7.5) #0f766e
+module 15,3 data Square translate(19.5 7.5) #be123c
+module 18,3 data Square translate(22.5 7.5) oklch(45% 0.2 293)
+module 19,3 data Square translate(23.5 7.5) #0f766e
+module 8,4 format Square translate(12.5 8.5) #0f766e
+module 14,4 data Square translate(18.5 8.5) #0f766e
+module 16,4 data Square translate(20.5 8.5) #be123c
+module 18,4 data Square translate(22.5 8.5) #be123c
+module 19,4 data Square translate(23.5 8.5) oklch(45% 0.2 293)
+module 9,5 data Square translate(13.5 9.5) oklch(45% 0.2 293)
+module 12,5 data Square translate(16.5 9.5) #be123c
+module 13,5 data Square translate(17.5 9.5) #be123c
+module 14,5 data Square translate(18.5 9.5) #0f766e
+module 15,5 data Square translate(19.5 9.5) oklch(45% 0.2 293)
+module 16,5 data Square translate(20.5 9.5) #be123c
+module 19,5 data Square translate(23.5 9.5) #0f766e
+module 8,6 timing Square translate(12.5 10.5) #be123c
+module 10,6 timing Square translate(14.5 10.5) #be123c
+module 12,6 timing Square translate(16.5 10.5) oklch(45% 0.2 293)
+module 14,6 timing Square translate(18.5 10.5) oklch(45% 0.2 293)
+module 16,6 timing Square translate(20.5 10.5) oklch(45% 0.2 293)
+module 18,6 timing Square translate(22.5 10.5) oklch(45% 0.2 293)
+module 20,6 timing Square translate(24.5 10.5) oklch(45% 0.2 293)
+module 8,7 format Square translate(12.5 11.5) #0f766e
+module 11,7 data Square translate(15.5 11.5) #0f766e
+module 12,7 data Square translate(16.5 11.5) #be123c
+module 14,7 data Square translate(18.5 11.5) #be123c
+module 15,7 data Square translate(19.5 11.5) #be123c
+module 16,7 data Square translate(20.5 11.5) #be123c
+module 17,7 data Square translate(21.5 11.5) oklch(45% 0.2 293)
+module 19,7 data Square translate(23.5 11.5) #0f766e
+module 1,8 format Square translate(5.5 12.5) oklch(45% 0.2 293)
+module 2,8 format Square translate(6.5 12.5) #0f766e
+module 4,8 format Square translate(8.5 12.5) oklch(45% 0.2 293)
+module 6,8 timing Square translate(10.5 12.5) #be123c
+module 7,8 format Square translate(11.5 12.5) #be123c
+module 9,8 data Square translate(13.5 12.5) #0f766e
+module 11,8 data Square translate(15.5 12.5) #0f766e
+module 16,8 data Square translate(20.5 12.5) #0f766e
+module 17,8 data Square translate(21.5 12.5) oklch(45% 0.2 293)
+module 18,8 data Square translate(22.5 12.5) #be123c
+module 19,8 data Square translate(23.5 12.5) #be123c
+module 22,8 format Square translate(26.5 12.5) oklch(45% 0.2 293)
+module 24,8 format Square translate(28.5 12.5) #be123c
+module 25,8 format Square translate(29.5 12.5) #0f766e
+module 26,8 format Square translate(30.5 12.5) #0f766e
+module 27,8 format Square translate(31.5 12.5) #be123c
+module 28,8 format Square translate(32.5 12.5) oklch(45% 0.2 293)
+module 0,9 data Square translate(4.5 13.5) #0f766e
+module 1,9 data Square translate(5.5 13.5) oklch(45% 0.2 293)
+module 2,9 data Square translate(6.5 13.5) #0f766e
+module 7,9 data Square translate(11.5 13.5) #0f766e
+module 9,9 data Square translate(13.5 13.5) oklch(45% 0.2 293)
+module 10,9 data Square translate(14.5 13.5) oklch(45% 0.2 293)
+module 12,9 data Square translate(16.5 13.5) oklch(45% 0.2 293)
+module 13,9 data Square translate(17.5 13.5) #be123c
+module 16,9 data Square translate(20.5 13.5) #0f766e
+module 18,9 data Square translate(22.5 13.5) #be123c
+module 21,9 data Square translate(25.5 13.5) oklch(45% 0.2 293)
+module 26,9 data Square translate(30.5 13.5) #be123c
+module 28,9 data Square translate(32.5 13.5) oklch(45% 0.2 293)
+module 1,10 data Square translate(5.5 14.5) #be123c
+module 2,10 data Square translate(6.5 14.5) #0f766e
+module 5,10 data Square translate(9.5 14.5) #be123c
+module 6,10 timing Square translate(10.5 14.5) #be123c
+module 7,10 data Square translate(11.5 14.5) #be123c
+module 9,10 data Square translate(13.5 14.5) oklch(45% 0.2 293)
+module 14,10 data Square translate(18.5 14.5) oklch(45% 0.2 293)
+module 15,10 data Square translate(19.5 14.5) #0f766e
+module 16,10 data Square translate(20.5 14.5) #be123c
+module 20,10 data Square translate(24.5 14.5) #0f766e
+module 23,10 data Square translate(27.5 14.5) #be123c
+module 25,10 data Square translate(29.5 14.5) #be123c
+module 27,10 data Square translate(31.5 14.5) oklch(45% 0.2 293)
+module 28,10 data Square translate(32.5 14.5) oklch(45% 0.2 293)
+module 0,11 data Square translate(4.5 15.5) oklch(45% 0.2 293)
+module 3,11 data Square translate(7.5 15.5) #0f766e
+module 9,11 data Square translate(13.5 15.5) oklch(45% 0.2 293)
+module 10,11 data Square translate(14.5 15.5) oklch(45% 0.2 293)
+module 11,11 data Square translate(15.5 15.5) oklch(45% 0.2 293)
+module 12,11 data Square translate(16.5 15.5) oklch(45% 0.2 293)
+module 14,11 data Square translate(18.5 15.5) #0f766e
+module 17,11 data Square translate(21.5 15.5) oklch(45% 0.2 293)
+module 18,11 data Square translate(22.5 15.5) #0f766e
+module 19,11 data Square translate(23.5 15.5) #0f766e
+module 20,11 data Square translate(24.5 15.5) #0f766e
+module 21,11 data Square translate(25.5 15.5) #be123c
+module 22,11 data Square translate(26.5 15.5) #be123c
+module 24,11 data Square translate(28.5 15.5) oklch(45% 0.2 293)
+module 27,11 data Square translate(31.5 15.5) #be123c
+module 0,12 data Square translate(4.5 16.5) oklch(45% 0.2 293)
+module 1,12 data Square translate(5.5 16.5) #be123c
+module 3,12 data Square translate(7.5 16.5) #be123c
+module 5,12 data Square translate(9.5 16.5) #0f766e
+module 6,12 timing Square translate(10.5 16.5) #be123c
+module 10,12 data Square translate(14.5 16.5) oklch(45% 0.2 293)
+module 11,12 data Square translate(15.5 16.5) #0f766e
+module 13,12 data Square translate(17.5 16.5) #be123c
+module 15,12 data Square translate(19.5 16.5) #be123c
+module 17,12 data Square translate(21.5 16.5) #0f766e
+module 22,12 data Square translate(26.5 16.5) oklch(45% 0.2 293)
+module 23,12 data Square translate(27.5 16.5) #0f766e
+module 0,13 data Square translate(4.5 17.5) oklch(45% 0.2 293)
+module 1,13 data Square translate(5.5 17.5) oklch(45% 0.2 293)
+module 3,13 data Square translate(7.5 17.5) #be123c
+module 4,13 data Square translate(8.5 17.5) #be123c
+module 7,13 data Square translate(11.5 17.5) oklch(45% 0.2 293)
+module 8,13 data Square translate(12.5 17.5) #0f766e
+module 14,13 data Square translate(18.5 17.5) #be123c
+module 15,13 data Square translate(19.5 17.5) #0f766e
+module 17,13 data Square translate(21.5 17.5) oklch(45% 0.2 293)
+module 18,13 data Square translate(22.5 17.5) #0f766e
+module 20,13 data Square translate(24.5 17.5) oklch(45% 0.2 293)
+module 21,13 data Square translate(25.5 17.5) #0f766e
+module 22,13 data Square translate(26.5 17.5) oklch(45% 0.2 293)
+module 23,13 data Square translate(27.5 17.5) oklch(45% 0.2 293)
+module 27,13 data Square translate(31.5 17.5) #0f766e
+module 28,13 data Square translate(32.5 17.5) #0f766e
+module 1,14 data Square translate(5.5 18.5) #0f766e
+module 2,14 data Square translate(6.5 18.5) #0f766e
+module 5,14 data Square translate(9.5 18.5) #0f766e
+module 6,14 timing Square translate(10.5 18.5) #be123c
+module 8,14 data Square translate(12.5 18.5) oklch(45% 0.2 293)
+module 9,14 data Square translate(13.5 18.5) #0f766e
+module 11,14 data Square translate(15.5 18.5) #0f766e
+module 12,14 data Square translate(16.5 18.5) #0f766e
+module 14,14 data Square translate(18.5 18.5) #be123c
+module 16,14 data Square translate(20.5 18.5) #be123c
+module 17,14 data Square translate(21.5 18.5) #0f766e
+module 18,14 data Square translate(22.5 18.5) #0f766e
+module 22,14 data Square translate(26.5 18.5) #0f766e
+module 23,14 data Square translate(27.5 18.5) #be123c
+module 26,14 data Square translate(30.5 18.5) #0f766e
+module 27,14 data Square translate(31.5 18.5) oklch(45% 0.2 293)
+module 28,14 data Square translate(32.5 18.5) oklch(45% 0.2 293)
+module 0,15 data Square translate(4.5 19.5) oklch(45% 0.2 293)
+module 1,15 data Square translate(5.5 19.5) oklch(45% 0.2 293)
+module 2,15 data Square translate(6.5 19.5) #be123c
+module 5,15 data Square translate(9.5 19.5) #0f766e
+module 7,15 data Square translate(11.5 19.5) #0f766e
+module 8,15 data Square translate(12.5 19.5) #0f766e
+module 9,15 data Square translate(13.5 19.5) #be123c
+module 10,15 data Square translate(14.5 19.5) oklch(45% 0.2 293)
+module 11,15 data Square translate(15.5 19.5) oklch(45% 0.2 293)
+module 15,15 data Square translate(19.5 19.5) #0f766e
+module 16,15 data Square translate(20.5 19.5) #0f766e
+module 17,15 data Square translate(21.5 19.5) oklch(45% 0.2 293)
+module 18,15 data Square translate(22.5 19.5) #0f766e
+module 19,15 data Square translate(23.5 19.5) #0f766e
+module 20,15 data Square translate(24.5 19.5) #be123c
+module 23,15 data Square translate(27.5 19.5) oklch(45% 0.2 293)
+module 28,15 data Square translate(32.5 19.5) #0f766e
+module 2,16 data Square translate(6.5 20.5) oklch(45% 0.2 293)
+module 3,16 data Square translate(7.5 20.5) oklch(45% 0.2 293)
+module 5,16 data Square translate(9.5 20.5) #be123c
+module 6,16 timing Square translate(10.5 20.5) #0f766e
+module 9,16 data Square translate(13.5 20.5) #0f766e
+module 13,16 data Square translate(17.5 20.5) #be123c
+module 15,16 data Square translate(19.5 20.5) oklch(45% 0.2 293)
+module 17,16 data Square translate(21.5 20.5) #0f766e
+module 18,16 data Square translate(22.5 20.5) #be123c
+module 20,16 data Square translate(24.5 20.5) oklch(45% 0.2 293)
+module 21,16 data Square translate(25.5 20.5) #0f766e
+module 22,16 data Square translate(26.5 20.5) #0f766e
+module 25,16 data Square translate(29.5 20.5) oklch(45% 0.2 293)
+module 28,16 data Square translate(32.5 20.5) #be123c
+module 5,17 data Square translate(9.5 21.5) oklch(45% 0.2 293)
+module 7,17 data Square translate(11.5 21.5) #0f766e
+module 8,17 data Square translate(12.5 21.5) #be123c
+module 10,17 data Square translate(14.5 21.5) #be123c
+module 11,17 data Square translate(15.5 21.5) oklch(45% 0.2 293)
+module 12,17 data Square translate(16.5 21.5) #0f766e
+module 13,17 data Square translate(17.5 21.5) #0f766e
+module 14,17 data Square translate(18.5 21.5) oklch(45% 0.2 293)
+module 15,17 data Square translate(19.5 21.5) #0f766e
+module 17,17 data Square translate(21.5 21.5) oklch(45% 0.2 293)
+module 18,17 data Square translate(22.5 21.5) oklch(45% 0.2 293)
+module 19,17 data Square translate(23.5 21.5) #be123c
+module 20,17 data Square translate(24.5 21.5) oklch(45% 0.2 293)
+module 21,17 data Square translate(25.5 21.5) #be123c
+module 23,17 data Square translate(27.5 21.5) #0f766e
+module 26,17 data Square translate(30.5 21.5) oklch(45% 0.2 293)
+module 27,17 data Square translate(31.5 21.5) #be123c
+module 28,17 data Square translate(32.5 21.5) #be123c
+module 0,18 data Square translate(4.5 22.5) #0f766e
+module 2,18 data Square translate(6.5 22.5) oklch(45% 0.2 293)
+module 3,18 data Square translate(7.5 22.5) #be123c
+module 4,18 data Square translate(8.5 22.5) #0f766e
+module 5,18 data Square translate(9.5 22.5) #0f766e
+module 6,18 timing Square translate(10.5 22.5) #0f766e
+module 7,18 data Square translate(11.5 22.5) oklch(45% 0.2 293)
+module 8,18 data Square translate(12.5 22.5) #0f766e
+module 9,18 data Square translate(13.5 22.5) #0f766e
+module 12,18 data Square translate(16.5 22.5) #be123c
+module 13,18 data Square translate(17.5 22.5) #be123c
+module 18,18 data Square translate(22.5 22.5) oklch(45% 0.2 293)
+module 21,18 data Square translate(25.5 22.5) oklch(45% 0.2 293)
+module 23,18 data Square translate(27.5 22.5) oklch(45% 0.2 293)
+module 24,18 data Square translate(28.5 22.5) #be123c
+module 25,18 data Square translate(29.5 22.5) oklch(45% 0.2 293)
+module 26,18 data Square translate(30.5 22.5) #be123c
+module 27,18 data Square translate(31.5 22.5) #be123c
+module 28,18 data Square translate(32.5 22.5) #be123c
+module 1,19 data Square translate(5.5 23.5) oklch(45% 0.2 293)
+module 2,19 data Square translate(6.5 23.5) oklch(45% 0.2 293)
+module 4,19 data Square translate(8.5 23.5) #0f766e
+module 8,19 data Square translate(12.5 23.5) #0f766e
+module 10,19 data Square translate(14.5 23.5) #be123c
+module 11,19 data Square translate(15.5 23.5) #0f766e
+module 14,19 data Square translate(18.5 23.5) #0f766e
+module 15,19 data Square translate(19.5 23.5) #be123c
+module 17,19 data Square translate(21.5 23.5) #be123c
+module 22,19 data Square translate(26.5 23.5) #be123c
+module 25,19 data Square translate(29.5 23.5) #be123c
+module 27,19 data Square translate(31.5 23.5) oklch(45% 0.2 293)
+module 28,19 data Square translate(32.5 23.5) #0f766e
+module 0,20 data Square translate(4.5 24.5) #0f766e
+module 2,20 data Square translate(6.5 24.5) #be123c
+module 4,20 data Square translate(8.5 24.5) #be123c
+module 5,20 data Square translate(9.5 24.5) #be123c
+module 6,20 timing Square translate(10.5 24.5) #be123c
+module 8,20 data Square translate(12.5 24.5) #be123c
+module 10,20 data Square translate(14.5 24.5) #be123c
+module 16,20 data Square translate(20.5 24.5) #0f766e
+module 17,20 data Square translate(21.5 24.5) oklch(45% 0.2 293)
+module 20,20 alignment Square translate(24.5 24.5) #0f766e
+module 21,20 alignment Square translate(25.5 24.5) #be123c
+module 22,20 alignment Square translate(26.5 24.5) #0f766e
+module 23,20 alignment Square translate(27.5 24.5) #0f766e
+module 24,20 alignment Square translate(28.5 24.5) #be123c
+module 27,20 data Square translate(31.5 24.5) #0f766e
+module 8,21 dark-module Square translate(12.5 25.5) oklch(45% 0.2 293)
+module 9,21 data Square translate(13.5 25.5) #be123c
+module 17,21 data Square translate(21.5 25.5) #be123c
+module 19,21 data Square translate(23.5 25.5) #be123c
+module 20,21 alignment Square translate(24.5 25.5) oklch(45% 0.2 293)
+module 24,21 alignment Square translate(28.5 25.5) #be123c
+module 27,21 data Square translate(31.5 25.5) #be123c
+module 28,21 data Square translate(32.5 25.5) #0f766e
+module 8,22 format Square translate(12.5 26.5) oklch(45% 0.2 293)
+module 10,22 data Square translate(14.5 26.5) oklch(45% 0.2 293)
+module 11,22 data Square translate(15.5 26.5) #be123c
+module 13,22 data Square translate(17.5 26.5) oklch(45% 0.2 293)
+module 14,22 data Square translate(18.5 26.5) #be123c
+module 19,22 data Square translate(23.5 26.5) #be123c
+module 20,22 alignment Square translate(24.5 26.5) oklch(45% 0.2 293)
+module 22,22 alignment Square translate(26.5 26.5) #0f766e
+module 24,22 alignment Square translate(28.5 26.5) #0f766e
+module 26,22 data Square translate(30.5 26.5) #be123c
+module 27,22 data Square translate(31.5 26.5) #be123c
+module 28,22 data Square translate(32.5 26.5) #be123c
+module 11,23 data Square translate(15.5 27.5) #be123c
+module 12,23 data Square translate(16.5 27.5) #be123c
+module 14,23 data Square translate(18.5 27.5) #be123c
+module 15,23 data Square translate(19.5 27.5) #be123c
+module 16,23 data Square translate(20.5 27.5) oklch(45% 0.2 293)
+module 17,23 data Square translate(21.5 27.5) #be123c
+module 20,23 alignment Square translate(24.5 27.5) #be123c
+module 24,23 alignment Square translate(28.5 27.5) #be123c
+module 27,23 data Square translate(31.5 27.5) oklch(45% 0.2 293)
+module 28,23 data Square translate(32.5 27.5) #0f766e
+module 8,24 format Square translate(12.5 28.5) oklch(45% 0.2 293)
+module 9,24 data Square translate(13.5 28.5) oklch(45% 0.2 293)
+module 10,24 data Square translate(14.5 28.5) oklch(45% 0.2 293)
+module 11,24 data Square translate(15.5 28.5) oklch(45% 0.2 293)
+module 12,24 data Square translate(16.5 28.5) #be123c
+module 13,24 data Square translate(17.5 28.5) #be123c
+module 14,24 data Square translate(18.5 28.5) oklch(45% 0.2 293)
+module 16,24 data Square translate(20.5 28.5) #be123c
+module 18,24 data Square translate(22.5 28.5) oklch(45% 0.2 293)
+module 20,24 alignment Square translate(24.5 28.5) #be123c
+module 21,24 alignment Square translate(25.5 28.5) #be123c
+module 22,24 alignment Square translate(26.5 28.5) oklch(45% 0.2 293)
+module 23,24 alignment Square translate(27.5 28.5) #be123c
+module 24,24 alignment Square translate(28.5 28.5) #be123c
+module 25,24 data Square translate(29.5 28.5) oklch(45% 0.2 293)
+module 27,24 data Square translate(31.5 28.5) #0f766e
+module 12,25 data Square translate(16.5 29.5) #0f766e
+module 13,25 data Square translate(17.5 29.5) #0f766e
+module 14,25 data Square translate(18.5 29.5) oklch(45% 0.2 293)
+module 15,25 data Square translate(19.5 29.5) #0f766e
+module 16,25 data Square translate(20.5 29.5) oklch(45% 0.2 293)
+module 20,25 data Square translate(24.5 29.5) #0f766e
+module 21,25 data Square translate(25.5 29.5) #0f766e
+module 24,25 data Square translate(28.5 29.5) #0f766e
+module 26,25 data Square translate(30.5 29.5) #0f766e
+module 8,26 format Square translate(12.5 30.5) oklch(45% 0.2 293)
+module 12,26 data Square translate(16.5 30.5) oklch(45% 0.2 293)
+module 14,26 data Square translate(18.5 30.5) #be123c
+module 15,26 data Square translate(19.5 30.5) oklch(45% 0.2 293)
+module 16,26 data Square translate(20.5 30.5) #0f766e
+module 19,26 data Square translate(23.5 30.5) oklch(45% 0.2 293)
+module 23,26 data Square translate(27.5 30.5) #0f766e
+module 24,26 data Square translate(28.5 30.5) oklch(45% 0.2 293)
+module 25,26 data Square translate(29.5 30.5) #be123c
+module 28,26 data Square translate(32.5 30.5) oklch(45% 0.2 293)
+module 8,27 format Square translate(12.5 31.5) #0f766e
+module 13,27 data Square translate(17.5 31.5) #be123c
+module 14,27 data Square translate(18.5 31.5) #0f766e
+module 16,27 data Square translate(20.5 31.5) #0f766e
+module 17,27 data Square translate(21.5 31.5) #be123c
+module 19,27 data Square translate(23.5 31.5) #be123c
+module 21,27 data Square translate(25.5 31.5) #be123c
+module 23,27 data Square translate(27.5 31.5) oklch(45% 0.2 293)
+module 27,27 data Square translate(31.5 31.5) #be123c
+module 9,28 data Square translate(13.5 32.5) #be123c
+module 10,28 data Square translate(14.5 32.5) #0f766e
+module 11,28 data Square translate(15.5 32.5) oklch(45% 0.2 293)
+module 15,28 data Square translate(19.5 32.5) #be123c
+module 16,28 data Square translate(20.5 32.5) #be123c
+module 17,28 data Square translate(21.5 32.5) #be123c
+module 19,28 data Square translate(23.5 32.5) #be123c
+module 20,28 data Square translate(24.5 32.5) #be123c
+module 24,28 data Square translate(28.5 32.5) #be123c
+module 27,28 data Square translate(31.5 32.5) #0f766e
+module 28,28 data Square translate(32.5 32.5) #be123c

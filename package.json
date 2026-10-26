@@ -1,0 +1,20 @@
+{
+  "name": "laravel-qr-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev .",
+    "docs:build": "vitepress build .",
+    "docs:preview": "vitepress preview ."
+  },
+  "devDependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
+    "vite": "^6.4.3",
+    "vitepress": "^1.6.4",
+    "zxing-wasm": "^2.2.4"
+  },
+  "overrides": {
+    "vite": "$vite",
+    "esbuild": "^0.25.0"
+  }
+}

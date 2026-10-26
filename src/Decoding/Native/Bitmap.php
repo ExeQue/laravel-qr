@@ -1,0 +1,169 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ExeQue\Qr\Decoding\Native;
+
+use ExeQue\Qr\Exceptions\MissingExtensionException;
+use ExeQue\Qr\Exceptions\UnreadableCodeException;
+use Imagick;
+use ImagickException;
+use ImagickPixel;
+
+/**
+ * An image as grey levels, and as dark and light pixels.
+ *
+ * @internal
+ */
+final readonly class Bitmap
+{
+    // Larger images are scaled down first: finding the code needs no more detail than this.
+    private const int MAX_SIDE = 800;
+
+    // What an image may have before it is decoded at all: enough for a photo, not for a bomb.
+    private const int MAX_PIXELS = 50_000_000;
+
+    /**
+     * @param list<int> $grey 0 (black) to 255 (white), row by row.
+     */
+    public function __construct(
+        public int $width,
+        public int $height,
+        public array $grey,
+    ) {
+    }
+
+    public static function fromImage(string $bytes): self
+    {
+        if (! extension_loaded('imagick')) {
+            throw MissingExtensionException::imagick(); // @codeCoverageIgnore
+        }
+
+        // Only the raster formats codes come in: ImageMagick reads many more, some of them unsafe.
+        if (! self::isRaster($bytes)) {
+            throw UnreadableCodeException::unreadableImage();
+        }
+
+        try {
+            $image = new Imagick();
+            $image->pingImageBlob($bytes);
+
+            if ($image->getImageWidth() * $image->getImageHeight() > self::MAX_PIXELS) {
+                throw UnreadableCodeException::unreadableImage();
+            }
+
+            $image = new Imagick();
+            $image->readImageBlob($bytes);
+            $image->setIteratorIndex(0);
+            $image->setImageBackgroundColor(new ImagickPixel('white'));
+            $image->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+
+            if (max($image->getImageWidth(), $image->getImageHeight()) > self::MAX_SIDE) {
+                $image->thumbnailImage(self::MAX_SIDE, self::MAX_SIDE, true);
+            }
+
+            [$width, $height] = [$image->getImageWidth(), $image->getImageHeight()];
+            $grey = $image->exportImagePixels(0, 0, $width, $height, 'I', Imagick::PIXEL_CHAR);
+            $image->clear();
+        } catch (ImagickException) {
+            throw UnreadableCodeException::unreadableImage();
+        }
+
+        return new self($width, $height, $grey);
+    }
+
+    /**
+     * PNG, JPEG, WebP or GIF, by their first bytes.
+     */
+    private static function isRaster(string $bytes): bool
+    {
+        return str_starts_with($bytes, "\x89PNG\r\n\x1A\n")
+            || str_starts_with($bytes, "\xFF\xD8\xFF")
+            || str_starts_with($bytes, 'GIF8')
+            || (str_starts_with($bytes, 'RIFF') && substr($bytes, 8, 4) === 'WEBP');
+    }
+
+    /**
+     * Dark where darker than a threshold for the whole image, picked by Otsu's method: the one
+     * that separates the grey levels into the two most distinct groups.
+     *
+     * @return list<bool>
+     */
+    public function global(): array
+    {
+        $histogram = array_fill(0, 256, 0);
+
+        foreach ($this->grey as $level) {
+            $histogram[$level]++;
+        }
+
+        $total = count($this->grey);
+        $sum = 0;
+
+        foreach ($histogram as $level => $count) {
+            $sum += $level * $count;
+        }
+
+        [$best, $threshold, $below, $sumBelow] = [-1.0, 127, 0, 0];
+
+        foreach ($histogram as $level => $count) {
+            $below += $count;
+            $sumBelow += $level * $count;
+            $above = $total - $below;
+
+            if ($below === 0 || $above === 0) {
+                continue;
+            }
+
+            $difference = $sumBelow / $below - ($sum - $sumBelow) / $above;
+            $between = $below * $above * $difference ** 2;
+
+            if ($between > $best) {
+                [$best, $threshold] = [$between, $level];
+            }
+        }
+
+        return array_map(fn (int $level): bool => $level <= $threshold, $this->grey);
+    }
+
+    /**
+     * Dark where darker than the pixels around it, for uneven light and gradients.
+     *
+     * @return list<bool>
+     */
+    public function local(): array
+    {
+        [$width, $height] = [$this->width, $this->height];
+        $radius = max(4, intdiv(min($width, $height), 16));
+
+        // A summed-area table, one wider and taller, so any box's sum takes four lookups.
+        $sums = array_fill(0, ($width + 1) * ($height + 1), 0);
+
+        for ($y = 0; $y < $height; $y++) {
+            $row = 0;
+
+            for ($x = 0; $x < $width; $x++) {
+                $row += $this->grey[$y * $width + $x];
+                $sums[($y + 1) * ($width + 1) + $x + 1] = $sums[$y * ($width + 1) + $x + 1] + $row;
+            }
+        }
+
+        $dark = [];
+
+        for ($y = 0; $y < $height; $y++) {
+            [$top, $bottom] = [max(0, $y - $radius), min($height, $y + $radius + 1)];
+
+            for ($x = 0; $x < $width; $x++) {
+                [$left, $right] = [max(0, $x - $radius), min($width, $x + $radius + 1)];
+
+                $sum = $sums[$bottom * ($width + 1) + $right] - $sums[$top * ($width + 1) + $right]
+                    - $sums[$bottom * ($width + 1) + $left] + $sums[$top * ($width + 1) + $left];
+                $mean = $sum / (($bottom - $top) * ($right - $left));
+
+                $dark[] = $this->grey[$y * $width + $x] < $mean - 8;
+            }
+        }
+
+        return $dark;
+    }
+}
