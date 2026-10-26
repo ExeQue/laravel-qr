@@ -73,8 +73,91 @@ jobs:
         run: composer analyse
 
   # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
-  # The suite runs in three shards per job, balanced by the timings in tests/.pest/shards.json
-  # (vendor/bin/pest --update-shards refreshes them).
+  # The suite runs in shards, balanced by the timings in tests/.pest/shards.json (vendor/bin/pest
+  # --update-shards refreshes them): three here, five where coverage, which triples the time, is measured.
+  imagemagick-6:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
+    name: PHP 8.5 - ImageMagick 6 (${{ matrix.shard }}/3)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: none
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Get the Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.5-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-8.5-composer-
+
+      - name: Install dependencies
+        run: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # zxing-cpp decodes the codes in the scan tests.
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Execute tests
+        run: vendor/bin/pest -p --ci --shard=${{ matrix.shard }}/3
+
+  # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
+  coverage: none
+
+      - name: Get the Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-8.5-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-8.5-composer-
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Check code formatting
+        run: composer lint:test
+
+      - name: Check type coverage
+        run: composer test:types
+
+      - name: Static analysis
+        run: composer analyse
+
+  # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
+  # The suite runs in shards, balanced by the timings in tests/.pest/shards.json (vendor/bin/pest
+  # --update-shards refreshes them): three here, five where coverage, which triples the time, is measured.
   imagemagick-6:
     runs-on: ubuntu-latest
 
