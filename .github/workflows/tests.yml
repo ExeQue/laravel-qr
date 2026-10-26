@@ -73,10 +73,17 @@ jobs:
         run: composer analyse
 
   # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
+  # The suite runs in three shards per job, balanced by the timings in tests/.pest/shards.json
+  # (vendor/bin/pest --update-shards refreshes them).
   imagemagick-6:
     runs-on: ubuntu-latest
 
-    name: PHP 8.5 - ImageMagick 6
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
+    name: PHP 8.5 - ImageMagick 6 (${{ matrix.shard }}/3)
 
     steps:
       - name: Checkout code
@@ -119,14 +126,19 @@ jobs:
         run: npm ci
 
       - name: Execute tests
-        run: vendor/bin/pest -p --ci
+        run: vendor/bin/pest -p --ci --shard=${{ matrix.shard }}/3
 
   # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
   imagemagick-7:
     runs-on: ubuntu-latest
     container: php:8.5-cli-alpine
 
-    name: PHP 8.5 - ImageMagick 7, with coverage
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
+    name: PHP 8.5 - ImageMagick 7 (${{ matrix.shard }}/3)
 
     steps:
       # tar and zstd for actions/cache; the libraries the compiled extensions link against.
@@ -168,6 +180,51 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      # Fails the build when line coverage drops below 100 %.
       - name: Execute tests with coverage
-        run: vendor/bin/pest -p --ci --coverage --min=100
+        run: vendor/bin/pest -p --ci --shard=${{ matrix.shard }}/3 --coverage-php coverage/shard-${{ matrix.shard }}.cov
+
+      - name: Keep the coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.shard }}
+          path: coverage/
+          retention-days: 1
+
+  # The shards' coverage together, in the same container so the paths in it match.
+  coverage:
+    needs: imagemagick-7
+    runs-on: ubuntu-latest
+    container: php:8.5-cli-alpine
+
+    name: Coverage
+
+    steps:
+      - name: Install system packages
+        run: apk add --no-cache git
+
+      - name: Install Composer
+        run: |
+          wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
+          chmod +x /usr/local/bin/install-php-extensions
+          install-php-extensions @composer
+          echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Collect the shards' coverage
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage/
+          merge-multiple: true
+
+      # Fails the build when line coverage drops below 100 %.
+      - name: Check coverage
+        run: |
+          vendor/bin/phpcov merge --text coverage.txt coverage
+          head -n 12 coverage.txt
+          grep -m 1 'Lines:' coverage.txt | grep -q '100.00%'

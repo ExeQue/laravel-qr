@@ -30,7 +30,8 @@
         "livewire/livewire": "^4.4",
         "orchestra/testbench": "^11.3",
         "pestphp/pest": "^5.0",
-        "pestphp/pest-plugin-type-coverage": "^5.0"
+        "pestphp/pest-plugin-type-coverage": "^5.0",
+        "phpunit/phpcov": "^13.2"
     },
     "suggest": {
         "ext-imagick": "Draws PNG, JPEG and WebP codes faster than GD, and SVG logos on them.",
