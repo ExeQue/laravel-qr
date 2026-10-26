@@ -130,8 +130,9 @@ describe('to input', function (): void {
         expect($payload['modules'])->toBe(['shape' => 'dots-medium', 'paint' => '#1e1b4b', 'rotation' => 10.0, 'scaleX' => 0.9, 'scaleY' => 0.8, 'opacity' => 0.7])
             ->and($payload['background'])->toBeNull()
             ->and($payload['margin'])->toBe(3)
-            ->and($payload['filters'][1]['options']['shapes'])->toBe(['square', 'dots-medium', ['class' => Rounded::class, 'options' => ['side' => 0.92, 'radius' => 0.1]]])
-            ->and(StyleRule::make()->toStyle(array_diff_key($payload, ['filters' => true]))->toArray())->toBe($style->withFilters()->toArray());
+            ->and($payload['filters'][1]['options']['shapes'])->toBe(['square', 'dots-medium', ['shape' => Qr::modules()->nameOf(Rounded::class), 'options' => ['side' => 0.92, 'radius' => 0.1]]])
+            ->and(\Illuminate\Support\Facades\Validator::make(['style' => $payload], StyleRule::everything()->modules(options: true)->for('style'))->errors()->toArray())->toBe([])
+            ->and(StyleRule::make()->toStyle($payload)->toArray())->toBe($style->toArray());
     });
 
     it('writes input the rules take, which reads back as the style', function (): void {
@@ -140,6 +141,25 @@ describe('to input', function (): void {
 
         expect(\Illuminate\Support\Facades\Validator::make(['style' => $payload], StyleRule::everything()->for('style'))->errors()->toArray())->toBe([])
             ->and(StyleRule::make()->toStyle($payload)->toArray())->toBe($style->toArray());
+    });
+
+    it('writes eye shapes in filters by name and options, and leaves shapes no registry knows', function (): void {
+        $unknown = new class () implements \ExeQue\Qr\Shapes\Contracts\OuterEyeShape, \ExeQue\Qr\Shapes\Contracts\Configurable {
+            public function path(): Path
+            {
+                return new Path();
+            }
+
+            public function options(): array
+            {
+                return [];
+            }
+        };
+        $style = Style::default()->withFilters(new \ExeQue\Qr\Filters\EyeMix(outer: [new \ExeQue\Qr\Shapes\OuterEyes\Rounded(outer: 3), $unknown], inner: ['soft']));
+        $outer = StyleRule::toPayload($style)['filters'][0]['options']['outer'];
+
+        expect($outer[0])->toBe(['shape' => 'soft-square', 'options' => ['outer' => 3.0, 'hole' => 0.9]])
+            ->and($outer[1])->toBe(['class' => $unknown::class, 'options' => []]);
     });
 
     it('writes a shape with options of its own by its class\'s name', function (): void {

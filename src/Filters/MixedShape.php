@@ -19,7 +19,7 @@ use ExeQue\Qr\Support\Seed;
 use ExeQue\Qr\Validation\Allow;
 use ExeQue\Qr\Validation\Contracts\HasOptionRules;
 use ExeQue\Qr\Validation\Rules\Options;
-use ExeQue\Qr\Validation\Rules\ShapeName;
+use ExeQue\Qr\Validation\Rules\ShapeEntry;
 
 /**
  * Draws each module with a shape of its own from a list, optionally weighted.
@@ -67,7 +67,7 @@ final class MixedShape implements ModuleFilter, NamedFilter, HasOptionRules
     {
         return [
             'shapes' => ['required', 'list', 'min:1', 'max:8'],
-            'shapes.*' => [new ShapeName('module', Allow::all())],
+            'shapes.*' => [new ShapeEntry('module', Allow::all())],
             'weights' => ['sometimes', 'nullable', 'list', 'max:8'],
             'weights.*' => ['numeric', 'min:0'],
             'seed' => Options::integer(),

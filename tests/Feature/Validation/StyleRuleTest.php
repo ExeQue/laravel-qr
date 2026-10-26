@@ -67,6 +67,8 @@ covers(
     Options::class,
     Scannable::class,
     \ExeQue\Qr\Validation\Rules\RegionInput::class,
+    \ExeQue\Qr\Validation\Rules\ShapeEntry::class,
+    \ExeQue\Qr\Support\Hydrate::class,
     InvalidOptionException::class,
     QrService::class,
     QrServiceProvider::class,
@@ -284,6 +286,39 @@ describe('filters', function (): void {
         [['kind' => 'blob'], false],
         ['logo', false],
     ]);
+
+    it('takes shapes in filters by name, or by name and options, as the style takes shapes', function (array $shapes, array $errors): void {
+        $rule = StyleRule::make()->modules(shapes: Allow::except(Module::Hearts), options: true)->shape(Module::Rounded, radius: [0, 0.2])->filters();
+
+        expect(styleErrors(['filters' => [['name' => 'mixed-shape', 'options' => ['shapes' => $shapes]]]], $rule))->toBe($errors);
+    })->with([
+        'names' => [['square', 'dots-medium'], []],
+        'with options' => [['square', ['shape' => 'rounded', 'options' => ['radius' => 0.1]]], []],
+        'name only' => [[['shape' => 'rounded']], []],
+        'not allowed' => [['hearts'], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field is not a module shape that may be chosen.']]],
+        'unknown' => [['tulips'], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field is not a module shape that may be chosen.']]],
+        'beyond the style\'s range' => [[['shape' => 'rounded', 'options' => ['radius' => 0.3]]], ['style.filters.0.options.shapes.0.options.radius' => ['The style.filters.0.options.shapes.0.options.radius field must be between 0 and 0.2.']]],
+        'bad option' => [[['shape' => 'rounded', 'options' => ['side' => 2]]], ['style.filters.0.options.shapes.0.options.side' => ['ExeQue\Qr\Shapes\Modules\Rounded\'s "side" must be from 0.1 to 1, 2 given.']]],
+        'unknown option' => [[['shape' => 'rounded', 'options' => ['curl' => 1]]], ['style.filters.0.options.shapes.0.options.curl' => ['The style.filters.0.options.shapes.0.options.curl option is not one this takes.']]],
+        'extra key' => [[['shape' => 'rounded', 'size' => 1]], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field must be a shape: its name, or its name and options.']]],
+        'options not a list' => [[['shape' => 'rounded', 'options' => 'round']], ['style.filters.0.options.shapes.0' => ['The style.filters.0.options.shapes.0 field must be a shape: its name, or its name and options.']]],
+    ]);
+
+    it('takes shapes\' options in filters only where the style takes them, every shape where it names none', function (): void {
+        $shapes = ['filters' => [['name' => 'mixed-shape', 'options' => ['shapes' => ['hearts', ['shape' => 'rounded', 'options' => ['radius' => 0.1]]]]]]];
+
+        expect(styleErrors($shapes, StyleRule::make()->modules()->filters()))->toBe(['style.filters.0.options.shapes.1' => ['The style.filters.0.options.shapes.1 field must be a shape: its name, or its name and options.']])
+            ->and(styleErrors($shapes, StyleRule::make()->filters()))->toHaveKey('style.filters.0.options.shapes.1')
+            ->and(styleErrors(['filters' => [['name' => 'mixed-shape', 'options' => ['shapes' => ['hearts', ['shape' => 'rounded']]]]]], StyleRule::make()->filters()))->toBe([]);
+    });
+
+    it('takes eye shapes in eye-mix as the style takes outer and inner eyes', function (): void {
+        $rule = StyleRule::make()->outer(Allow::only(OuterEye::Rounded), options: true)->inner(options: true)->filters();
+        $mix = fn (array $outer): array => ['filters' => [['name' => 'eye-mix', 'options' => ['outer' => $outer, 'inner' => ['soft', ['shape' => 'soft', 'options' => ['radius' => 1]]]]]]];
+
+        expect(styleErrors($mix([['shape' => 'rounded', 'options' => ['outer' => 3]]]), $rule))->toBe([])
+            ->and(styleErrors($mix(['circle']), $rule))->toHaveKey('style.filters.0.options.outer.0');
+    });
 
     it('never takes the filters that wrap others', function (): void {
         expect(FilterEntry::choosable(Allow::all()))->not->toContain('by-role', 'region', 'compound')

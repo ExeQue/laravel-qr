@@ -61,27 +61,46 @@ final class ShapeOptions implements DataAwareRule, ValidationRule
             return;
         }
 
-        $class = $registry->classOf($name);
-        $rules = $class === null ? [] : app(ResolvesOptionRules::class)->for($class);
-
-        foreach ($this->ranges[$name] ?? [] as $option => $range) {
-            $rules[$option] = [...(array) ($rules[$option] ?? ['sometimes']), ...Options::between($range)];
-        }
-
-        $problems = Options::problems($value, $rules, $attribute);
-
-        if ($problems === []) {
-            try {
-                $registry->get($name, $value);
-            } catch (InvalidOptionException $exception) {
-                $problems[$exception->option ?? ''] = $exception->getMessage();
-            } catch (Throwable $exception) {
-                $problems[''] = $exception->getMessage();
-            }
-        }
+        $problems = self::problems($this->kind, $name, $value, $this->ranges[$name] ?? [], $attribute);
 
         foreach ($problems as $option => $message) {
             $fail($option === '' ? $attribute : "{$attribute}.{$option}", $message);
         }
+    }
+
+    /**
+     * What is wrong with a named shape's options, by option; '' for the shape as a whole.
+     *
+     * @param 'module'|'outer'|'inner' $kind
+     * @param array<array-key, mixed> $options
+     * @param array<string, array{float|int, float|int}> $ranges Tighter ranges by option.
+     *
+     * @return array<string, string>
+     */
+    public static function problems(string $kind, string $name, array $options, array $ranges, string $prefix): array
+    {
+        $registry = ShapeName::registry($kind);
+        $class = $registry->classOf($name);
+        $rules = $class === null ? [] : app(ResolvesOptionRules::class)->for($class);
+
+        foreach ($ranges as $option => $range) {
+            $rules[$option] = [...(array) ($rules[$option] ?? ['sometimes']), ...Options::between($range)];
+        }
+
+        $problems = Options::problems($options, $rules, $prefix);
+
+        if ($problems !== []) {
+            return $problems;
+        }
+
+        try {
+            $registry->get($name, $options);
+        } catch (InvalidOptionException $exception) {
+            return [$exception->option ?? '' => $exception->getMessage()];
+        } catch (Throwable $exception) {
+            return ['' => $exception->getMessage()];
+        }
+
+        return [];
     }
 }

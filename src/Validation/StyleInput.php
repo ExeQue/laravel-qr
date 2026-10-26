@@ -297,9 +297,17 @@ final class StyleInput
             }
         }
 
-        $name = $registry->nameOf($shape::class) ?? throw InvalidStyleException::notInput($what);
+        $name = self::nameOfClass($registry, $shape::class) ?? throw InvalidStyleException::notInput($what);
 
         return ['shape' => $name, 'options' => $shape instanceof Configurable ? (array) Normalizer::value($shape->options()) : []];
+    }
+
+    /**
+     * A name the class is registered under, alone or with options.
+     */
+    private static function nameOfClass(ModuleRegistry|OuterEyeRegistry|InnerEyeRegistry $registry, string $class): ?string
+    {
+        return $registry->nameOf($class) ?? array_find($registry->names(), fn (string $name): bool => $registry->classOf($name) === $class);
     }
 
     private static function tryGet(ModuleRegistry|OuterEyeRegistry|InnerEyeRegistry $registry, string $name): ?object
@@ -312,19 +320,28 @@ final class StyleInput
     }
 
     /**
-     * Filter options with any shape in them by its registered name, as input gives shapes.
+     * Filter options with any shape in them as input gives shapes: by registered name, with options
+     * where the name alone does not give the shape.
      */
     private static function named(mixed $value): mixed
     {
         if (is_array($value) && array_keys($value) === ['class', 'options'] && is_string($value['class'])) {
             foreach ([app(ModuleRegistry::class), app(OuterEyeRegistry::class), app(InnerEyeRegistry::class)] as $registry) {
-                foreach ($registry->names() as $name) {
-                    $shape = self::tryGet($registry, $name);
+                $name = self::nameOfClass($registry, $value['class']);
+
+                if ($name === null) {
+                    continue;
+                }
+
+                foreach ($registry->names() as $candidate) {
+                    $shape = self::tryGet($registry, $candidate);
 
                     if ($shape instanceof Configurable && $shape::class === $value['class'] && Normalizer::value($shape->options()) == $value['options']) {
-                        return $name;
+                        return $candidate;
                     }
                 }
+
+                return ['shape' => $name, 'options' => $value['options']];
             }
 
             return $value;
@@ -332,7 +349,7 @@ final class StyleInput
 
         if (is_string($value) && class_exists($value)) {
             foreach ([app(ModuleRegistry::class), app(OuterEyeRegistry::class), app(InnerEyeRegistry::class)] as $registry) {
-                $name = $registry->nameOf($value);
+                $name = self::nameOfClass($registry, $value);
 
                 if ($name !== null) {
                     return $name;

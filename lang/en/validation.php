@@ -15,6 +15,7 @@ return [
         'module' => 'The :attribute field is not a module shape that may be chosen.',
         'outer' => 'The :attribute field is not an outer eye that may be chosen.',
         'inner' => 'The :attribute field is not an inner eye that may be chosen.',
+        'entry' => 'The :attribute field must be a shape: its name, or its name and options.',
     ],
 
     'filter' => [

@@ -304,7 +304,7 @@ final readonly class StyleRule implements ValidationRule
 
         if (isset($this->fields['filters'])) {
             $rules["{$attribute}.filters"] = ['sometimes', 'list', 'max:'.$this->fields['filters']['max']];
-            $rules["{$attribute}.filters.*"] = ['filled', new FilterEntry($this->fields['filters']['allow'], $this->filterRanges)];
+            $rules["{$attribute}.filters.*"] = ['filled', new FilterEntry($this->fields['filters']['allow'], $this->filterRanges, $this->shapePolicies())];
         }
 
         if (isset($this->fields['logo'])) {
@@ -347,6 +347,28 @@ final readonly class StyleRule implements ValidationRule
     public static function toPayload(Style $style): array
     {
         return StyleInput::of($style);
+    }
+
+    /**
+     * The rules for shapes of each kind allowed, which shapes in filters' options follow too.
+     *
+     * @return array<string, array{allow: Allow, options: bool, ranges: array<string, array<string, array{float|int, float|int}>>}>
+     */
+    private function shapePolicies(): array
+    {
+        $policies = [];
+
+        foreach (['modules' => 'module', 'outer' => 'outer', 'inner' => 'inner'] as $field => $kind) {
+            if (isset($this->fields[$field])) {
+                $policies[$kind] = [
+                    'allow' => $this->fields[$field]['shapes'] ?? Allow::all(),
+                    'options' => (bool) $this->fields[$field]['options'],
+                    'ranges' => $this->shapeRanges[$kind] ?? [],
+                ];
+            }
+        }
+
+        return $policies;
     }
 
     /**

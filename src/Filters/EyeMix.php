@@ -19,7 +19,7 @@ use ExeQue\Qr\Support\Seed;
 use ExeQue\Qr\Validation\Allow;
 use ExeQue\Qr\Validation\Contracts\HasOptionRules;
 use ExeQue\Qr\Validation\Rules\Options;
-use ExeQue\Qr\Validation\Rules\ShapeName;
+use ExeQue\Qr\Validation\Rules\ShapeEntry;
 
 /**
  * A shape picked for each corner's outer part, inner part or both, from a few: three eyes
@@ -75,9 +75,9 @@ final class EyeMix implements EyeFilter, NamedFilter, HasOptionRules
     {
         return [
             'outer' => ['sometimes', 'list', 'max:8'],
-            'outer.*' => [new ShapeName('outer', Allow::all())],
+            'outer.*' => [new ShapeEntry('outer', Allow::all())],
             'inner' => ['sometimes', 'list', 'max:8'],
-            'inner.*' => [new ShapeName('inner', Allow::all())],
+            'inner.*' => [new ShapeEntry('inner', Allow::all())],
             'seed' => Options::integer(),
         ];
     }

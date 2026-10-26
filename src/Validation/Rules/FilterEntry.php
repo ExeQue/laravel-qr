@@ -35,10 +35,13 @@ final readonly class FilterEntry implements ValidationRule
 
     /**
      * @param array<string, array<string, array{float|int, float|int}>> $ranges Option ranges by filter name.
+     * @param array<string, array{allow: Allow, options: bool, ranges: array<string, array<string, array{float|int, float|int}>>}> $shapes
+     *        The style's rules for shapes by kind, which shapes in a filter's options follow too.
      */
     public function __construct(
         private Allow $allow,
         private array $ranges = [],
+        private array $shapes = [],
     ) {
     }
 
@@ -98,6 +101,8 @@ final readonly class FilterEntry implements ValidationRule
             $rules = [...$rules, ...self::scope()];
         }
 
+        $rules = array_map(fn (mixed $rule): mixed => is_array($rule) ? array_map($this->shapeRule(...), $rule) : $rule, $rules);
+
         foreach ($this->ranges[$name] ?? [] as $option => $range) {
             $rules[$option] = [...(array) ($rules[$option] ?? ['sometimes']), ...Options::between($range)];
         }
@@ -117,6 +122,20 @@ final readonly class FilterEntry implements ValidationRule
         }
 
         return [];
+    }
+
+    /**
+     * A shape in a filter's options under the style's rules for its kind; none allows every shape, without options.
+     */
+    private function shapeRule(mixed $rule): mixed
+    {
+        if (! $rule instanceof ShapeEntry) {
+            return $rule;
+        }
+
+        $policy = $this->shapes[$rule->kind] ?? ['allow' => Allow::all(), 'options' => false, 'ranges' => []];
+
+        return $rule->within($policy['allow'], $policy['options'], $policy['ranges']);
     }
 
     /**

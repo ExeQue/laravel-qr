@@ -177,6 +177,15 @@ A filter's options are checked by the filter's own rules: ranges, lists and the 
 ->filter(Filter::MixedRotation, min: [-30, 0], max: [0, 30])
 ```
 
+Shapes in a filter's options (`mixed-shape`'s `shapes`, `eye-mix`'s `outer` and `inner`) follow the style's rules
+for shapes of their kind: the shapes `modules()`, `outer()` and `inner()` allow, their options only where those
+allow them, within the ranges `shape()` sets. Where the field is not allowed, every shape is, without options. A shape
+there is its name, or its name and options:
+
+```php
+['name' => 'mixed-shape', 'options' => ['shapes' => ['square', ['shape' => 'rounded', 'options' => ['radius' => 0.1]]]]]
+```
+
 Filters that wrap others (`by-role`, `region`, `compound`) are never taken from input; a filter's `only` and `in`
 do what they do.
 
