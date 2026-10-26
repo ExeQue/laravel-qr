@@ -1,4 +1,4 @@
-<p align="center"><img src="./art/cover.jpg" alt="Laravel QR - styled, scannable QR codes for Laravel, and a reader to scan them back" width="100%"></p>
+<p align="center"><img src="./art/cover.jpg" alt="Laravel QR - styled, scannable, beautiful QR codes for Laravel, and a reader to scan them back" width="100%"></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/exeque/laravel-qr"><img src="https://img.shields.io/packagist/v/exeque/laravel-qr" alt="Latest version"></a>

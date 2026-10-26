@@ -25,7 +25,7 @@
   .title { font: 800 96px/1 Inter, sans-serif; letter-spacing: -.035em; }
   .title span { background: linear-gradient(120deg, #fb7185, #a5b4fc); -webkit-background-clip: text; color: transparent; }
   .tagline { font: 400 27px/1.4 Inter, sans-serif; color: #cfcbe3; max-width: 760px; }
-  .code { font-variant-ligatures: none; margin-top: 6px; font: 400 19px/1.65 'JetBrains Mono', monospace; color: #d9d6ee; background: rgba(255,255,255,.04);
+  .code { margin-top: 6px; font: 400 19px/1.65 'JetBrains Mono', monospace; font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; color: #d9d6ee; background: rgba(255,255,255,.04);
           border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 16px 22px; width: fit-content; }
   .code .c { color: #a5b4fc; } .code .m { color: #fda4af; } .code .s { color: #86efac; }
 </style>
@@ -39,7 +39,7 @@
   <div class="text">
     <div class="kicker">exeque/laravel-qr</div>
     <div class="title">Laravel <span>QR</span></div>
-    <div class="tagline">Styled, scannable QR codes for Laravel, and a reader to scan them back.</div>
+    <div class="tagline">Styled, scannable, beautiful QR codes for Laravel, and a reader to scan them back.</div>
     <div class="code"><span class="c">Qr</span>::<span class="m">url</span>($url)<br>&nbsp;&nbsp;-&gt;<span class="m">modules</span>(<span class="s">'flowing-medium'</span>)<br>&nbsp;&nbsp;-&gt;<span class="m">paint</span>(<span class="c">LinearGradient</span>::<span class="m">make</span>(<span class="s">'#be123c'</span>, <span class="s">'#4338ca'</span>))<br>&nbsp;&nbsp;-&gt;<span class="m">png</span>()</div>
   </div>
 </body>
