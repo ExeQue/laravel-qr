@@ -29,24 +29,5 @@ A code's content is in `$event->code`; take care not to log it, as codes hold pa
 ## Monocle
 
 With [exeque/laravel-monocle](https://exeque.github.io/laravel-monocle/) installed, every request's codes show in
-their own **QR codes** section:
-
-- a row per code: the kind of content (`url`, `wifi`, `text`, ...), the link's host, the format, whether it was
-  drawn or served, version, error correction, size in modules, timings per phase, what the scan guards changed,
-  whether it has a logo and whether it can be cached;
-- a summary: how many codes, the time spent, the share served without drawing;
-- advice: codes drawn more than once in a request, slow codes, codes the guards changed, codes that cannot be cached;
-- `qr.encode`, `qr.render` and `qr.write` spans on the timeline.
-
-The content itself is never recorded: only its kind, its length, a hash keyed with the application key, and a link's
-host.
-
-```php
-// config/qr.php
-'monocle' => [
-    'enabled' => true,        // QR_MONOCLE
-    'slow_render_ms' => 50,   // what counts as slow
-],
-```
-
-The lens is registered on its own when Monocle is installed; nothing to set up.
+their own section, with their style, timings and what the scan guards changed, but never their content. See
+[Monocle](monocle.md).

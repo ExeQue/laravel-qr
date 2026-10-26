@@ -20,7 +20,8 @@
 - [Caching](caching.md) - Writing each code once
 - [Extending](extending.md) - Your own shapes, filters, gradients, content, formats and readers
 - [Testing](testing.md) - `Qr::fake()` and its assertions
-- [Events and Monocle](events.md) - What the package tells, and the Monocle lens
+- [Events](events.md) - What the package tells as it works
+- [Monocle](monocle.md) - The codes each request rendered, in the Monocle profiler
 - [Artisan commands](commands.md) - `qr:check`, `qr:clear` and `qr:icons`
 - [Configuration](configuration.md) - Every option in `config/qr.php`
 
