@@ -74,7 +74,6 @@ jobs:
 
   # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
   imagemagick-6:
-    needs: lint
     runs-on: ubuntu-latest
 
     name: PHP 8.5 - ImageMagick 6
@@ -124,23 +123,40 @@ jobs:
 
   # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
   imagemagick-7:
-    needs: lint
     runs-on: ubuntu-latest
     container: php:8.5-cli-alpine
 
     name: PHP 8.5 - ImageMagick 7, with coverage
 
     steps:
+      # tar and zstd for actions/cache; the libraries the compiled extensions link against.
       - name: Install system packages
-        run: apk add --no-cache git nodejs npm imagemagick imagemagick-svg
+        run: |
+          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-libs icu-libs libzip libpng libjpeg-turbo freetype libgomp
+          echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
+
+      # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.
+      - name: Cache PHP extensions
+        id: extensions
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/php/extensions
+            /usr/local/etc/php/conf.d
+            /usr/local/bin/composer
+          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v1
 
       - name: Install PHP extensions
+        if: steps.extensions.outputs.cache-hit != 'true'
         run: |
           wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
           chmod +x /usr/local/bin/install-php-extensions
           install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
           # The image has no php.ini, so PHP keeps its 128 MB default; setup-php lifts it as well.
           echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
+
+      - name: Check PHP extensions
+        run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { extension_loaded($e) || exit("missing {$e}\n"); } echo Imagick::getVersion()["versionString"], PHP_EOL;'
 
       - name: Checkout code
         uses: actions/checkout@v5
