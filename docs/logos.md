@@ -16,7 +16,7 @@ Qr::url($url)->logo(storage_path('app/brand/logo.svg'), size: 0.22);
 
 ```php
 ->logo('/path/to/logo.png')                 // a file
-->logo($bytes)                               // PNG, JPEG, WebP, GIF (its first frame) or SVG bytes
+->logo($bytes)                               // PNG, JPEG, WebP, GIF (its first frame), HEIC, HEIF, AVIF or SVG bytes
 ->logo('<svg xmlns="http://www.w3.org/2000/svg">...</svg>')
 ->logo('data:image/png;base64,...')
 ->logo(Logo::fromFile($path))
@@ -101,3 +101,7 @@ Choose the sanitizer with `qr.logos.sanitizer`: a class implementing `ExeQue\Qr\
 SVG codes inline an SVG logo as SVG (or embed it as an image with `svg(inlineSvgLogos: false)`) and embed raster
 logos as images. PNG, JPEG and WebP codes draw the logo in; an SVG logo there needs the Imagick driver with
 ImageMagick's SVG support (librsvg), as GD cannot read SVG, and says so when it is missing.
+
+HEIC, HEIF and AVIF logos, as phones take photos, become PNG when they are read, so every writer and browser shows
+them. That needs Imagick with ImageMagick's HEIF support (libheif): Ubuntu and Debian have it, Alpine needs
+`imagemagick-heic`.

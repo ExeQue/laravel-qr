@@ -16,6 +16,12 @@ use ExeQue\Qr\Gradients\Contracts\Gradient;
 use ExeQue\Qr\Paints\Layered;
 use ExeQue\Qr\Registries\FilterRegistry;
 use ExeQue\Qr\Registries\GradientRegistry;
+use ExeQue\Qr\Registries\InnerEyeRegistry;
+use ExeQue\Qr\Registries\ModuleRegistry;
+use ExeQue\Qr\Registries\OuterEyeRegistry;
+use ExeQue\Qr\Shapes\Contracts\InnerEyeShape;
+use ExeQue\Qr\Shapes\Contracts\ModuleShape;
+use ExeQue\Qr\Shapes\Contracts\OuterEyeShape;
 
 /**
  * Makes parts again from the plain values `Normalizer` gives: what stored and
@@ -66,7 +72,7 @@ final class Hydrate
     }
 
     /**
-     * A shape from its class name, or `['class' => ..., 'options' => [...]]`.
+     * A shape from its class name or registered name, or `['class' => ..., 'options' => [...]]` with either.
      *
      * @template T of object
      *
@@ -85,10 +91,28 @@ final class Hydrate
         $made = match (true) {
             is_object($shape) => $shape,
             is_string($class) && class_exists($class) => app(Factory::class)->make($class, $options),
+            is_string($class) => self::named($class, $options, $contract),
             default => null,
         };
 
         return $made instanceof $contract ? $made : throw InvalidStyleException::unreadable('shape', $shape);
+    }
+
+    /**
+     * A shape by the name its registry knows it by; null when none does.
+     *
+     * @param array<array-key, mixed> $options
+     */
+    private static function named(string $name, array $options, string $contract): ?object
+    {
+        $registry = match ($contract) {
+            ModuleShape::class => app(ModuleRegistry::class),
+            OuterEyeShape::class => app(OuterEyeRegistry::class),
+            InnerEyeShape::class => app(InnerEyeRegistry::class),
+            default => null,
+        };
+
+        return $registry !== null && $registry->has($name) ? $registry->get($name, $options) : null;
     }
 
     /**

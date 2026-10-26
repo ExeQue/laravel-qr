@@ -8,6 +8,7 @@ use ExeQue\Qr\Exceptions\InvalidLogoException;
 use ExeQue\Qr\Logos\Contracts\SvgSanitizer;
 use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use Imagick;
+use ImagickException;
 
 /**
  * An image to place over a code: PNG, JPEG, WebP, GIF (its first frame) or SVG.
@@ -16,6 +17,11 @@ use Imagick;
  */
 final readonly class Logo
 {
+    // The brands an ISO media file names in its ftyp box, by what it holds.
+    private const array HEIF_BRANDS = ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'mif1', 'msf1'];
+
+    private const array AVIF_BRANDS = ['avif', 'avis'];
+
     /**
      * @param string $hash Of the contents: what caching goes by.
      */
@@ -42,12 +48,18 @@ final readonly class Logo
             str_starts_with($bytes, "\xFF\xD8\xFF") => 'image/jpeg',
             str_starts_with($bytes, 'GIF8') => 'image/gif',
             str_starts_with($bytes, 'RIFF') && substr($bytes, 8, 4) === 'WEBP' => 'image/webp',
+            substr($bytes, 4, 4) === 'ftyp' && in_array(substr($bytes, 8, 4), self::AVIF_BRANDS, true) => 'image/avif',
+            substr($bytes, 4, 4) === 'ftyp' && in_array(substr($bytes, 8, 4), self::HEIF_BRANDS, true) => 'image/heif',
             default => throw InvalidLogoException::unsupportedType(),
         };
 
-        if ($mimeType === 'image/gif') {
-            [$bytes, $mimeType] = [self::firstFrame($bytes), 'image/png'];
-        }
+        // A GIF's first frame, and HEIF and AVIF, which browsers and GD read only in part, become PNG.
+        [$bytes, $mimeType] = match ($mimeType) {
+            'image/gif' => [self::firstFrame($bytes), 'image/png'],
+            'image/heif' => [self::toPng($bytes, 'HEIC'), 'image/png'],
+            'image/avif' => [self::toPng($bytes, 'AVIF'), 'image/png'],
+            default => [$bytes, $mimeType],
+        };
 
         $size = getimagesizefromstring($bytes) ?: throw InvalidLogoException::unreadable();
 
@@ -121,6 +133,27 @@ final readonly class Logo
     /**
      * A GIF's first frame, as PNG.
      */
+    /**
+     * A HEIF or AVIF image as PNG, through ImageMagick's support for it.
+     */
+    private static function toPng(string $bytes, string $format): string
+    {
+        if (! extension_loaded('imagick') || Imagick::queryFormats($format) === []) {
+            throw InvalidLogoException::heifNeedsImageMagick($format === 'AVIF' ? 'AVIF' : 'HEIF'); // @codeCoverageIgnore
+        }
+
+        try {
+            $image = new Imagick();
+            $image->readImageBlob($bytes);
+            $image->setImageFormat('png');
+            $image->setOption('png:exclude-chunks', 'date,time');
+
+            return $image->getImageBlob();
+        } catch (ImagickException) {
+            throw InvalidLogoException::unreadable();
+        }
+    }
+
     private static function firstFrame(string $gif): string
     {
         if (Driver::resolve() === Driver::Gd) {

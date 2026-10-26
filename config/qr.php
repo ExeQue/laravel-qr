@@ -107,21 +107,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Color names
-    |--------------------------------------------------------------------------
-    |
-    | Names of your own, usable wherever a color is, next to the CSS names:
-    | 'brand' => '#be123c' makes ->paint('brand') work. The value is any color
-    | notation, a color instance such as new Oklch(0.55, 0.24, 293), or an
-    | array such as ['r' => 190, 'g' => 18, 'b' => 60]; all of them survive
-    | php artisan config:cache. CSS names cannot be redefined.
-    |
-    */
-
-    'colors' => [],
-
-    /*
-    |--------------------------------------------------------------------------
     | Streams
     |--------------------------------------------------------------------------
     |
@@ -204,6 +189,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Color names
+    |--------------------------------------------------------------------------
+    |
+    | Names of your own, usable wherever a color is, next to the CSS names:
+    | 'brand' => '#be123c' makes ->paint('brand') work. The value is any color
+    | notation, a color instance such as new Oklch(0.55, 0.24, 293), or an
+    | array such as ['r' => 190, 'g' => 18, 'b' => 60]; all of them survive
+    | php artisan config:cache. CSS names cannot be redefined.
+    |
+    */
+
+    'colors' => [
+        // As a string, in any CSS notation:
+        // 'brand' => '#be123c',
+        // 'ink' => 'oklch(0.25 0.05 280)',
+        // As a color class:
+        // 'accent' => new ExeQue\Qr\Colors\Hex('#0f766e'),
+        // 'highlight' => new ExeQue\Qr\Colors\Oklch(0.55, 0.24, 293),
+        // 'sand' => new ExeQue\Qr\Colors\Rgb(240, 222, 196),
+        // As an array:
+        // 'paper' => ['r' => 255, 'g' => 251, 'b' => 245],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Registries
     |--------------------------------------------------------------------------
     |
@@ -244,12 +254,31 @@ return [
     | Reusable designs by name, as Style::toArray() gives them, optionally
     | building on others with 'extends'; or an enum class implementing
     | ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle, every case under its value.
-    |
-    |   'brand' => ['modules' => ['paint' => '#1c1917'], 'margin' => 2],
-    |   'wedding' => ['extends' => 'brand', 'modules' => ['paint' => '#be123c']],
+    | Shapes, filters and gradients go by their registered names, colors by
+    | any notation or a name from 'colors'. Use one with ->style('brand').
     |
     */
 
-    'styles' => [],
+    'styles' => [
+        // 'brand' => [
+        //     'modules' => ['shape' => 'dots-medium', 'paint' => 'brand'],
+        //     'eyes' => [
+        //         'top-left' => ['outer' => ['shape' => 'rounded'], 'inner' => ['shape' => 'circle']],
+        //         'top-right' => ['outer' => ['shape' => 'rounded'], 'inner' => ['shape' => 'circle']],
+        //         'bottom-left' => ['outer' => ['shape' => 'rounded'], 'inner' => ['shape' => 'circle']],
+        //     ],
+        //     'background' => 'paper',
+        //     'margin' => 2,
+        // ],
+        // 'launch' => [
+        //     'extends' => 'brand',
+        //     'modules' => ['paint' => [
+        //         'kind' => 'linear',
+        //         'angle' => 135,
+        //         'stops' => [['color' => 'brand', 'position' => 0], ['color' => 'ink', 'position' => 1]],
+        //     ]],
+        //     'filters' => [['name' => 'mixed-rotation', 'options' => ['min' => -15, 'max' => 15]]],
+        // ],
+    ],
 
 ];

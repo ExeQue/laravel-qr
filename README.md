@@ -77,6 +77,8 @@ pecl install imagick
 apk add imagemagick-svg
 # SVG logos on PNG, JPEG and WebP codes: Ubuntu 24.04 (Debian 13 has it already)
 apt install libmagickcore-6.q16-7-extra
+# HEIC, HEIF and AVIF logos: Alpine (Ubuntu and Debian have it already)
+apk add imagemagick-heic
 # The zxing reader, reading SVG too
 php artisan qr:install --svg
 # A dedicated sanitizer for SVG logos

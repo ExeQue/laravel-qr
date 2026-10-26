@@ -95,7 +95,7 @@ it('takes a square for an SVG without a size', function (): void {
 it('refuses what it cannot use', function (callable $read, string $message): void {
     expect($read)->toThrow(InvalidLogoException::class, $message);
 })->with([
-    [fn () => Logo::fromBytes('plain text'), 'The logo is not a PNG, JPEG, WebP, GIF or SVG image.'],
+    [fn () => Logo::fromBytes('plain text'), 'The logo is not a PNG, JPEG, WebP, GIF, HEIC, HEIF, AVIF or SVG image.'],
     [fn () => Logo::fromBytes("\x89PNG\r\n\x1A\nbroken"), 'The logo image cannot be read.'],
     [fn () => Logo::fromFile('/no/such/logo.png'), 'The logo file "/no/such/logo.png" does not exist or cannot be read.'],
     [fn () => Logo::fromDataUri('https://example.com/logo.png'), 'The logo is not a data: URI of an image.'],
@@ -240,4 +240,20 @@ it('checks a changed size and padding as well', function (callable $change, stri
 
 it('says what to install when ImageMagick cannot read SVG logos', function (): void {
     expect(MissingExtensionException::svgLogos()->getMessage())->toContain('SVG support');
+});
+
+describe('HEIF and AVIF logos', function (): void {
+    it('turns them into PNG, so every writer and browser can show them', function (string $file): void {
+        $logo = Logo::fromFile(fixture($file));
+
+        expect($logo->mimeType)->toBe('image/png')
+            ->and($logo->contents)->toStartWith("\x89PNG")
+            ->and([$logo->width, $logo->height])->toBe([(float) getimagesize(fixture('ellipse.png'))[0], (float) getimagesize(fixture('ellipse.png'))[1]])
+            ->and(\ExeQue\Qr\Facades\Qr::make('https://example.com')->logo(fixture($file), size: 0.2)->svg()->contents())->toContain('data:image/png;base64');
+    })->with(['ellipse.heic', 'ellipse.avif']);
+
+    it('says when one cannot be read', function (): void {
+        expect(fn () => Logo::fromBytes("\0\0\0\x18ftypheic\0\0\0\0broken"))->toThrow(InvalidLogoException::class, 'cannot be read')
+            ->and(InvalidLogoException::heifNeedsImageMagick('HEIF')->getMessage())->toContain("ImageMagick's HEIF support (libheif)");
+    });
 });

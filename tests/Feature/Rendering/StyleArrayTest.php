@@ -214,3 +214,16 @@ it('refuses a filter that is not one for modules or eyes', function (): void {
 it('refuses a scoped filter that is not a module filter', function (): void {
     new ByRole(['data'], ['name' => 'eye-tilt']);
 })->throws(\ExeQue\Qr\Exceptions\InvalidFilterException::class, 'A filter limited to roles or a region is a named module filter.');
+
+it('reads shapes by their registered names, as config holds them', function (): void {
+    $style = Style::fromArray([
+        'modules' => ['shape' => ['class' => 'drops', 'options' => ['point' => 'random']]],
+        'eyes' => ['top-left' => ['outer' => ['shape' => 'leaf'], 'inner' => ['shape' => 'pill']]],
+    ]);
+
+    expect($style->modules->shape)->toBeInstanceOf(\ExeQue\Qr\Shapes\Modules\Drop::class)
+        ->and($style->modules->shape->point)->toBe(\ExeQue\Qr\Shapes\Enums\Direction::Random)
+        ->and($style->eye(\ExeQue\Qr\Rendering\Enums\Corner::TopLeft)->outer->shape)->toBeInstanceOf(\ExeQue\Qr\Shapes\OuterEyes\Rounded::class)
+        ->and(fn () => Style::fromArray(['modules' => ['shape' => 'no-such-shape']]))->toThrow(\ExeQue\Qr\Exceptions\InvalidStyleException::class)
+        ->and(fn () => \ExeQue\Qr\Support\Hydrate::shape('dots-medium', \ExeQue\Qr\Filters\Contracts\NamedFilter::class))->toThrow(\ExeQue\Qr\Exceptions\InvalidStyleException::class);
+});

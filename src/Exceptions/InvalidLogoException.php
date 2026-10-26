@@ -20,7 +20,12 @@ final class InvalidLogoException extends InvalidArgumentException implements QrE
 
     public static function unsupportedType(): self
     {
-        return new self('The logo is not a PNG, JPEG, WebP, GIF or SVG image.');
+        return new self('The logo is not a PNG, JPEG, WebP, GIF, HEIC, HEIF, AVIF or SVG image.');
+    }
+
+    public static function heifNeedsImageMagick(string $format): self
+    {
+        return new self("A {$format} logo needs the imagick PHP extension with ImageMagick's {$format} support (libheif), to turn it into a PNG.");
     }
 
     public static function unreadable(): self
