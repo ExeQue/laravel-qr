@@ -84,6 +84,7 @@
 
         .layer { display: grid; gap: 8px; border: 1px dashed var(--line); border-radius: 8px; padding: 8px; }
         .field { color: var(--muted); font-size: 13px; }
+        .downloads { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); font-size: 13px; }
         .shapes { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
         .shape { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid var(--line); border-radius: 8px; padding: 6px; cursor: pointer; color: inherit; position: relative; }
         .shape:hover { border-color: var(--muted); }

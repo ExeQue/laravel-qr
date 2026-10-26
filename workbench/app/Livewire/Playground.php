@@ -8,6 +8,7 @@ use BackedEnum;
 use ExeQue\Qr\Builders\EyeBuilder;
 use ExeQue\Qr\Builders\EyesBuilder;
 use ExeQue\Qr\Builders\PendingQr;
+use ExeQue\Qr\Builders\Rendered;
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Encoder\Enums\Role;
 use ExeQue\Qr\Exceptions\QrExceptionInterface;
@@ -34,6 +35,7 @@ use Livewire\WithFileUploads;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 use TypeError;
 use ValueError;
@@ -300,12 +302,7 @@ class Playground extends Component
      */
     private function draw(PendingQr $code, int $started): array
     {
-        $output = match ($this->format) {
-            'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
-            'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
-        };
+        $output = $this->output($code, $this->format);
         $scene = $code->scene();
 
         return [
@@ -317,6 +314,26 @@ class Playground extends Component
             'milliseconds' => round((hrtime(true) - $started) / 1e6, 1),
             'scans' => $this->checkScan ? $this->scans($code) : null,
         ];
+    }
+
+    /**
+     * The code on screen as a file, in any format, with this format's settings.
+     */
+    public function download(string $format): StreamedResponse
+    {
+        $format = in_array($format, ['svg', 'png', 'jpeg', 'webp'], true) ? $format : 'svg';
+
+        return $this->output($this->code(), $format)->download("qr-code.{$format}");
+    }
+
+    private function output(PendingQr $code, string $format): Rendered
+    {
+        return match ($format) {
+            'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
+            'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
+        };
     }
 
     private function code(): PendingQr

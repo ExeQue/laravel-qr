@@ -258,6 +258,12 @@
                     <span class="{{ str_starts_with($scans, 'scans') ? 'good' : 'bad' }}">{{ $scans }}</span>
                 @endif
             </div>
+            <div class="downloads">
+                <span>Download</span>
+                @foreach (['svg' => 'SVG', 'png' => 'PNG', 'jpeg' => 'JPEG', 'webp' => 'WebP'] as $type => $label)
+                    <button type="button" wire:click="download('{{ $type }}')">{{ $label }}</button>
+                @endforeach
+            </div>
             @if ($php)
                 <x-pg.code :php="$php" />
             @endif
