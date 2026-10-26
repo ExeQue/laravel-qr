@@ -1,4 +1,4 @@
-<p align="center"><img src="./art/cover.jpg" alt="Laravel QR - styled, scannable, beautiful QR codes for Laravel, and a reader to scan them back" width="100%"></p>
+<p align="center"><img src="./art/cover.jpg" alt="Laravel QR - customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back" width="100%"></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/exeque/laravel-qr"><img src="https://img.shields.io/packagist/v/exeque/laravel-qr" alt="Latest version"></a>
@@ -14,7 +14,13 @@
 
 **Documentation: [exeque.github.io/laravel-qr](https://exeque.github.io/laravel-qr/)**
 
-QR codes for Laravel: styled, scannable, cached, and read back.
+Customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back.
+
+| 30 | 14 | 20 | 17 | 15 | 5 |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| module shapes | outer eyes | inner eyes | eye presets | filters | gradients |
+
+Scan guards check that every styled code stays readable, and say what they changed.
 
 ```php
 use ExeQue\Qr\Facades\Qr;
@@ -62,7 +68,27 @@ place of any of the package's services. See [Extending](docs/extending.md).
 composer require exeque/laravel-qr
 ```
 
-PHP 8.5 and Laravel 13. SVG needs nothing more; PNG, JPEG and WebP need the Imagick extension.
+PHP 8.5 and Laravel 13. SVG needs nothing more.
+
+To read codes with zxing, the most capable reader, install `zxing-wasm` with your package manager (found from your
+lock file, or asked):
+
+```bash
+php artisan qr:install
+```
+
+### Recommended
+
+- **The Imagick extension**, for PNG, JPEG and WebP output, raster logos, and the package's own reader. Built for
+  ImageMagick 7; ImageMagick 6 works too.
+- **ImageMagick's SVG support** (librsvg, such as `imagemagick-svg` on Alpine), to put SVG logos on PNG, JPEG and
+  WebP codes.
+- **Node.js with `zxing-wasm`**, through `php artisan qr:install`, to read codes with zxing; add `--svg` to read SVG
+  images too.
+- [`enshrined/svg-sanitize`](https://github.com/darylldoyle/svg-sanitizer), to sanitize SVG logos with a dedicated
+  sanitizer instead of the package's own allowlist.
+- [`exeque/laravel-monocle`](https://github.com/ExeQue/laravel-monocle), to see the codes each request rendered, with
+  timings and advice.
 
 ## Documentation
 
