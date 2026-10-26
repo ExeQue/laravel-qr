@@ -87,7 +87,7 @@ Shown inside the square outer eye.
 | `sparkle` | `InnerEyes\Sparkle` | — a full four-pointed sparkle |
 | `clover` | `InnerEyes\Clover` | — |
 | `cross` | `InnerEyes\Cross` | — a plus with broad bars |
-| `pill` | `InnerEyes\Pill` | — standing up |
+| `pill` | `InnerEyes\Pill` | `vertical` true: standing up, or lying down |
 | `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
 
 The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
@@ -130,22 +130,21 @@ still measures about three modules.
 
 `Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
 
-## Mirrored
+## Turned to point out
 
-Eyes are drawn as they are on every corner. Shapes with one distinct corner - `round-corner`, `soft-round-corner`,
-`heart` - look best turned so that corner points out of the code on all three eyes. `mirrored()` turns the top-right
-eye a quarter clockwise and the bottom-left a quarter back:
+Eye parts whose corners differ - `round-corner`, `soft-round-corner`, `drop`, `leaf`, `heart`, and rounded shapes of
+your own with uneven corners - turn by themselves on each corner, so their distinct corner points out of the code on
+all three eyes: the top-right a quarter clockwise, the bottom-left a quarter back.
 
-| | |
-|---|---|
-| ![As drawn](images/eyes/round-corner-plain.png) | ![Mirrored](images/eyes/round-corner-mirrored.png) |
-| as drawn | `->mirrored()` |
+![Turned on each corner](images/eyes/round-corner-mirrored.png)
+
+`mirrored()` turns every other eye part the same way, for shapes of your own that should point out too:
 
 ```php
-Qr::url($url)->eyes(Eye::RoundCorner)->mirrored();
+Qr::url($url)->eyes('my-arrow')->mirrored();
 ```
 
-Symmetric eyes look the same either way.
+A shape of your own turns by itself when it implements `Shapes\Contracts\Directional` and says it is.
 
 ## One corner at a time
 
