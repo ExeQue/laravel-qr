@@ -59,7 +59,7 @@ final readonly class Resolve
      */
     public function module(ModuleShape|ProvidesQrModule|string $module, array $options = []): ModuleShape
     {
-        return $this->resolve($module, $options, ModuleShape::class, fn (object $value): ?ModuleShape => $value instanceof ProvidesQrModule ? $value->qrModule() : null, $this->modules->has(...), $this->modules->get(...), 'a module shape');
+        return $this->resolve($module, $options, ModuleShape::class, ProvidesQrModule::class, fn (object $value): ?ModuleShape => $value instanceof ProvidesQrModule ? $value->qrModule() : null, $this->modules->has(...), $this->modules->get(...), 'a module shape');
     }
 
     /**
@@ -67,7 +67,7 @@ final readonly class Resolve
      */
     public function outerEye(OuterEyeShape|ProvidesQrOuterEye|string $eye, array $options = []): OuterEyeShape
     {
-        return $this->resolve($eye, $options, OuterEyeShape::class, fn (object $value): ?OuterEyeShape => $value instanceof ProvidesQrOuterEye ? $value->qrOuterEye() : null, $this->outerEyes->has(...), $this->outerEyes->get(...), 'an outer eye');
+        return $this->resolve($eye, $options, OuterEyeShape::class, ProvidesQrOuterEye::class, fn (object $value): ?OuterEyeShape => $value instanceof ProvidesQrOuterEye ? $value->qrOuterEye() : null, $this->outerEyes->has(...), $this->outerEyes->get(...), 'an outer eye');
     }
 
     /**
@@ -75,7 +75,7 @@ final readonly class Resolve
      */
     public function innerEye(InnerEyeShape|ProvidesQrInnerEye|string $eye, array $options = []): InnerEyeShape
     {
-        return $this->resolve($eye, $options, InnerEyeShape::class, fn (object $value): ?InnerEyeShape => $value instanceof ProvidesQrInnerEye ? $value->qrInnerEye() : null, $this->innerEyes->has(...), $this->innerEyes->get(...), 'an inner eye');
+        return $this->resolve($eye, $options, InnerEyeShape::class, ProvidesQrInnerEye::class, fn (object $value): ?InnerEyeShape => $value instanceof ProvidesQrInnerEye ? $value->qrInnerEye() : null, $this->innerEyes->has(...), $this->innerEyes->get(...), 'an inner eye');
     }
 
     /**
@@ -83,7 +83,7 @@ final readonly class Resolve
      */
     public function eye(ProvidesQrEye|string $eye): ProvidesQrEye
     {
-        return $this->resolve($eye, [], ProvidesQrEye::class, fn (object $value): null => null, $this->eyes->has(...), $this->eyes->get(...), 'a whole eye (outer and inner)');
+        return $this->resolve($eye, [], ProvidesQrEye::class, ProvidesQrEye::class, fn (object $value): null => null, $this->eyes->has(...), $this->eyes->get(...), 'a whole eye (outer and inner)');
     }
 
     /**
@@ -100,7 +100,7 @@ final readonly class Resolve
             return new ClosureFilter($filter, $name);
         }
 
-        $resolved = $this->resolve($filter, $options, NamedFilter::class, fn (object $value): ?NamedFilter => $value instanceof ProvidesQrFilter ? $value->qrFilter() : null, $this->filters->has(...), $this->filters->get(...), 'a filter');
+        $resolved = $this->resolve($filter, $options, NamedFilter::class, ProvidesQrFilter::class, fn (object $value): ?NamedFilter => $value instanceof ProvidesQrFilter ? $value->qrFilter() : null, $this->filters->has(...), $this->filters->get(...), 'a filter');
 
         return $resolved instanceof ModuleFilter || $resolved instanceof EyeFilter
             ? $resolved
@@ -109,7 +109,7 @@ final readonly class Resolve
 
     public function style(Style|ProvidesQrStyle|string $style): Style
     {
-        return $this->resolve($style, [], Style::class, fn (object $value): ?Style => $value instanceof ProvidesQrStyle ? $value->qrStyle() : null, $this->styles->has(...), $this->styles->get(...), 'a style');
+        return $this->resolve($style, [], Style::class, ProvidesQrStyle::class, fn (object $value): ?Style => $value instanceof ProvidesQrStyle ? $value->qrStyle() : null, $this->styles->has(...), $this->styles->get(...), 'a style');
     }
 
     /**
@@ -117,13 +117,14 @@ final readonly class Resolve
      *
      * @param array<array-key, mixed> $options
      * @param class-string<T> $contract
+     * @param class-string $provider What can give a `$contract`; only these and `$contract` are built from a class name.
      * @param Closure(object): (T|null) $provide
      * @param Closure(string): bool $has
      * @param Closure(string, array<string, mixed>): T $get
      *
      * @return T
      */
-    private function resolve(mixed $value, array $options, string $contract, Closure $provide, Closure $has, Closure $get, string $expected): object
+    private function resolve(mixed $value, array $options, string $contract, string $provider, Closure $provide, Closure $has, Closure $get, string $expected): object
     {
         if ($value instanceof $contract) {
             return $value;
@@ -138,8 +139,8 @@ final readonly class Resolve
             return $provide($value) ?? throw ResolveException::cannot($value, $expected);
         }
 
-        if (is_string($value) && class_exists($value)) {
-            return $this->resolve($this->factory->make($value, $options), [], $contract, $provide, $has, $get, $expected);
+        if (is_string($value) && (is_a($value, $contract, true) || is_a($value, $provider, true))) {
+            return $this->resolve($this->factory->make($value, $options), [], $contract, $provider, $provide, $has, $get, $expected);
         }
 
         if (is_string($value) && $has($value)) {

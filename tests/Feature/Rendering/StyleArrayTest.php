@@ -189,6 +189,14 @@ describe('invalid input', function (): void {
         Style::fromArray(['logo' => ['hash' => 'abc', 'size' => 0.2]]);
     })->throws(InvalidStyleException::class, 'A stored logo has no source to read it from');
 
+    it('builds no class from a stored name that is not a shape', function (): void {
+        \Tests\Fixtures\ConstructionSpy::$built = 0;
+
+        expect(fn () => Style::fromArray(['modules' => ['shape' => \Tests\Fixtures\ConstructionSpy::class]]))
+            ->toThrow(InvalidStyleException::class, 'A stored shape cannot be read')
+            ->and(\Tests\Fixtures\ConstructionSpy::$built)->toBe(0);
+    });
+
     it('refuses what it cannot read', function (array $data, string $exception, string $message): void {
         expect(fn () => Style::fromArray($data))->toThrow($exception, $message);
     })->with([

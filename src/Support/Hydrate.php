@@ -90,7 +90,8 @@ final class Hydrate
 
         $made = match (true) {
             is_object($shape) => $shape,
-            is_string($class) && class_exists($class) => app(Factory::class)->make($class, $options),
+            // Only a class that is a shape is built from its name: stored styles can come from anywhere.
+            is_string($class) && is_a($class, $contract, true) => app(Factory::class)->make($class, $options),
             is_string($class) => self::named($class, $options, $contract),
             default => null,
         };
