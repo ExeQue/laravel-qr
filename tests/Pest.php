@@ -79,3 +79,90 @@ expect()->extend('toDecodeAs', function (string $content): Pest\Expectation {
 
     return $this;
 });
+
+/**
+ * The longest content of `$mode` that fits `$version` - every block full.
+ */
+function fullContent(\ExeQue\Qr\Encoder\Enums\Mode $mode, int $version, \ExeQue\Qr\Encoder\Enums\ErrorCorrection $level): string
+{
+    $bits = \ExeQue\Qr\Encoder\Tables::dataCodewords($version, $level) * 8 - 4 - $mode->countBits($version);
+    $rest = $bits % match ($mode) {
+        \ExeQue\Qr\Encoder\Enums\Mode::Numeric => 10,
+        \ExeQue\Qr\Encoder\Enums\Mode::Alphanumeric => 11,
+        \ExeQue\Qr\Encoder\Enums\Mode::Byte => 8,
+    };
+
+    // Numeric packs three digits in 10 bits, alphanumeric two characters in 11, byte one in 8;
+    // a last group of fewer characters takes fewer bits.
+    $characters = match ($mode) {
+        \ExeQue\Qr\Encoder\Enums\Mode::Numeric => intdiv($bits, 10) * 3 + ($rest >= 7 ? 2 : ($rest >= 4 ? 1 : 0)),
+        \ExeQue\Qr\Encoder\Enums\Mode::Alphanumeric => intdiv($bits, 11) * 2 + ($rest >= 6 ? 1 : 0),
+        \ExeQue\Qr\Encoder\Enums\Mode::Byte => intdiv($bits, 8),
+    };
+
+    $alphabet = match ($mode) {
+        \ExeQue\Qr\Encoder\Enums\Mode::Numeric => '0123456789',
+        \ExeQue\Qr\Encoder\Enums\Mode::Alphanumeric => '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:',
+        \ExeQue\Qr\Encoder\Enums\Mode::Byte => 'abcdefghijklmnopqrstuvwxyz0123456789',
+    };
+
+    // Stepping through the alphabet keeps the data from being one long run.
+    $content = '';
+
+    for ($index = 0; $index < $characters; $index++) {
+        $content .= $alphabet[($index * 7 + $version) % strlen($alphabet)];
+    }
+
+    return $content;
+}
+
+const SCAN_CONTENTS = [
+    'url' => 'https://example.com/e/ABCD1234',
+    'wifi' => 'WIFI:T:WPA;S:Home;P:correct horse battery;;',
+];
+
+/**
+ * Every built-in shape of a kind ('modules', 'outer-eyes', 'inner-eyes' or 'eyes'), eye presets mirrored too.
+ *
+ * @return iterable<string, array{string, BackedEnum, bool}>
+ */
+function scanCases(string $kind): iterable
+{
+    $cases = [
+        'modules' => \ExeQue\Qr\Shapes\Enums\Module::cases(),
+        'outer-eyes' => \ExeQue\Qr\Shapes\Enums\OuterEye::cases(),
+        'inner-eyes' => \ExeQue\Qr\Shapes\Enums\InnerEye::cases(),
+        'eyes' => \ExeQue\Qr\Shapes\Enums\Eye::cases(),
+    ][$kind];
+
+    foreach ($cases as $case) {
+        yield "{$kind} {$case->value}" => [$kind, $case, false];
+
+        if ($kind === 'eyes') {
+            yield "{$kind} {$case->value} mirrored" => [$kind, $case, true];
+        }
+    }
+}
+
+/**
+ * Checks that a shape scans, as SVG and as a 600 pixel PNG, holding a link and a Wi-Fi login - but
+ * where tests/Support/scan-baselines.php lists it as not scanning, and there that it still does not.
+ */
+function expectScansAsBaselineSays(string $kind, BackedEnum $shape, bool $mirrored): void
+{
+    $known = (require __DIR__.'/Support/scan-baselines.php')[$kind][$shape->value] ?? [];
+    $method = ['modules' => 'modules', 'outer-eyes' => 'outer', 'inner-eyes' => 'inner', 'eyes' => 'eyes'][$kind];
+
+    foreach (SCAN_CONTENTS as $name => $content) {
+        $code = \ExeQue\Qr\Facades\Qr::make($content)->{$method}($shape)->when($mirrored)->mirrored();
+
+        foreach (['svg' => $code->svg(), 'png' => $code->png(600)] as $format => $rendered) {
+            $scans = Decoder::instance()->decode($rendered) === $content;
+            $case = $mirrored ? "{$name}:{$format}:mirrored" : "{$name}:{$format}";
+
+            expect($scans)->toBe(! in_array($case, $known, true), $scans
+                ? "{$kind} {$shape->value} now scans ({$case}): take it off the baseline."
+                : "{$kind} {$shape->value} does not scan ({$case}).");
+        }
+    }
+}

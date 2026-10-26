@@ -28,6 +28,7 @@ final readonly class Knockout
 
     private const float AUTO_MIN = 0.05;
 
+
     // A centered logo shrinks by this much at a time while it covers a function pattern.
     private const float SHRINK = 0.95;
 
@@ -55,6 +56,14 @@ final readonly class Knockout
             $style = $style->withSize(max(self::AUTO_MIN, min(self::AUTO_MAX, self::maxSize($matrix, $style, $maxShare))));
         }
 
+        return self::fit($matrix, $style);
+    }
+
+    /**
+     * The logo placed, a centered one shrunk until it covers no function pattern.
+     */
+    private static function fit(Matrix $matrix, LogoStyle $style): self
+    {
         while (true) {
             $knockout = self::place($matrix, $style);
 
@@ -81,7 +90,7 @@ final readonly class Knockout
         // A size shrunk to fit clear of the function patterns is what counts, so compare with that.
         for ($step = 0; $step < 20; $step++) {
             $size = ($low + $high) / 2;
-            $knockout = self::for($matrix, $style->withSize($size));
+            $knockout = self::fit($matrix, $style->withSize($size));
 
             $knockout->clearedDataCells <= self::budget($matrix, $maxShare) && (float) $knockout->style->size >= $size * 0.999
                 ? $low = $size
@@ -121,28 +130,43 @@ final readonly class Knockout
         $width = (float) $style->size * $matrix->size;
         $height = $width / $style->logo->aspectRatio();
         [$x, $y] = $style->position ?? [($matrix->size - $width) / 2, ($matrix->size - $height) / 2];
-        $padding = $style->padding;
+        $box = [$x, $y, $width, $height];
 
-        $area = match ($style->shape) {
-            LogoShape::Circle => Region::circle($x + $width / 2, $y + $height / 2, max($width, $height) / 2 + $padding),
-            LogoShape::Rounded => Region::rounded($x - $padding, $y - $padding, $width + 2 * $padding, $height + 2 * $padding, min($width, $height) / 4 + $padding),
-            LogoShape::Alpha => self::visibleCells($matrix, $style, [$x, $y, $width, $height]),
-            LogoShape::Square => Region::rect($x - $padding, $y - $padding, $width + 2 * $padding, $height + 2 * $padding),
-        };
+        // The plate fills the padding; the modules clear half a module further, as a module stays
+        // when its middle is outside: so none comes nearer the logo than the padding.
+        $area = self::area($matrix, $style, $box, $style->padding);
+        $clear = $style->shape === LogoShape::Alpha ? $area : self::area($matrix, $style, $box, $style->padding + 0.5);
 
         $cleared = [];
         $data = 0;
 
         for ($row = 0; $row < $matrix->size; $row++) {
             for ($column = 0; $column < $matrix->size; $column++) {
-                if ($area->contains($column + 0.5, $row + 0.5)) {
+                if ($clear->contains($column + 0.5, $row + 0.5)) {
                     $cleared["{$column},{$row}"] = true;
                     $data += $matrix->role($column, $row) === Role::Data ? 1 : 0;
                 }
             }
         }
 
-        return new self($style, [$x, $y, $width, $height], $area, $cleared, $data);
+        return new self($style, $box, $area, $cleared, $data);
+    }
+
+    /**
+     * The logo's box grown by `$padding` modules, in the logo's shape.
+     *
+     * @param array{float, float, float, float} $box
+     */
+    private static function area(Matrix $matrix, LogoStyle $style, array $box, float $padding): Region
+    {
+        [$x, $y, $width, $height] = $box;
+
+        return match ($style->shape) {
+            LogoShape::Circle => Region::circle($x + $width / 2, $y + $height / 2, max($width, $height) / 2 + $padding),
+            LogoShape::Rounded => Region::rounded($x - $padding, $y - $padding, $width + 2 * $padding, $height + 2 * $padding, min($width, $height) / 4 + $padding),
+            LogoShape::Alpha => self::visibleCells($matrix, $style, $box),
+            LogoShape::Square => Region::rect($x - $padding, $y - $padding, $width + 2 * $padding, $height + 2 * $padding),
+        };
     }
 
     /**

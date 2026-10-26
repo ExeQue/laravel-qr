@@ -302,6 +302,25 @@ describe('an automatic size', function (): void {
             ->and(\ExeQue\Qr\Facades\Qr::read($code->png(500)->contents())->text)->toBe('https://example.com/e/ABCD1234');
     })->with(['square', 'wide', 'round'])->with(['square', 'rounded', 'circle', 'alpha']);
 
+    it('keeps no module nearer the logo than its padding', function (float|string $size, int $padding): void {
+        $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('H')
+            ->logo(fixture('ellipse.png'), size: $size, padding: $padding);
+        $knockout = \ExeQue\Qr\Logos\Knockout::for($code->matrix(), $code->scene()->logo->style);
+        [$x, $y, $width, $height] = $knockout->box;
+        $closest = INF;
+
+        for ($row = 0; $row < $code->matrix()->size; $row++) {
+            for ($column = 0; $column < $code->matrix()->size; $column++) {
+                if (! $knockout->clears($column, $row)) {
+                    // How far the module's square is from the logo's box, across or down.
+                    $closest = min($closest, max($x - ($column + 1), $column - ($x + $width), $y - ($row + 1), $row - ($y + $height)));
+                }
+            }
+        }
+
+        expect($closest)->toBeGreaterThanOrEqual($padding - 1e-9);
+    })->with(['auto', 0.17, 0.19, 0.23])->with([0, 1, 2]);
+
     it('keeps the code readable, and is stored as auto', function (): void {
         $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('Q')
             ->logo(fn (\ExeQue\Qr\Builders\LogoBuilder $logo) => $logo->from(fixture('ellipse.png'))->size('auto'));

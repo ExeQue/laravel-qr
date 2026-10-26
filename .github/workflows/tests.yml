@@ -73,17 +73,11 @@ jobs:
         run: composer analyse
 
   # ImageMagick 6, as Ubuntu and Debian ship it: the package must work there too.
-  # The suite runs in shards, balanced by the timings in tests/.pest/shards.json (vendor/bin/pest
-  # --update-shards refreshes them): three here, five where coverage, which triples the time, is measured.
   imagemagick-6:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3]
 
-    name: PHP 8.5 - ImageMagick 6 (${{ matrix.shard }}/3)
+    name: PHP 8.5 - ImageMagick 6
 
     steps:
       - name: Checkout code
@@ -126,19 +120,15 @@ jobs:
         run: npm ci
 
       - name: Execute tests
-        run: vendor/bin/pest -p --ci --shard=${{ matrix.shard }}/3
+        run: vendor/bin/pest -p --ci
 
   # ImageMagick 7, the primary target, as Alpine ships it; coverage is measured here.
   imagemagick-7:
     runs-on: ubuntu-latest
     container: php:8.5-cli-alpine
 
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4, 5]
 
-    name: PHP 8.5 - ImageMagick 7 (${{ matrix.shard }}/5)
+    name: PHP 8.5 - ImageMagick 7
 
     steps:
       # tar and zstd for actions/cache; the libraries the compiled extensions link against.
@@ -180,34 +170,47 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Execute tests with coverage
-        run: vendor/bin/pest -p --ci --shard=${{ matrix.shard }}/5 --coverage-php coverage/shard-${{ matrix.shard }}.cov
+      - name: Execute tests
+        run: vendor/bin/pest -p --ci
 
-      - name: Keep the coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-${{ matrix.shard }}
-          path: coverage/
-          retention-days: 1
-
-  # The shards' coverage together, in the same container so the paths in it match.
+  # Coverage on its own, once the suite passes on both ImageMagick versions.
   coverage:
-    needs: imagemagick-7
+    needs: [imagemagick-6, imagemagick-7]
     runs-on: ubuntu-latest
     container: php:8.5-cli-alpine
+
 
     name: Coverage
 
     steps:
+      # tar and zstd for actions/cache; the libraries the compiled extensions link against.
       - name: Install system packages
-        run: apk add --no-cache git
+        run: |
+          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-heic imagemagick-libs icu-libs libzip libpng libjpeg-turbo libwebp libavif libxpm freetype libgomp
+          echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
 
-      - name: Install Composer
+      # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.
+      - name: Cache PHP extensions
+        id: extensions
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/php/extensions
+            /usr/local/etc/php/conf.d
+            /usr/local/bin/composer
+          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v1
+
+      - name: Install PHP extensions
+        if: steps.extensions.outputs.cache-hit != 'true'
         run: |
           wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
           chmod +x /usr/local/bin/install-php-extensions
-          install-php-extensions @composer
+          install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
+          # The image has no php.ini, so PHP keeps its 128 MB default; setup-php lifts it as well.
           echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
+
+      - name: Check PHP extensions
+        run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { if (! extension_loaded($e)) { fwrite(STDERR, "missing {$e}\n"); exit(1); } } echo Imagick::getVersion()["versionString"], PHP_EOL;'
 
       - name: Checkout code
         uses: actions/checkout@v5
@@ -215,16 +218,10 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-stable --prefer-dist --no-interaction
 
-      - name: Collect the shards' coverage
-        uses: actions/download-artifact@v4
-        with:
-          pattern: coverage-*
-          path: coverage/
-          merge-multiple: true
+      # zxing-cpp decodes the codes in the scan tests.
+      - name: Install Node dependencies
+        run: npm ci
 
       # Fails the build when line coverage drops below 100 %.
-      - name: Check coverage
-        run: |
-          vendor/bin/phpcov merge --text coverage.txt coverage
-          head -n 12 coverage.txt
-          grep -m 1 'Lines:' coverage.txt | grep -q '100.00%'
+      - name: Execute tests with coverage
+        run: vendor/bin/pest -p --ci --coverage --min=100

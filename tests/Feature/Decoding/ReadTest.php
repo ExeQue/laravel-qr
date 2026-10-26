@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Decoding;
 
-use BackedEnum;
 use Closure;
 use ExeQue\Qr\Decoding\Native\Bitmap;
 use ExeQue\Qr\Decoding\Native\FinderLocator;
@@ -15,10 +14,6 @@ use ExeQue\Qr\Decoding\NativeDecoder;
 use ExeQue\Qr\Exceptions\UnreadableCodeException;
 use ExeQue\Qr\Facades\Qr;
 use ExeQue\Qr\Gradients\LinearGradient;
-use ExeQue\Qr\Shapes\Enums\Eye;
-use ExeQue\Qr\Shapes\Enums\InnerEye;
-use ExeQue\Qr\Shapes\Enums\Module;
-use ExeQue\Qr\Shapes\Enums\OuterEye;
 use Illuminate\Http\UploadedFile;
 use Imagick;
 use ImagickDraw;
@@ -55,26 +50,8 @@ function hugeGif(): string
     return 'GIF89a'.pack('vv', 60000, 60000)."\x00\x00\x00".','.pack('vvvv', 0, 0, 60000, 60000)."\x00\x02\x02\x44\x01\x00;";
 }
 
-/**
- * @return iterable<string, array{string, BackedEnum}>
- */
-function everyShape(): iterable
-{
-    foreach (['modules' => Module::cases(), 'outer' => OuterEye::cases(), 'inner' => InnerEye::cases(), 'eyes' => Eye::cases()] as $method => $cases) {
-        foreach ($cases as $case) {
-            yield "{$method} {$case->value}" => [$method, $case];
-        }
-    }
-}
 
 describe('images', function (): void {
-    it('reads every built-in shape', function (string $method, BackedEnum $shape): void {
-        $decoded = new NativeDecoder()->decode(Qr::make(READ_URL)->{$method}($shape)->png(600)->contents());
-
-        expect($decoded->text)->toBe(READ_URL)
-            ->and($decoded->version)->toBe(3);
-    })->with(everyShape(...));
-
     it('says when there is no code to read', function (Closure $image, string $message): void {
         expect(fn () => new NativeDecoder()->decode($image()))->toThrow(UnreadableCodeException::class, $message);
     })->with([

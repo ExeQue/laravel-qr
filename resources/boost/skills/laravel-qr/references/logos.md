@@ -49,7 +49,7 @@ Logos are read from files, disks, bytes and data URIs only.
 | Option | Default | |
 |---|---|---|
 | `size` | 0.2 | the logo's width as a share of the code's, or `'auto'` |
-| `padding` | 1 | modules of clear space round it |
+| `padding` | 1 | modules of clear space round it: no module comes nearer the logo than this |
 | `shape` | `square` | the cleared area: `square`, `rounded`, `circle`, or `alpha` (only under the logo's visible pixels) |
 | `plate` | none | a backing behind the logo and its padding: any color or gradient |
 | `plateRadius` | 0 | the plate's corner radius, in modules |

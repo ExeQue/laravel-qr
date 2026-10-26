@@ -10,4 +10,3 @@ node_modules/
 .vitepress/dist/
 .vitepress/cache/
 /build/
-/coverage/
