@@ -33,7 +33,7 @@ use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Imagick;
 use ImagickPixel;
 
-covers(MissingExtensionException::class, \ExeQue\Qr\Rendering\Guard::class, Style::class, Logo::class, LogoStyle::class, LogoShape::class, Knockout::class, LogoLayer::class, Region::class, Renderer::class, Scene::class, SvgWriter::class, RasterWriter::class, InvalidLogoException::class, ScanSafetyException::class);
+covers(\ExeQue\Qr\Builders\LogoBuilder::class, MissingExtensionException::class, \ExeQue\Qr\Rendering\Guard::class, Style::class, Logo::class, LogoStyle::class, LogoShape::class, Knockout::class, LogoLayer::class, Region::class, Renderer::class, Scene::class, SvgWriter::class, RasterWriter::class, InvalidLogoException::class, ScanSafetyException::class);
 
 const LOGO_URL = 'https://example.com/e/ABCD1234';
 
