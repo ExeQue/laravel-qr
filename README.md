@@ -1,3 +1,15 @@
+<p align="center"><img src="./art/cover.jpg" alt="Laravel QR - styled, scannable QR codes for Laravel, and a reader to scan them back" width="100%"></p>
+
+<p align="center">
+<a href="https://packagist.org/packages/exeque/laravel-qr"><img src="https://img.shields.io/packagist/v/exeque/laravel-qr" alt="Latest version"></a>
+<a href="https://packagist.org/packages/exeque/laravel-qr"><img src="https://img.shields.io/packagist/dt/exeque/laravel-qr" alt="Total downloads"></a>
+<a href="https://github.com/ExeQue/laravel-qr/actions/workflows/tests.yml"><img src="https://github.com/ExeQue/laravel-qr/actions/workflows/tests.yml/badge.svg?branch=main" alt="Tests"></a>
+<a href="https://github.com/ExeQue/laravel-qr/actions/workflows/docs.yml"><img src="https://github.com/ExeQue/laravel-qr/actions/workflows/docs.yml/badge.svg?branch=main" alt="Documentation"></a>
+<img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FExeQue%2Flaravel-qr%2Fmain%2Fcomposer.json&query=%24.require.php&label=php&color=777bb4" alt="PHP version">
+<img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FExeQue%2Flaravel-qr%2Fmain%2Fcomposer.json&query=%24.require%5B%22laravel%2Fframework%22%5D&label=laravel&color=ff2d20" alt="Laravel version">
+<a href="LICENSE.md"><img src="https://img.shields.io/github/license/ExeQue/laravel-qr" alt="License"></a>
+</p>
+
 # Laravel QR
 
 **Documentation: [exeque.github.io/laravel-qr](https://exeque.github.io/laravel-qr/)**
@@ -36,6 +48,13 @@ Qr::url('https://example.com/e/ABCD1234')
 - **Caching**, a **testing fake**, **events**, a **Monocle** lens, and **artisan** commands.
 
 Every built-in shape is checked with a real decoder, as SVG and as PNG.
+
+## Make it yours
+
+Nearly everything is open to change. Register your own module shapes, eyes, filters, gradients, content types,
+writers and decoders by name, and use them like the built-in ones; name whole styles in config and apply them with
+`->style('brand')`; turn any shape's options, from corner radii to the way a drop points; or bind your own class in
+place of any of the package's services. See [Extending](docs/extending.md).
 
 ## Install
 

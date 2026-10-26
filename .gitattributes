@@ -23,3 +23,4 @@
 /package-lock.json      export-ignore
 /.nvmrc                 export-ignore
 /CONTRIBUTING.md        export-ignore
+/art                    export-ignore
