@@ -139,6 +139,8 @@ jobs:
           wget -q -O /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
           chmod +x /usr/local/bin/install-php-extensions
           install-php-extensions imagick intl zip gd bcmath exif pcntl pcov @composer
+          # The image has no php.ini, so PHP keeps its 128 MB default; setup-php lifts it as well.
+          echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
 
       - name: Checkout code
         uses: actions/checkout@v5
