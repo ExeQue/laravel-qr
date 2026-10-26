@@ -83,6 +83,15 @@
         .notice ul { margin: 4px 0 0; padding-left: 18px; }
 
         .layer { display: grid; gap: 8px; border: 1px dashed var(--line); border-radius: 8px; padding: 8px; }
+        .field { color: var(--muted); font-size: 13px; }
+        .shapes { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
+        .shape { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid var(--line); border-radius: 8px; padding: 6px; cursor: pointer; color: inherit; position: relative; }
+        .shape:hover { border-color: var(--muted); }
+        .shape:has(input:checked) { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+        .shape:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .shape input { position: absolute; opacity: 0; pointer-events: none; }
+        .shape svg { width: 100%; height: 100%; display: block; }
+        .shape-blank { font-size: 11px; text-align: center; line-height: 1.1; }
         .layer > summary { display: flex; justify-content: space-between; align-items: center; margin: 0; }
         .layer > summary .hint { font-weight: 400; margin-left: 6px; }
         label.range > span { display: flex; justify-content: space-between; }

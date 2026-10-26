@@ -19,11 +19,8 @@
 
         <details open wire:ignore.self>
             <summary>Modules</summary>
-            <label>Shape
-                <select wire:model.live="module">
-                    @foreach ($moduleNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                </select>
-            </label>
+            <span class="field">Shape <span class="hint">{{ $module }}</span></span>
+            <x-pg.shapes kind="module" :names="$moduleNames" model="module" />
             <x-pg.options :options="$moduleOptions" path="moduleOptions" :choices="$moduleChoices" />
             <h4>Paint</h4>
             <x-pg.paint :spec="$paint" path="paint" />
@@ -44,23 +41,14 @@
                 <label class="inline"><input type="radio" value="parts" wire:model.live="eyeMode"> Outer and inner</label>
             </div>
             @if ($eyeMode === 'preset')
-                <label>Preset
-                    <select wire:model.live="eye">
-                        @foreach ($eyeNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                    </select>
-                </label>
+                <span class="field">Preset <span class="hint">{{ $eye }}</span></span>
+                <x-pg.shapes kind="eye" :names="$eyeNames" model="eye" />
             @else
-                <label>Outer
-                    <select wire:model.live="outer">
-                        @foreach ($outerNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                    </select>
-                </label>
+                <span class="field">Outer <span class="hint">{{ $outer }}</span></span>
+                <x-pg.shapes kind="outer" :names="$outerNames" model="outer" />
                 <x-pg.options :options="$outerOptions" path="outerOptions" :choices="$outerChoices" />
-                <label>Inner
-                    <select wire:model.live="inner">
-                        @foreach ($innerNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                    </select>
-                </label>
+                <span class="field">Inner <span class="hint">{{ $inner }}</span></span>
+                <x-pg.shapes kind="inner" :names="$innerNames" model="inner" />
                 <x-pg.options :options="$innerOptions" path="innerOptions" :choices="$innerChoices" />
             @endif
             <label class="inline"><input type="checkbox" wire:model.live="mirrored"> Mirrored (top-right and bottom-left turned to point out)</label>
@@ -68,20 +56,10 @@
             @foreach ($corners as $corner => $settings)
                 <details class="layer" wire:ignore.self wire:key="corner-{{ $corner }}">
                     <summary><span>{{ $corner }} <span class="hint">{{ collect([$settings['outer'], $settings['inner'], (float) $settings['rotate'] ? $settings['rotate'].'°' : '', $settings['outerPaint'], $settings['innerPaint']])->filter()->implode(', ') ?: 'as above' }}</span></span></summary>
-                    <div class="row">
-                        <label>Outer
-                            <select wire:model.live="corners.{{ $corner }}.outer">
-                                <option value="">as above</option>
-                                @foreach ($outerNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                            </select>
-                        </label>
-                        <label>Inner
-                            <select wire:model.live="corners.{{ $corner }}.inner">
-                                <option value="">as above</option>
-                                @foreach ($innerNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
-                            </select>
-                        </label>
-                    </div>
+                    <span class="field">Outer <span class="hint">{{ $settings['outer'] ?: 'as above' }}</span></span>
+                    <x-pg.shapes kind="outer" :names="$outerNames" :model="'corners.'.$corner.'.outer'" blank="as above" />
+                    <span class="field">Inner <span class="hint">{{ $settings['inner'] ?: 'as above' }}</span></span>
+                    <x-pg.shapes kind="inner" :names="$innerNames" :model="'corners.'.$corner.'.inner'" blank="as above" />
                     <label>Rotate <input type="number" step="15" wire:model.live.debounce.300ms="corners.{{ $corner }}.rotate"></label>
                     <x-pg.color :path="'corners.'.$corner.'.outerPaint'" label="Outer paint" optional />
                     <x-pg.color :path="'corners.'.$corner.'.innerPaint'" label="Inner paint" optional />
