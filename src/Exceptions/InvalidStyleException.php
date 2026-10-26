@@ -15,7 +15,7 @@ final class InvalidStyleException extends InvalidArgumentException implements Qr
 
     public static function logoWithoutSource(): self
     {
-        return new self('The style has logo settings but no logo: give its image to toStyle() or qrStyle() as logo, or a stored style a path or a data: URI as "source".');
+        return new self('The style has logo settings but no logo: give its image to toStyle() or qrStyle() as logo, or a stored style a path as "file" or a data: URI as "source".');
     }
 
     /**

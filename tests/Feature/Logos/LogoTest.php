@@ -274,8 +274,24 @@ describe('drawing', function (): void {
 });
 
 describe('files', function (): void {
+    it('takes a string as the image itself, never as a path', function (): void {
+        expect(fn () => \ExeQue\Qr\Facades\Qr::style()->logo(fixture('ellipse.png'))->toStyle())
+            ->toThrow(InvalidLogoException::class, 'is not an image: give a file by path with file: or Logo::fromFile()')
+            ->and(\ExeQue\Qr\Facades\Qr::style()->logo(file: fixture('ellipse.png'))->toStyle()->logo?->logo->mimeType)->toBe('image/png')
+            ->and(\ExeQue\Qr\Facades\Qr::style()->logo((string) file_get_contents(fixture('ellipse.png')))->toStyle()->logo?->logo->mimeType)->toBe('image/png')
+            ->and(fn () => \ExeQue\Qr\Facades\Qr::style()->logo(size: 0.2)->toStyle())->toThrow(InvalidLogoException::class, 'The logo has no image');
+    });
+
+    it('reads a stored style\'s logo from its file, or from its source as the image itself', function (): void {
+        $svg = (string) file_get_contents(fixture('badge.svg'));
+
+        expect(\ExeQue\Qr\Rendering\Style::fromArray(['logo' => ['source' => $svg]])->logo?->logo->isSvg())->toBeTrue()
+            ->and(\ExeQue\Qr\Rendering\Style::fromArray(['logo' => ['file' => fixture('badge.svg')]])->logo?->logo->isSvg())->toBeTrue();
+    });
+
     it('reads logos from local files only, never through a URL or stream wrapper', function (string $source): void {
-        expect(fn () => \ExeQue\Qr\Facades\Qr::style()->logo($source)->toStyle())->toThrow(InvalidLogoException::class, 'logos are never fetched from elsewhere')
+        expect(fn () => \ExeQue\Qr\Facades\Qr::style()->logo(file: $source)->toStyle())->toThrow(InvalidLogoException::class, 'logos are never fetched from elsewhere')
+            ->and(fn () => \ExeQue\Qr\Facades\Qr::style()->logo($source)->toStyle())->toThrow(InvalidLogoException::class, 'is not an image')
             ->and(fn () => Logo::fromFile($source))->toThrow(InvalidLogoException::class, 'logos are never fetched from elsewhere');
     })->with(['ftp://example.com/logo.png', 'https://example.com/logo.svg', 'phar://logo.phar/logo.png']);
 
@@ -333,7 +349,7 @@ describe('HEIF and AVIF logos', function (): void {
         expect($logo->mimeType)->toBe('image/png')
             ->and($logo->contents)->toStartWith("\x89PNG")
             ->and([$logo->width, $logo->height])->toBe([(float) getimagesize(fixture('ellipse.png'))[0], (float) getimagesize(fixture('ellipse.png'))[1]])
-            ->and(\ExeQue\Qr\Facades\Qr::make('https://example.com')->logo(fixture($file), size: 0.2)->svg()->contents())->toContain('data:image/png;base64');
+            ->and(\ExeQue\Qr\Facades\Qr::make('https://example.com')->logo(file: fixture($file), size: 0.2)->svg()->contents())->toContain('data:image/png;base64');
     })->with(['ellipse.heic', 'ellipse.avif']);
 
     it('says when one cannot be read', function (): void {
@@ -345,7 +361,7 @@ describe('HEIF and AVIF logos', function (): void {
 describe('an automatic size', function (): void {
     it('grows the logo as far as the error correction can make up for, and no further', function (): void {
         $size = fn (string $level): float => (float) \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')
-            ->errorCorrection($level)->logo(fixture('ellipse.png'), size: 'auto')->scene()->logo->style->size;
+            ->errorCorrection($level)->logo(file: fixture('ellipse.png'), size: 'auto')->scene()->logo->style->size;
 
         expect($size('L'))->toBeLessThan($size('M'))
             ->and($size('M'))->toBeLessThan($size('H'))
@@ -368,7 +384,7 @@ describe('an automatic size', function (): void {
         $source = match ($logo) {
             'square' => $png(false),
             'round' => $png(true),
-            default => fixture('ellipse.png'),
+            default => \ExeQue\Qr\Logos\Logo::fromFile(fixture('ellipse.png')),
         };
         $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('M')->logo($source, size: 'auto', shape: $shape);
         $knockout = \ExeQue\Qr\Logos\Knockout::for($code->matrix(), $code->scene()->logo->style);
@@ -380,7 +396,7 @@ describe('an automatic size', function (): void {
 
     it('keeps no module nearer the logo than its padding', function (float|string $size, int $padding): void {
         $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('H')
-            ->logo(fixture('ellipse.png'), size: $size, padding: $padding);
+            ->logo(file: fixture('ellipse.png'), size: $size, padding: $padding);
         $knockout = \ExeQue\Qr\Logos\Knockout::for($code->matrix(), $code->scene()->logo->style);
         [$x, $y, $width, $height] = $knockout->box;
         $closest = INF;
@@ -399,11 +415,11 @@ describe('an automatic size', function (): void {
 
     it('keeps the code readable, and is stored as auto', function (): void {
         $code = \ExeQue\Qr\Facades\Qr::make('https://example.com/e/ABCD1234')->errorCorrection('Q')
-            ->logo(fn (\ExeQue\Qr\Builders\LogoBuilder $logo) => $logo->from(fixture('ellipse.png'))->size('auto'));
+            ->logo(fn (\ExeQue\Qr\Builders\LogoBuilder $logo) => $logo->file(fixture('ellipse.png'))->size('auto'));
         $style = $code->toStyle();
 
         expect(\ExeQue\Qr\Facades\Qr::read($code->png(500)->contents())->text)->toBe('https://example.com/e/ABCD1234')
             ->and($style->toArray()['logo']['size'])->toBe('auto')
-            ->and(\ExeQue\Qr\Rendering\Style::fromArray([...$style->toArray(), 'logo' => [...$style->toArray()['logo'], 'source' => fixture('ellipse.png')]])->logo->size)->toBeNull();
+            ->and(\ExeQue\Qr\Rendering\Style::fromArray([...$style->toArray(), 'logo' => [...$style->toArray()['logo'], 'file' => fixture('ellipse.png')]])->logo->size)->toBeNull();
     });
 });

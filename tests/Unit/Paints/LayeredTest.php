@@ -72,7 +72,7 @@ describe('the paint', function (): void {
 describe('drawing', function (): void {
     it('draws a path per layer in SVG, bottom first, on the background and the logo plate too', function (): void {
         $svg = Qr::make('layers')->paint(glow())->background(Layered::make('#ffffff')->layer('#fde68a', 0.25))->svg()->contents();
-        $plate = Qr::make('layers')->logo(dirname(__DIR__, 2).'/Fixtures/logos/badge.svg', plate: Layered::make('#ffffff')->layer('#fde68a', 0.4))->svg()->contents();
+        $plate = Qr::make('layers')->logo(file: dirname(__DIR__, 2).'/Fixtures/logos/badge.svg', plate: Layered::make('#ffffff')->layer('#fde68a', 0.4))->svg()->contents();
 
         expect($plate)->toContain('fill-opacity="0.4" fill-rule="nonzero"');
 
@@ -95,7 +95,7 @@ describe('drawing', function (): void {
 
     it('draws every layer in raster images', function (): void {
         $png = Qr::make('layers')->paint(glow())->background(Layered::make('#ffffff')->layer('#fde68a', 0.25))
-            ->logo(dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', size: 0.15, plate: Layered::make('#ffffff')->layer('#fde68a', 0.4))
+            ->logo(file: dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', size: 0.15, plate: Layered::make('#ffffff')->layer('#fde68a', 0.4))
             ->png(200);
 
         expect(Qr::read($png->contents(), 'native')->text)->toBe('layers');

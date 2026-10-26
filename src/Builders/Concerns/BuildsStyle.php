@@ -258,17 +258,19 @@ trait BuildsStyle
     }
 
     /**
-     * A logo over the code: a file (an uploaded one too) or its path, a data: URI, an SVG, raw image
-     * bytes, a Logo or something providing one, with named options (size, padding, shape, plate,
-     * plateRadius, position) - or a closure, given the logo's builder.
+     * A logo over the code: a file (an uploaded one too), a data: URI, an SVG, raw image bytes, a Logo
+     * or something providing one - or a file by path as `file:` - with named options (size, padding,
+     * shape, plate, plateRadius, position); or a closure, given the logo's builder.
      *
-     * @param Logo|ProvidesQrLogo|SplFileInfo|Closure(LogoBuilder): LogoBuilder|string $logo
+     * @param Logo|ProvidesQrLogo|SplFileInfo|Closure(LogoBuilder): LogoBuilder|string|null $logo
      */
-    public function logo(Logo|ProvidesQrLogo|SplFileInfo|Closure|string $logo, mixed ...$options): static
+    public function logo(Logo|ProvidesQrLogo|SplFileInfo|Closure|string|null $logo = null, mixed ...$options): static
     {
-        $builder = $logo instanceof Closure
-            ? $logo(new LogoBuilder())
-            : new LogoBuilder()->from($logo)->with(...$options);
+        $builder = match (true) {
+            $logo instanceof Closure => $logo(new LogoBuilder()),
+            $logo === null => new LogoBuilder()->with(...$options),
+            default => new LogoBuilder()->from($logo)->with(...$options),
+        };
 
         return $this->with(style: $this->style->withLogo($builder->toLogoStyle()));
     }

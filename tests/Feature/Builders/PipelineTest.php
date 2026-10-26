@@ -133,7 +133,7 @@ describe('caching', function (): void {
     });
 
     it('keeps raster output apart by the configured driver', function (): void {
-        $code = Qr::url('https://example.com/driver')->logo(dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', shape: 'alpha');
+        $code = Qr::url('https://example.com/driver')->logo(file: dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png', shape: 'alpha');
 
         config()->set('qr.raster.driver', 'gd');
         $gd = $code->png(200)->contents();

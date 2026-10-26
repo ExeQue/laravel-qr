@@ -190,7 +190,7 @@ describe('drawing', function (): void {
 
     it('spreads a gradient in its own box across the logo plate', function (): void {
         $code = \ExeQue\Qr\Facades\Qr::make(RASTER_URL)->logo(
-            dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png',
+            file: dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png',
             size: 0.2,
             plate: LinearGradient::make('#000000', '#ffffff')->angle(90)->box(GradientBox::Shape),
         );

@@ -17,7 +17,7 @@ read back from an uploaded image. Everything goes through the `ExeQue\Qr\Facades
    are given; never build `WIFI:`, `BEGIN:VCARD` or `mailto:` strings by hand.
 2. **Style it, if asked.** `->modules('dots-medium')`, `->eyes('rounded')`, `->paint('#1e1b4b')`,
    `->background(null)`, `->margin(2)`, `->filter('mixed-rotation', min: -15, max: 15)`,
-   `->logo($path, size: 0.2)`. A paint is a color, a gradient (`LinearGradient::make('#be123c', '#1e1b4b')`) or
+   `->logo(file: $path, size: 0.2)`. A paint is a color, a gradient (`LinearGradient::make('#be123c', '#1e1b4b')`) or
    paints stacked with `Layered::make($bottom)->layer($top, 0.5)`. Prefer a named style (`->style('brand')`) when the application has one; check
    `Qr::styles()->names()` or `config('qr.styles')`.
 3. **End with a format.** `->svg()`, `->png($size)`, `->jpeg($size)` or `->webp($size)`, then `->save($path, $disk)`,

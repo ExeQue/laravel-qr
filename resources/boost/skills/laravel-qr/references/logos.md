@@ -4,13 +4,13 @@ A logo sits in the middle of the code, on the modules it clears. The code's erro
 hides, so a code with a logo is raised to error correction `H` unless you set a level yourself.
 
 ```php
-Qr::url($url)->logo(storage_path('app/brand/logo.svg'), size: 0.22);
+Qr::url($url)->logo(file: storage_path('app/brand/logo.svg'), size: 0.22);
 ```
 
 ## Where the image comes from
 
 ```php
-->logo('/path/to/logo.png')                 // a file
+->logo(file: '/path/to/logo.png')           // a file, by its path
 ->logo($request->file('logo'))              // an uploaded file, or any SplFileInfo
 ->logo($bytes)                               // PNG, JPEG, WebP, GIF (its first frame), HEIC, HEIF, AVIF or SVG bytes
 ->logo('<svg xmlns="http://www.w3.org/2000/svg">...</svg>')
@@ -45,9 +45,10 @@ class Team extends Model implements ProvidesQrLogo
 
 Logos are read from files, disks, bytes and data URIs only.
 
-A string that names a file is read from disk, and so is a stored style's logo `source` given to `Style::fromArray()`.
-Give a user's logo as the uploaded file or its contents, never as a path taken from a request, and take style input
-through [StyleRule](https://exeque.github.io/laravel-qr/docs/validation), which never reads a logo's source from the input.
+A string is the image itself, never a path: a short string that is not an image (`'/path/logo.png'`, a URL) throws an
+`InvalidLogoException` that says how to give a file. A file is read only when given as a file, as `file:`, or as
+a stored style's logo `file` given to `Style::fromArray()`; give a user's logo as the uploaded file, and take style
+input through [StyleRule](https://exeque.github.io/laravel-qr/docs/validation), which never reads a logo's image from the input.
 
 ## Options
 
@@ -61,10 +62,10 @@ through [StyleRule](https://exeque.github.io/laravel-qr/docs/validation), which 
 | `position` | centered | the logo's top-left corner, in modules from the code's |
 
 ```php
-->logo($path, size: 0.25, padding: 1, shape: 'rounded', plate: '#ffffff', plateRadius: 1)
+->logo(file: $path, size: 0.25, padding: 1, shape: 'rounded', plate: '#ffffff', plateRadius: 1)
 
 ->logo(fn (LogoBuilder $logo) => $logo
-    ->from($path)
+    ->file($path)
     ->size(0.25)
     ->shape('circle')
     ->plate('#fde68a', radius: 2))
@@ -75,7 +76,7 @@ than the scan guards allow (`max_logo_share` of what the error correction level 
 of the code's width. Higher error correction gives a larger logo:
 
 ```php
-Qr::url($url)->errorCorrection('H')->logo($path, size: 'auto');
+Qr::url($url)->errorCorrection('H')->logo(file: $path, size: 'auto');
 ```
 
 The logo keeps its proportions inside its box. A logo, placed or centered, must stay clear of the finder, timing,

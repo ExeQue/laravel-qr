@@ -124,14 +124,14 @@ describe('drawing', function (): void {
 describe('logos', function (): void {
     it('places raster logos on a plate, cut to their shape', function (string $file, string $shape): void {
         $png = Qr::make(GD_URL)->errorCorrection('H')
-            ->logo(gdLogo($file), size: 0.2, shape: $shape, plate: LinearGradient::make('#ffffff', '#fff1f2'))
+            ->logo(file: gdLogo($file), size: 0.2, shape: $shape, plate: LinearGradient::make('#ffffff', '#fff1f2'))
             ->png(400, driver: 'gd')->contents();
 
         expect(Qr::read($png, 'native')->text)->toBe(GD_URL);
     })->with([['ellipse.png', 'circle'], ['ellipse.png', 'square'], ['two-frames.gif', 'rounded']]);
 
     it('cannot draw an SVG logo', function (): void {
-        expect(fn () => Qr::make(GD_URL)->logo(gdLogo('badge.svg'))->png(300, driver: 'gd'))
+        expect(fn () => Qr::make(GD_URL)->logo(file: gdLogo('badge.svg'))->png(300, driver: 'gd'))
             ->toThrow(MissingExtensionException::class, 'GD cannot draw an SVG logo');
     });
 
@@ -139,7 +139,7 @@ describe('logos', function (): void {
         config()->set('qr.raster.driver', 'gd');
 
         $logo = Logo::fromFile(gdLogo('two-frames.gif'));
-        $knocked = Qr::make(GD_URL)->errorCorrection('H')->logo(gdLogo('ellipse.png'), size: 0.25, shape: 'alpha')->png(400)->contents();
+        $knocked = Qr::make(GD_URL)->errorCorrection('H')->logo(file: gdLogo('ellipse.png'), size: 0.25, shape: 'alpha')->png(400)->contents();
 
         expect($logo->mimeType)->toBe('image/png')
             ->and(Qr::read($knocked, 'native')->text)->toBe(GD_URL);

@@ -148,7 +148,7 @@ describe('reading back', function (): void {
         $stored['logo']['source'] = $logo->toDataUri();
 
         expect(Style::fromArray($stored)->toArray())->toBe($style->toArray())
-            ->and(Style::fromArray(['logo' => ['source' => dirname(__DIR__, 2).'/Fixtures/logos/badge.svg']])->logo?->logo->hash)->toBe($logo->hash)
+            ->and(Style::fromArray(['logo' => ['file' => dirname(__DIR__, 2).'/Fixtures/logos/badge.svg']])->logo?->logo->hash)->toBe($logo->hash)
             ->and(Style::fromArray(['logo' => ['source' => $logo]])->logo?->logo)->toBe($logo);
     });
 
