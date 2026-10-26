@@ -44,22 +44,42 @@ final class QrServiceProvider extends ServiceProvider
 
         $this->app->scoped(Qr::class);
 
+        $this->streams();
+        $this->logos();
+        $this->colors();
+        $this->registries();
+        $this->decoders();
+        $this->monocle();
+    }
+
+    /**
+     * Where written codes are held: in memory up to qr.streams.max_memory, on disk beyond it.
+     */
+    private function streams(): void
+    {
         $this->app->singleton(StreamFactory::class, fn (Application $app): StreamFactory => new StreamFactory(
             maxMemory: $app->make('config')->get('qr.streams.max_memory'),
         ));
+    }
 
+    /**
+     * The sanitizer SVG logos go through, as qr.logos.sanitizer names it.
+     */
+    private function logos(): void
+    {
         $this->app->bind(SvgSanitizer::class, fn (Application $app): SvgSanitizer => $app->make(
             $app->make('config')->get('qr.logos.sanitizer', AutoSvgSanitizer::class),
         ));
+    }
 
-        $this->registries();
-
+    /**
+     * The application's own color names, from qr.colors.
+     */
+    private function colors(): void
+    {
         $this->app->singleton(ColorNames::class, fn (Application $app): ColorNames => new ColorNames(
             (array) $app->make('config')->get('qr.colors', []),
         ));
-
-        $this->decoders();
-        $this->monocle();
     }
 
     /**
@@ -125,15 +145,32 @@ final class QrServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->views();
+        $this->console();
+    }
+
+    /**
+     * The Blade components, as <x-qr> and <x-qr::...>, with their views and translations.
+     */
+    private function views(): void
+    {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'qr');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'qr');
         Blade::componentNamespace('ExeQue\\Qr\\View\\Components', 'qr');
         Blade::component('qr', Code::class);
+    }
 
-        if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
-            $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
-            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
+    /**
+     * What the package adds to artisan: its commands, and the files it publishes.
+     */
+    private function console(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
         }
+
+        $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
+        $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
+        $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
     }
 }
