@@ -28,6 +28,8 @@ use ExeQue\Qr\Registries\StyleRegistry;
 use ExeQue\Qr\Registries\WriterRegistry;
 use ExeQue\Qr\View\Components\Code;
 use ExeQue\Qr\Writers\StreamFactory;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Process\Factory as Processes;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -42,16 +44,19 @@ final class QrServiceProvider extends ServiceProvider
 
         $this->app->scoped(Qr::class);
 
-        $this->app->singleton(StreamFactory::class);
-        $this->app->when(StreamFactory::class)->needs('$maxMemory')->giveConfig('qr.streams.max_memory');
-        $this->app->bind(SvgSanitizer::class, fn (): SvgSanitizer => $this->app->make(
-            $this->app->make('config')->get('qr.logos.sanitizer', AutoSvgSanitizer::class),
+        $this->app->singleton(StreamFactory::class, fn (Application $app): StreamFactory => new StreamFactory(
+            maxMemory: $app->make('config')->get('qr.streams.max_memory'),
+        ));
+
+        $this->app->bind(SvgSanitizer::class, fn (Application $app): SvgSanitizer => $app->make(
+            $app->make('config')->get('qr.logos.sanitizer', AutoSvgSanitizer::class),
         ));
 
         $this->registries();
 
-        $this->app->singleton(ColorNames::class);
-        $this->app->when(ColorNames::class)->needs('$colors')->giveConfig('qr.colors', []);
+        $this->app->singleton(ColorNames::class, fn (Application $app): ColorNames => new ColorNames(
+            (array) $app->make('config')->get('qr.colors', []),
+        ));
 
         $this->decoders();
         $this->monocle();
@@ -62,10 +67,23 @@ final class QrServiceProvider extends ServiceProvider
      */
     private function decoders(): void
     {
-        $this->app->when(ZxingDecoder::class)->needs('$command')->give(fn (): array => array_values(array_map(strval(...), (array) $this->app->make('config')->get('qr.reading.zxing.command', ['node']))));
-        $this->app->when(ZxingDecoder::class)->needs('$nodeModules')->give(fn (): string => (string) ($this->app->make('config')->get('qr.reading.zxing.node_modules') ?? base_path('node_modules')));
-        $this->app->when(ZxingDecoder::class)->needs('$timeout')->giveConfig('qr.reading.zxing.timeout', 10);
-        $this->app->when(StackDecoder::class)->needs('$decoders')->giveConfig('qr.reading.stack', ['zxing', 'native']);
+        $this->app->bind(ZxingDecoder::class, function (Application $app, array $parameters): ZxingDecoder {
+            $config = $app->make('config');
+
+            return new ZxingDecoder(...[
+                'processes' => $app->make(Processes::class),
+                'command' => array_values(array_map(strval(...), (array) $config->get('qr.reading.zxing.command', ['node']))),
+                'nodeModules' => (string) ($config->get('qr.reading.zxing.node_modules') ?? base_path('node_modules')),
+                'timeout' => (int) $config->get('qr.reading.zxing.timeout', 10),
+                ...$parameters,
+            ]);
+        });
+
+        $this->app->bind(StackDecoder::class, fn (Application $app, array $parameters): StackDecoder => new StackDecoder(...[
+            'registry' => $app->make(DecoderRegistry::class),
+            'decoders' => (array) $app->make('config')->get('qr.reading.stack', ['zxing', 'native']),
+            ...$parameters,
+        ]));
     }
 
     /**
