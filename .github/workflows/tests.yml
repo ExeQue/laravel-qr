@@ -132,7 +132,7 @@ jobs:
       # tar and zstd for actions/cache; the libraries the compiled extensions link against.
       - name: Install system packages
         run: |
-          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-heic imagemagick-libs icu-libs libzip libpng libjpeg-turbo freetype libgomp
+          apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-heic imagemagick-libs icu-libs libzip libpng libjpeg-turbo libwebp libavif libxpm freetype libgomp
           echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
 
       # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.
@@ -156,7 +156,7 @@ jobs:
           echo 'memory_limit=-1' > "$PHP_INI_DIR/conf.d/memory.ini"
 
       - name: Check PHP extensions
-        run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { extension_loaded($e) || exit("missing {$e}\n"); } echo Imagick::getVersion()["versionString"], PHP_EOL;'
+        run: php -r 'foreach (["imagick", "intl", "zip", "gd", "pcov"] as $e) { if (! extension_loaded($e)) { fwrite(STDERR, "missing {$e}\n"); exit(1); } } echo Imagick::getVersion()["versionString"], PHP_EOL;'
 
       - name: Checkout code
         uses: actions/checkout@v5
