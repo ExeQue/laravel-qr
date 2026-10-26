@@ -34,6 +34,7 @@ return [
         'hex' => 'The :attribute field must be a hex color, such as #be123c.',
         'kind' => 'The :attribute field is not a kind of gradient that may be chosen.',
         'stops' => 'The :attribute field may have at most :max colors.',
+        'min_stops' => 'The :attribute field must have at least two color stops.',
         'stop_color' => 'The :attribute field has a color stop that is not a color that may be chosen.',
         'gradient' => 'The :attribute field is not a gradient: :reason',
         'gradient_keys' => 'The :attribute field has settings a gradient does not take, or of the wrong type.',

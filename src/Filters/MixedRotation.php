@@ -40,7 +40,8 @@ final class MixedRotation implements ModuleFilter, NamedFilter, HasOptionRules
             throw InvalidFilterException::weightsDoNotMatch($this->name(), 0, null);
         }
 
-        $this->steps = $steps;
+        // Numbers from a form are strings; a list of them is not converted on the way in.
+        $this->steps = $steps === null ? null : array_map(floatval(...), $steps);
     }
 
     public function module(ModuleContext $cell, ModuleStyle $style): ModuleStyle

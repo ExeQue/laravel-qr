@@ -23,7 +23,7 @@
 - [Testing](testing.md) - `Qr::fake()` and its assertions
 - [Events](events.md) - What the package tells as it works
 - [Monocle](monocle.md) - The codes each request rendered, in the Monocle profiler
-- [Artisan commands](commands.md) - `qr:check`, `qr:clear` and `qr:icons`
+- [Artisan commands](commands.md) - `qr:check`, `qr:clear`, `qr:icons` and `qr:install`
 - [Configuration](configuration.md) - Every option in `config/qr.php`
 
 ## Where things are

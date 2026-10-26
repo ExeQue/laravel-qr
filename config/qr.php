@@ -66,6 +66,9 @@ return [
         'max_skew' => 20,
         'max_skip' => 0.25,
         'max_logo_share' => 0.6,
+        'outer_eye_scale' => [0.93, 1.0],
+        'inner_eye_scale' => [0.6, 1.15],
+        'eye_rotation_warning' => 10,
     ],
 
     /*

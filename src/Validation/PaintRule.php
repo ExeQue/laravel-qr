@@ -151,6 +151,10 @@ final readonly class PaintRule implements ValidationRule
             ? array_merge(...array_map(fn (mixed $row): array => is_array($row) ? array_values($row) : [$row], array_values((array) ($value['rows'] ?? []))))
             : array_map(fn (mixed $stop): mixed => is_array($stop) ? ($stop['color'] ?? null) : null, array_values((array) ($value['stops'] ?? [])));
 
+        if (count($colors) < 2 && $kind !== 'mesh') {
+            return self::message('min_stops');
+        }
+
         if (count($colors) > $this->stops) {
             return self::message('stops', ['max' => $this->stops]);
         }
@@ -188,11 +192,11 @@ final readonly class PaintRule implements ValidationRule
         foreach ($layers as $layer) {
             $opacity = is_array($layer) ? ($layer['opacity'] ?? 1) : null;
 
-            if (! is_array($layer) || array_diff(array_keys($layer), ['paint', 'opacity']) !== [] || ! is_numeric($opacity) || $opacity < 0 || $opacity > 1) {
+            if (! is_array($layer) || ! array_key_exists('paint', $layer) || array_diff(array_keys($layer), ['paint', 'opacity']) !== [] || ! is_numeric($opacity) || $opacity < 0 || $opacity > 1) {
                 return self::message('layer');
             }
 
-            $problem = $this->problem($layer['paint'] ?? null, layered: true);
+            $problem = $layer['paint'] === null ? self::message('layer') : $this->problem($layer['paint'], layered: true);
 
             if ($problem !== null) {
                 return $problem;

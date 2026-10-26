@@ -37,7 +37,10 @@ final readonly class Scannable implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! is_array($value) || app(Factory::class)->make([$attribute => $value], $this->rules->for($attribute))->fails()) {
+        $data = [];
+        data_set($data, $attribute, $value);
+
+        if (! is_array($value) || app(Factory::class)->make($data, $this->rules->for($attribute))->fails()) {
             return;
         }
 

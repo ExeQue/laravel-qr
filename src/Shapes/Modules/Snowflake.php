@@ -26,6 +26,8 @@ final readonly class Snowflake implements Configurable, ModuleShape
         public float $reach = 0.52,
         public float $width = 0.26,
     ) {
+        self::within('reach', $reach, 0.1, 0.75);
+        self::within('width', $width, 0.05, 0.5);
     }
 
     public function draw(ModuleContext $cell): Path

@@ -70,6 +70,7 @@ covers(
     \ExeQue\Qr\Validation\Rules\ShapeEntry::class,
     \ExeQue\Qr\Support\Hydrate::class,
     InvalidOptionException::class,
+    \ExeQue\Qr\Exceptions\InvalidRuleException::class,
     QrService::class,
     QrServiceProvider::class,
     RoundedOuter::class,
@@ -132,6 +133,14 @@ describe('fields', function (): void {
         expect(styleErrors($style, StyleRule::everything()))->toBe([])
             ->and(styleErrors(['logo' => ['size' => 0.2]], StyleRule::everything()))->toBe(['style' => ['The style field has unknown keys: logo.']]);
     });
+
+    it('refuses fields it does not have', function (): void {
+        StyleRule::everything()->only('outer');
+    })->throws(\ExeQue\Qr\Exceptions\InvalidRuleException::class, 'A style has no field "outer" to allow; its fields are modules, eyes, background, margin, filters, logo.');
+
+    it('refuses fields it does not have to leave out', function (): void {
+        StyleRule::everything()->except('margni');
+    })->throws(\ExeQue\Qr\Exceptions\InvalidRuleException::class);
 
     it('keeps only some fields, or all but some', function (): void {
         expect(styleErrors(['margin' => 3], StyleRule::everything()->only('modules')))->toBe(['style' => ['The style field has unknown keys: margin.']])
@@ -214,7 +223,7 @@ describe('eyes', function (): void {
     });
 
     it('takes eye shapes\' options, a number or one per corner', function (): void {
-        $rule = StyleRule::make()->outer(options: true)->inner(options: true)->shape(OuterEye::Rounded, hole: [0, 2.2])->shape(InnerEye::Soft, radius: [0, 1.2]);
+        $rule = StyleRule::make()->outer(options: true)->inner(options: true)->shape(OuterEye::Rounded, hole: [0, 2.2])->shape('soft', kind: 'inner', radius: [0, 1.2]);
 
         expect(styleErrors(['eyes' => ['outer' => ['shape' => 'rounded', 'options' => ['outer' => [3, 0, 3, 0], 'hole' => 2]], 'inner' => ['shape' => 'soft', 'options' => ['radius' => 1]]]], $rule))->toBe([])
             ->and(styleErrors(['eyes' => ['inner' => ['shape' => 'soft', 'options' => ['radius' => [1, 1]]]]], $rule))->toBe(['style.eyes.inner.options.radius' => ['The style.eyes.inner.options.radius field must be a number from 0 to 1.5, or a list of 4 of them.']])
@@ -234,7 +243,8 @@ describe('background, margin and logo', function (): void {
     it('takes a margin within the guards\' least and 16, or the range given', function (): void {
         expect(styleErrors(['margin' => 1], StyleRule::make()->margin()))->toBe(['style.margin' => ['The style.margin field must be between 2 and 16.']])
             ->and(styleErrors(['margin' => 1], StyleRule::make()->margin([0, 4])))->toBe([])
-            ->and(styleErrors(['margin' => 1.5], StyleRule::make()->margin([0, 4])))->toBe(['style.margin' => ['The style.margin field must be an integer.']]);
+            ->and(styleErrors(['margin' => 1.5], StyleRule::make()->margin([0, 4])))->toBe(['style.margin' => ['The style.margin field must be an integer.']])
+            ->and(styleErrors(['margin' => 1], StyleRule::make()->margin()->scannable(new ScanSafety(minMargin: 1))))->toBe([]);
     });
 
     it('takes the logo\'s settings, each one refusable', function (): void {
@@ -244,6 +254,7 @@ describe('background, margin and logo', function (): void {
             ->and(styleErrors(['logo' => ['size' => 0.5]], $rule))->toBe(['style.logo.size' => ['The style.logo.size field must be from 0.05 to 0.3, or auto.']])
             ->and(styleErrors(['logo' => ['size' => 'big']], $rule))->toHaveKey('style.logo.size')
             ->and(styleErrors(['logo' => ['position' => [4, 40]]], $rule))->toHaveKey('style.logo.position.1')
+            ->and(styleErrors(['logo' => ['position' => ['x' => 4, 'y' => 4]]], $rule))->toHaveKey('style.logo.position')
             ->and(styleErrors(['logo' => ['position' => [4, 4]]], StyleRule::make()->logo()))->toBe(['style.logo' => ['The style.logo field has unknown keys: position.']])
             ->and(styleErrors(['logo' => ['shape' => 'circle']], StyleRule::make()->logo(shapes: Allow::only('square'))))->toHaveKey('style.logo.shape')
             ->and(array_keys(StyleRule::make()->logo(size: false, padding: false, plate: false, plateRadius: false)->for('style')))->toBe(['style', 'style.logo', 'style.logo.shape']);
@@ -405,11 +416,21 @@ describe('as one rule', function (): void {
     });
 
     it('sets and gives the application\'s rules', function (): void {
-        expect(StyleRule::defaults(fn (): StyleRule => StyleRule::make()->margin()))->toBeNull()
-            ->and(array_keys(StyleRule::defaults()?->for('style') ?? []))->toBe(['style', 'style.margin'])
+        StyleRule::useDefaults(fn (): StyleRule => StyleRule::make()->margin());
+
+        expect(array_keys(StyleRule::defaults()->for('style')))->toBe(['style', 'style.margin'])
             ->and(array_keys(Qr::rule()->for('style')))->toBe(['style', 'style.margin']);
 
-        StyleRule::defaults(fn (): StyleRule => StyleRule::everything());
+        StyleRule::useDefaults(fn (): StyleRule => StyleRule::everything());
+    });
+
+    it('checks a style under a nested or wildcard attribute', function (): void {
+        $style = ['margin' => 999, 'modules' => ['shape' => 'nope']];
+
+        expect(Validator::make(['design' => ['style' => $style]], ['design.style' => StyleRule::everything()])->errors()->get('design.style'))->toHaveCount(2)
+            ->and(Validator::make(['styles' => [$style, []]], ['styles.*' => StyleRule::everything()])->errors()->toArray())->toHaveKey('styles.0')
+            ->and(Validator::make(['styles' => [$style]], StyleRule::everything()->for('styles.*'))->errors()->toArray())->toHaveKeys(['styles.0.margin', 'styles.0.modules.shape'])
+            ->and(Validator::make(['design' => ['style' => ['background' => '#111111']]], ['design.style' => StyleRule::everything()->scannable()])->errors()->get('design.style'))->toHaveCount(1);
     });
 });
 

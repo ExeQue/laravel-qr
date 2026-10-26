@@ -27,10 +27,25 @@ final readonly class Rounded implements Configurable, Directional, OuterEyeShape
      * @param float|array{float, float, float, float} $outer The outline's radius, up to 3.5.
      * @param float|array{float, float, float, float} $hole The hole's radius, up to 2.5.
      */
-    public function __construct(
-        public float|array $outer = 1.9,
-        public float|array $hole = 0.9,
-    ) {
+    /**
+     * @var float|array{float, float, float, float}
+     */
+    public float|array $outer;
+
+    /**
+     * @var float|array{float, float, float, float}
+     */
+    public float|array $hole;
+
+    /**
+     * @param float|array{float, float, float, float} $outer The outline's radius, up to 3.5.
+     * @param float|array{float, float, float, float} $hole The hole's radius, up to 2.5.
+     */
+    public function __construct(float|array $outer = 1.9, float|array $hole = 0.9)
+    {
+        // Numbers from a form are strings; a list of them is not converted on the way in.
+        $this->outer = $outer = is_array($outer) ? array_map(floatval(...), $outer) : $outer;
+        $this->hole = $hole = is_array($hole) ? array_map(floatval(...), $hole) : $hole;
         $outers = is_array($outer) ? $outer : [$outer, $outer, $outer, $outer];
         $holes = is_array($hole) ? $hole : [$hole, $hole, $hole, $hole];
 

@@ -132,7 +132,7 @@ final class Qr
      */
     public function rule(): StyleRule
     {
-        return StyleRule::defaults() ?? StyleRule::everything();
+        return StyleRule::defaults();
     }
 
     public function url(string $url): PendingQr

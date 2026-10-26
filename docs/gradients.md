@@ -73,7 +73,7 @@ Two stops at the same position make a hard edge.
 
 ## Blending
 
-Colors blend in OKLab by default, which keeps the middle of a gradient from going grey or muddy. Any of the CSS
+Colors blend in OKLab by default, which keeps the middle of a gradient from going gray or muddy. Any of the CSS
 spaces can be chosen:
 
 ```php

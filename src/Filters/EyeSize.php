@@ -27,6 +27,8 @@ final class EyeSize implements EyeFilter, NamedFilter, HasOptionRules
         private float|array $inner = 0.85,
         private int $seed = 0,
     ) {
+        // Numbers from a form are strings; a range of them is not converted on the way in.
+        $this->inner = is_array($inner) ? array_map(floatval(...), $inner) : $inner;
     }
 
     public function eye(EyeContext $eye, EyeStyle $style): EyeStyle

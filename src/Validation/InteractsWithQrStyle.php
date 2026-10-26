@@ -25,6 +25,6 @@ trait InteractsWithQrStyle
     {
         $validated = method_exists($this, 'validated') ? $this->validated($key) : data_get($this->validate(), $key);
 
-        return StyleRule::make()->toStyle((array) ($validated ?? []), $base, $logo);
+        return StyleRule::toStyle((array) ($validated ?? []), $base, $logo);
     }
 }

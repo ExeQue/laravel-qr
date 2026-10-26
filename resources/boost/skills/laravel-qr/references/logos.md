@@ -11,6 +11,7 @@ Qr::url($url)->logo(storage_path('app/brand/logo.svg'), size: 0.22);
 
 ```php
 ->logo('/path/to/logo.png')                 // a file
+->logo($request->file('logo'))              // an uploaded file, or any SplFileInfo
 ->logo($bytes)                               // PNG, JPEG, WebP, GIF (its first frame), HEIC, HEIF, AVIF or SVG bytes
 ->logo('<svg xmlns="http://www.w3.org/2000/svg">...</svg>')
 ->logo('data:image/png;base64,...')
@@ -43,6 +44,10 @@ class Team extends Model implements ProvidesQrLogo
 ```
 
 Logos are read from files, disks, bytes and data URIs only.
+
+A string that names a file is read from disk, and so is a stored style's logo `source` given to `Style::fromArray()`.
+Give a user's logo as the uploaded file or its contents, never as a path taken from a request, and take style input
+through [StyleRule](https://exeque.github.io/laravel-qr/docs/validation), which never reads a logo's source from the input.
 
 ## Options
 

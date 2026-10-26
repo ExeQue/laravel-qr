@@ -76,9 +76,9 @@ final class QrFake
     /**
      * @param (Closure(PendingQr, string): bool)|null $callback Given the code and the format.
      */
-    public function assertRenderedCount(int $expected, ?Closure $callback = null): self
+    public function assertRenderedCount(int $count, ?Closure $callback = null): self
     {
-        Assert::assertCount($expected, $this->rendered($callback), 'Failed asserting how many QR codes were rendered.');
+        Assert::assertCount($count, $this->rendered($callback), 'Failed asserting how many QR codes were rendered.');
 
         return $this;
     }

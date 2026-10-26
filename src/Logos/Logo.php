@@ -23,6 +23,11 @@ final readonly class Logo
     private const array AVIF_BRANDS = ['avif', 'avis'];
 
     /**
+     * The most pixels a raster logo may have: plenty for any code, too few to exhaust memory.
+     */
+    public const int MAX_PIXELS = 16_777_216;
+
+    /**
      * @param string $hash Of the contents: what caching goes by.
      */
     private function __construct(
@@ -52,6 +57,8 @@ final readonly class Logo
             substr($bytes, 4, 4) === 'ftyp' && in_array(substr($bytes, 8, 4), self::HEIF_BRANDS, true) => 'image/heif',
             default => throw InvalidLogoException::unsupportedType(),
         };
+
+        self::checkPixels($bytes, $mimeType);
 
         // A GIF's first frame, and HEIF and AVIF, which browsers and GD read only in part, become PNG.
         [$bytes, $mimeType] = match ($mimeType) {
@@ -111,6 +118,43 @@ final readonly class Logo
     public function toDataUri(): string
     {
         return "data:{$this->mimeType};base64,".base64_encode($this->contents);
+    }
+
+    /**
+     * Refuses an image with more pixels than a logo may have, from its header, before it is decoded.
+     */
+    private static function checkPixels(string $bytes, string $mimeType): void
+    {
+        $size = in_array($mimeType, ['image/heif', 'image/avif'], true) ? self::pinged($bytes) : getimagesizefromstring($bytes);
+
+        if ($size === false) {
+            throw InvalidLogoException::unreadable();
+        }
+
+        if ($size[0] * $size[1] > self::MAX_PIXELS) {
+            throw InvalidLogoException::tooLarge($size[0], $size[1], self::MAX_PIXELS);
+        }
+    }
+
+    /**
+     * A HEIF or AVIF image's size, from ImageMagick reading its header only.
+     *
+     * @return array{int, int}|false
+     */
+    private static function pinged(string $bytes): array|false
+    {
+        if (! extension_loaded('imagick')) {
+            return false; // @codeCoverageIgnore
+        }
+
+        try {
+            $image = new Imagick();
+            $image->pingImageBlob($bytes);
+
+            return [$image->getImageWidth(), $image->getImageHeight()];
+        } catch (ImagickException) {
+            return false;
+        }
     }
 
     /**

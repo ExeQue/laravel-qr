@@ -22,11 +22,17 @@ final readonly class Rounded implements Configurable, Directional, InnerEyeShape
     use HasOptions;
 
     /**
+     * @var float|array{float, float, float, float}
+     */
+    public float|array $radius;
+
+    /**
      * @param float|array{float, float, float, float} $radius Up to 1.5.
      */
-    public function __construct(
-        public float|array $radius = 0.7,
-    ) {
+    public function __construct(float|array $radius = 0.7)
+    {
+        // Numbers from a form are strings; a list of them is not converted on the way in.
+        $this->radius = is_array($radius) ? array_map(floatval(...), $radius) : $radius;
     }
 
     public static function optionRules(): array

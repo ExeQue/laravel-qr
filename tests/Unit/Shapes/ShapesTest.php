@@ -179,6 +179,13 @@ describe('options', function (): void {
     })->with([
         [fn () => new Modules\Dot(1.5), 'Dot\'s "diameter" must be from 0.1 to 1, 1.5 given.'],
         [fn () => new Modules\Flowing(0.6), '"radius" must be from 0 to 0.5'],
+        [fn () => new Modules\Flower(petal: 5), '"petal" must be from 0.05 to 0.5'],
+        [fn () => new Modules\Flower(reach: 5), '"reach" must be from 0 to 0.5'],
+        [fn () => new Modules\Flower(heart: 5), '"heart" must be from 0 to 0.5'],
+        [fn () => new Modules\Star(outer: 2), '"outer" must be from 0.1 to 0.75'],
+        [fn () => new Modules\Star(inner: 0.6), '"inner" must be from 0.05 to 0.52'],
+        [fn () => new Modules\Snowflake(reach: 2), '"reach" must be from 0.1 to 0.75'],
+        [fn () => new Modules\Snowflake(width: 2), '"width" must be from 0.05 to 0.5'],
         [fn () => new Modules\Rounded(side: 0), '"side"'],
         [fn () => new Modules\Rounded(radius: 1), '"radius"'],
         [fn () => new Modules\Squircle(2), '"side"'],

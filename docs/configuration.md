@@ -53,15 +53,18 @@ See [Caching](caching.md).
 ## metadata
 
 Attribution written into every code's file: `title`, `author`, `description`, `copyright`, `url` and `keywords` (a
-list). A code's own `->metadata()` is merged over these. See [Output](output.md#attribution).
+list). The published config holds `author`, `copyright` and `url`; add any of the others. A code's own
+`->metadata()` is merged over these. See [Output](output.md#attribution).
 
-## svg and png
+## svg, png and raster
 
 | Key | Default | |
 |---|---|---|
 | `svg.precision` | 3 | decimals in path data |
 | `svg.xml_declaration` | `false` | start SVG files with `<?xml ...?>` |
 | `png.dpi` | `null` | a resolution written into PNG, JPEG and WebP files |
+| `png.compression_level` | 6 | 0 to 9: how hard PNGs are packed; higher is smaller and slower |
+| `raster.driver` | `auto` (`QR_RASTER_DRIVER`) | what draws PNG, JPEG and WebP: `imagick`, `gd`, or `auto` for Imagick when it is loaded |
 
 ## colors
 

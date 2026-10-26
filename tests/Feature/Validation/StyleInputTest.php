@@ -38,7 +38,7 @@ const LOGO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><c
 
 describe('to a style', function (): void {
     it('applies every field over the base', function (): void {
-        $style = StyleRule::make()->toStyle([
+        $style = StyleRule::toStyle([
             'modules' => ['shape' => 'rounded', 'options' => ['radius' => 0.1], 'paint' => '#1e1b4b', 'rotation' => 10, 'scaleX' => 0.9, 'opacity' => 0.8],
             'eyes' => [
                 'preset' => 'leaf',
@@ -68,9 +68,9 @@ describe('to a style', function (): void {
     it('starts from the base given, by style or name, and takes a transparent background', function (): void {
         Qr::styles()->register('dark', Style::default()->withMargin(6));
 
-        expect(StyleRule::make()->toStyle([], base: 'dark')->margin)->toBe(6)
-            ->and(StyleRule::make()->toStyle(['background' => null], base: Style::default()->withMargin(5))->background)->toBeNull()
-            ->and(StyleRule::make()->toStyle(['background' => null], base: Style::default()->withMargin(5))->margin)->toBe(5);
+        expect(StyleRule::toStyle([], base: 'dark')->margin)->toBe(6)
+            ->and(StyleRule::toStyle(['background' => null], base: Style::default()->withMargin(5))->background)->toBeNull()
+            ->and(StyleRule::toStyle(['background' => null], base: Style::default()->withMargin(5))->margin)->toBe(5);
     });
 
     it('takes a logo\'s settings with the image given apart, or the base\'s', function (): void {
@@ -78,16 +78,16 @@ describe('to a style', function (): void {
         file_put_contents($file, LOGO_SVG);
         $settings = ['logo' => ['size' => 'auto', 'padding' => 2, 'shape' => 'circle', 'plate' => '#ffffff', 'plateRadius' => 1, 'position' => [3, 4]]];
 
-        $style = StyleRule::make()->toStyle($settings, logo: new SplFileInfo($file));
-        $kept = StyleRule::make()->toStyle(['logo' => ['plateRadius' => 2, 'position' => null, 'plate' => null]], base: $style);
-        $radiusOnly = StyleRule::make()->toStyle(['logo' => ['plateRadius' => 3]], base: $style);
+        $style = StyleRule::toStyle($settings, logo: new SplFileInfo($file));
+        $kept = StyleRule::toStyle(['logo' => ['plateRadius' => 2, 'position' => null, 'plate' => null]], base: $style);
+        $radiusOnly = StyleRule::toStyle(['logo' => ['plateRadius' => 3]], base: $style);
 
         expect($style->logo?->size)->toBeNull()
             ->and([$style->logo?->padding, $style->logo?->shape, $style->logo?->plate?->toCss(), $style->logo?->plateRadius, $style->logo?->position])->toBe([2, LogoShape::Circle, '#ffffff', 1.0, [3.0, 4.0]])
             ->and([$kept->logo?->plate, $kept->logo?->plateRadius, $kept->logo?->position])->toBe([null, 2.0, null])
             ->and([$radiusOnly->logo?->plate?->toCss(), $radiusOnly->logo?->plateRadius])->toBe(['#ffffff', 3.0])
-            ->and(StyleRule::make()->toStyle(['logo' => ['size' => 0.1]], logo: Logo::fromSvg(LOGO_SVG))->logo?->size)->toBe(0.1)
-            ->and(fn () => StyleRule::make()->toStyle(['logo' => ['size' => 0.1]]))->toThrow(InvalidStyleException::class, 'A stored logo has no source');
+            ->and(StyleRule::toStyle(['logo' => ['size' => 0.1]], logo: Logo::fromSvg(LOGO_SVG))->logo?->size)->toBe(0.1)
+            ->and(fn () => StyleRule::toStyle(['logo' => ['size' => 0.1]]))->toThrow(InvalidStyleException::class, 'A stored logo has no source');
 
         unlink($file);
     });
@@ -132,7 +132,7 @@ describe('to input', function (): void {
             ->and($payload['margin'])->toBe(3)
             ->and($payload['filters'][1]['options']['shapes'])->toBe(['square', 'dots-medium', ['shape' => Qr::modules()->nameOf(Rounded::class), 'options' => ['side' => 0.92, 'radius' => 0.1]]])
             ->and(\Illuminate\Support\Facades\Validator::make(['style' => $payload], StyleRule::everything()->modules(options: true)->for('style'))->errors()->toArray())->toBe([])
-            ->and(StyleRule::make()->toStyle($payload)->toArray())->toBe($style->toArray());
+            ->and(StyleRule::toStyle($payload)->toArray())->toBe($style->toArray());
     });
 
     it('writes input the rules take, which reads back as the style', function (): void {
@@ -140,7 +140,7 @@ describe('to input', function (): void {
         $payload = StyleRule::toPayload($style);
 
         expect(\Illuminate\Support\Facades\Validator::make(['style' => $payload], StyleRule::everything()->for('style'))->errors()->toArray())->toBe([])
-            ->and(StyleRule::make()->toStyle($payload)->toArray())->toBe($style->toArray());
+            ->and(StyleRule::toStyle($payload)->toArray())->toBe($style->toArray());
     });
 
     it('writes eye shapes in filters by name and options, and leaves shapes no registry knows', function (): void {
@@ -240,6 +240,22 @@ describe('from a form', function (): void {
     it('takes an uploaded logo', function (): void {
         $upload = UploadedFile::fake()->createWithContent('logo.svg', LOGO_SVG);
 
-        expect(StyleRule::make()->toStyle(['logo' => ['size' => 0.2]], logo: $upload)->logo?->size)->toBe(0.2);
+        expect(StyleRule::toStyle(['logo' => ['size' => 0.2]], logo: $upload)->logo?->size)->toBe(0.2);
+    });
+});
+
+describe('numbers from a form', function (): void {
+    it('draws filters and eyes given lists of numbers as strings', function (): void {
+        $style = StyleRule::toStyle([
+            'eyes' => ['inner' => ['shape' => 'soft', 'options' => ['radius' => ['1', '0', '1', '0']]], 'outer' => ['shape' => 'soft', 'options' => ['outer' => ['3', '0', '3', '0'], 'hole' => '2']]],
+            'filters' => [
+                ['name' => 'mixed-rotation', 'options' => ['steps' => ['0', '90']]],
+                ['name' => 'eye-tilt', 'options' => ['outer' => ['-5', '5']]],
+                ['name' => 'eye-size', 'options' => ['inner' => ['0.8', '1.1']]],
+            ],
+        ]);
+
+        expect(Qr::make('numbers')->style($style)->svg()->contents())->toContain('<svg')
+            ->and($style->eye(Corner::TopLeft)->inner->shape)->toEqual(Qr::innerEyes()->get('soft', ['radius' => [1.0, 0.0, 1.0, 0.0]]));
     });
 });

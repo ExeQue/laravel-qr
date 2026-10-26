@@ -170,7 +170,7 @@ describe('reading', function (): void {
         $transparent = Qr::make(GD_URL)->background(null)->png(300)->contents();
 
         expect(Bitmap::fromImage($png, Driver::Gd)->width)->toBe(800)
-            ->and(Bitmap::fromImage($transparent, Driver::Gd)->grey[0])->toBe(255);
+            ->and(Bitmap::fromImage($transparent, Driver::Gd)->gray[0])->toBe(255);
 
         config()->set('qr.raster.driver', 'gd');
 

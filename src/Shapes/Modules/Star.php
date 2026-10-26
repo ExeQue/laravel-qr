@@ -27,6 +27,8 @@ final readonly class Star implements Configurable, ModuleShape
         public float $inner = 0.34,
         public int $points = 5,
     ) {
+        self::within('outer', $outer, 0.1, 0.75);
+        self::within('inner', $inner, 0.05, $outer);
         self::within('points', $points, 3, 12);
     }
 

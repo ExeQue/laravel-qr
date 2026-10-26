@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use SplFileInfo;
 
 /**
  * A logo and where and how it sits. Each call returns a changed copy.
@@ -34,15 +35,16 @@ final class LogoBuilder
     private array $settings = [];
 
     /**
-     * The image: a Logo or something providing one, a file path, a data: URI, an
-     * SVG or raw image bytes - or a disk (by name or instance) and a path on it.
+     * The image: a Logo or something providing one, a file (an uploaded one too) or its path, a
+     * data: URI, an SVG or raw image bytes - or a disk (by name or instance) and a path on it.
      */
-    public function from(Logo|ProvidesQrLogo|Filesystem|string|null $source, ?string $path = null): self
+    public function from(Logo|ProvidesQrLogo|SplFileInfo|Filesystem|string|null $source, ?string $path = null): self
     {
         $logo = match (true) {
             $path !== null => Logo::fromBytes((string) self::disk($source)->get($path)),
             $source instanceof Logo => $source,
             $source instanceof ProvidesQrLogo => $source->qrLogo(),
+            $source instanceof SplFileInfo => Logo::fromFile($source->getPathname()),
             is_string($source) && str_starts_with($source, 'data:') => Logo::fromDataUri($source),
             is_string($source) && strlen($source) < 4096 && ! str_contains($source, '<') && is_file($source) => Logo::fromFile($source),
             is_string($source) => Logo::fromBytes($source),
@@ -117,7 +119,7 @@ final class LogoBuilder
         return new LogoStyle($this->logo ?? throw InvalidLogoException::noSource(), ...$this->settings);
     }
 
-    private static function disk(Logo|ProvidesQrLogo|Filesystem|string|null $disk): Filesystem
+    private static function disk(Logo|ProvidesQrLogo|SplFileInfo|Filesystem|string|null $disk): Filesystem
     {
         return $disk instanceof Filesystem ? $disk : Storage::disk(is_string($disk) ? $disk : null);
     }

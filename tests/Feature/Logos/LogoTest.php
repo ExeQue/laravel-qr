@@ -32,6 +32,7 @@ use ExeQue\Qr\Writers\Svg\Options as SvgOptions;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Imagick;
 use ImagickPixel;
+use SplFileInfo;
 
 covers(\ExeQue\Qr\Builders\LogoBuilder::class, MissingExtensionException::class, \ExeQue\Qr\Rendering\Guard::class, Style::class, Logo::class, LogoStyle::class, LogoShape::class, Knockout::class, LogoLayer::class, Region::class, Renderer::class, Scene::class, SvgWriter::class, RasterWriter::class, InvalidLogoException::class, ScanSafetyException::class);
 
@@ -135,6 +136,19 @@ describe('placement', function (): void {
 
         expect($scene->logo->style->size)->toBeLessThan(0.9);
     });
+
+    it('covers the alignment pattern in the middle of a larger symbol, and still scans', function (float|string $size): void {
+        $svg = (string) file_get_contents(fixture('badge.svg'));
+        $content = str_repeat('a', 400);
+        $code = \ExeQue\Qr\Facades\Qr::make($content)->logo($svg, size: $size);
+
+        expect($code->matrix()->version)->toBeGreaterThanOrEqual(7)
+            ->and($code->svg()->contents())->toDecodeAs($content);
+    })->with([0.2, 'auto'])->group('scan');
+
+    it('refuses a logo whose padding leaves no room clear of the function patterns', function (): void {
+        withLogo(new LogoStyle(Logo::fromFile(fixture('ellipse.png')), 0.2, padding: 30));
+    })->throws(InvalidLogoException::class, 'covers part of a finder');
 
     it('refuses a placed logo over a function pattern', function (): void {
         withLogo(new LogoStyle(Logo::fromFile(fixture('ellipse.png')), 0.2, position: [0, 0]));
@@ -248,6 +262,40 @@ describe('drawing', function (): void {
         'svg, circle, inlined' => ['badge.svg', LogoShape::Circle, true],
         'svg, rounded, as an image' => ['badge.svg', LogoShape::Rounded, false],
     ]);
+});
+
+describe('files', function (): void {
+    it('reads a logo from a file object, such as an upload', function (): void {
+        $style = \ExeQue\Qr\Facades\Qr::style()->logo(new SplFileInfo(fixture('badge.svg')), size: 0.2)->toStyle();
+
+        expect($style->logo?->logo->isSvg())->toBeTrue();
+    });
+});
+
+describe('large logos', function (): void {
+    it('refuses a raster logo with too many pixels, from its header alone', function (): void {
+        $header = pack('NN', 12000, 12000)."\x08\x06\x00\x00\x00";
+        $png = "\x89PNG\r\n\x1A\n".pack('N', 13).'IHDR'.$header.pack('N', crc32('IHDR'.$header));
+
+        Logo::fromBytes($png);
+    })->throws(InvalidLogoException::class, 'A logo may have at most 16777216 pixels; this one is 12000 by 12000.');
+
+    it('refuses HEIF and AVIF it cannot read the size of', function (): void {
+        Logo::fromBytes("\x00\x00\x00\x18ftypheic".str_repeat("\x00", 32));
+    })->throws(InvalidLogoException::class);
+
+    it('refuses HEIF whose size can be read but not its image', function (): void {
+        Logo::fromBytes(substr((string) file_get_contents(fixture('ellipse.heic')), 0, 800));
+    })->throws(InvalidLogoException::class, 'cannot be read');
+
+    it('draws an SVG that says it is huge at the size it is placed at', function (): void {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="30000" height="30000" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#be123c"/></svg>';
+        $start = microtime(true);
+        $png = \ExeQue\Qr\Facades\Qr::make('large')->logo($svg, size: 0.2)->png(300)->contents();
+
+        expect(microtime(true) - $start)->toBeLessThan(5.0)
+            ->and(getimagesizefromstring($png)[0] ?? 0)->toBe(300);
+    })->skip(fn (): bool => ! extension_loaded('imagick') || Imagick::queryFormats('SVG') === [], 'ImageMagick cannot read SVG here.');
 });
 
 describe('HEIF and AVIF logos', function (): void {

@@ -29,6 +29,9 @@ final readonly class Flower implements Configurable, ModuleShape
         public float $heart = 0.25,
         public int $petals = 6,
     ) {
+        self::within('petal', $petal, 0.05, 0.5);
+        self::within('reach', $reach, 0.0, 0.5);
+        self::within('heart', $heart, 0.0, 0.5);
         self::within('petals', $petals, 3, 12);
     }
 

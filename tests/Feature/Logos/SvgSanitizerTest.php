@@ -72,6 +72,11 @@ describe('stripping', function (): void {
         'an escaped @import' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>@\69mport "//evil/x.css";</style></svg>', 'evil'],
         'any at-rule' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>@font-face{font-family:x}</style></svg>', 'font-face'],
         'an escape in a style attribute' => ['<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:u\72l(//evil)"/></svg>', 'evil'],
+        'an image-set in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>.a{background:image-set(x 1x)}</style></svg>', 'image-set'],
+        'an image-set in a style attribute' => ['<svg xmlns="http://www.w3.org/2000/svg"><rect style="background:-webkit-image-set(x 1x)"/></svg>', 'image-set'],
+        'a cross-fade in a style attribute' => ['<svg xmlns="http://www.w3.org/2000/svg"><rect style="background:cross-fade(a, b)"/></svg>', 'cross-fade'],
+        'a quoted string in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>a[x="{"],body{display:none}</style></svg>', 'display'],
+        'a comment in a style sheet' => ['<svg xmlns="http://www.w3.org/2000/svg"><style>a,body/*}*/{display:none}</style></svg>', 'display'],
         'an element of another namespace' => ['<svg xmlns="http://www.w3.org/2000/svg"><h:style xmlns:h="http://www.w3.org/1999/xhtml">body{display:none}</h:style></svg>', 'display'],
     ]);
 
@@ -118,6 +123,6 @@ describe('styles', function (): void {
     it('drops style sheets it cannot keep to the logo', function (string $css): void {
         expect(SvgIds::prefix('<svg xmlns="http://www.w3.org/2000/svg"><style>'.$css.'</style></svg>', 'p-'))
             ->toBe('<svg xmlns="http://www.w3.org/2000/svg" id="p-root"/>');
-    })->with(['@media print{.a{fill:red}}', '.a{fill:u\72l(x)}', '.a{fill:red']);
+    })->with(['@media print{.a{fill:red}}', '.a{fill:u\72l(x)}', '.a{fill:red', 'a[x="{"],body/*}*/{display:none}', "a[x='}']{fill:red}"]);
 
 });

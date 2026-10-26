@@ -1,11 +1,11 @@
 # Validating input
 
 `StyleRule` validates a style taken from input, in a form request or a Livewire form, and turns what passed into a
-style. A field is allowed once its method is called; anything else in the input is refused, at every level, so a typo
-is an error rather than dropped unseen.
+style. A field is allowed once its method is called; anything else in the input is refused, at every level.
 
 ```php
 use ExeQue\Qr\Filters\Enums\Filter;
+use ExeQue\Qr\Rendering\ScanSafety;
 use ExeQue\Qr\Shapes\Enums\Eye;
 use ExeQue\Qr\Shapes\Enums\Module;
 use ExeQue\Qr\Validation\Allow;
@@ -25,7 +25,8 @@ StyleRule::make()
 
 ## Using it
 
-As one rule, with every error under the style's key and naming the field it is about:
+As one rule, with every error under the style's key and naming the field it is about, under a nested or wildcard
+attribute too (`'design.style'`, `'styles.*'`):
 
 ```php
 public function rules(): array
@@ -69,7 +70,7 @@ Qr::url($url)->style($style)->png(600);
 The trait works the same in a Livewire form (`$this->form->qrStyle()`). Without it:
 
 ```php
-$style = StyleRule::defaults()->toStyle($request->validated('style'), base: 'brand');
+$style = StyleRule::toStyle($request->validated('style'), base: 'brand');
 ```
 
 `StyleRule::toPayload($style)` goes the other way, to fill a form for editing a style.
@@ -103,7 +104,12 @@ $style = StyleRule::defaults()->toStyle($request->validated('style'), base: 'bra
 
 Every field is optional; what is left out stays as the base has it. Shapes, presets and filters are named as their
 registries know them, the application's own included. A paint is a CSS color, a gradient as its stored array
-(`['kind' => 'linear', 'stops' => [['color' => '#be123c', 'position' => 0], ...]]`), or layers of either.
+(`['kind' => 'linear', 'stops' => [['color' => '#be123c', 'position' => 0], ...]]`, two stops at least), or, where
+`PaintRule::layers()` allows them, layers of either.
+
+The input names settings as a stored style does (`rotation`, `plateRadius`), where the builder's methods are verbs
+and short names (`->rotate()`, `->plate($paint, radius: 1)`). It is not `Style::toArray()`'s format: eyes are shared
+or set apart under `eyes.corners`, and no background is `null`.
 
 A corner set apart takes a preset or parts and a paint, as the shared settings do, and keeps what it leaves out from
 them. The logo's image never comes through the input: it is given to `toStyle()` or `qrStyle()` apart, validated by
@@ -112,7 +118,8 @@ the application's own rules.
 ## Fields
 
 `StyleRule::make()` allows nothing; each method allows its field. `StyleRule::everything()` allows every field but the
-logo, eyes by corner included, with the defaults below. `only()` and `except()` keep or drop fields already allowed:
+logo, eyes by corner included, with the defaults below. `only()` and `except()` keep or drop fields already allowed;
+naming a field the style does not have throws an `InvalidRuleException`:
 
 ```php
 StyleRule::everything()->except('margin', 'filters');
@@ -121,13 +128,13 @@ StyleRule::everything()->only('modules', 'eyes');
 
 | Method | Allows | Defaults |
 |---|---|---|
-| `modules(shapes, paint, rotation, size, opacity, options)` | `modules` | every shape, any paint, -180 to 180 degrees, the scan guards' scale, 0 to 1 |
+| `modules(shapes, paint, rotation, size, opacity, options)` | `modules` | every shape, any color or gradient, -180 to 180 degrees, the scan guards' scale, 0 to 1 |
 | `eyes(presets, corners, paint)` | `eyes.preset`, `eyes.paint`, and `eyes.corners` with `corners: true` or a list of corners | every preset |
 | `outer(shapes, paint, rotation, size, opacity, options)` | `eyes.outer`, shared and by corner | every outer eye, the guards' outer eye scale |
 | `inner(...)` | `eyes.inner` | every inner eye, the guards' inner eye scale |
 | `paint(PaintRule)` | | the paint every module and eye paint takes, unless its own method gives one |
-| `background(PaintRule)` | `background` | any paint, or none |
-| `margin(range)` | `margin` | the guards' least margin to 16 |
+| `background(PaintRule)` | `background` | any color or gradient, or none |
+| `margin(range)` | `margin` | the least margin of the guards (`scannable()`'s, else the configured ones) to 16 |
 | `filters(filters, max)` | `filters` | every filter, at most 8 |
 | `logo(size, padding, shapes, plate, plateRadius, position)` | `logo` | 0.05 to 0.3 or `'auto'`, 0 to 4, every shape, any color or none, 0 to 4; `position` refused unless given a range |
 
@@ -152,16 +159,16 @@ shapes. It takes enum cases and registered names.
 
 ## Paints
 
-`PaintRule` is a rule of its own too, for a single color field:
+`PaintRule` is a rule of its own too, for a single paint field:
 
 | | |
 |---|---|
 | `PaintRule::colors()` | colors only |
-| `PaintRule::gradients(Allow $kinds)` | gradients only, of the kinds allowed |
+| `PaintRule::gradients(?Allow $kinds = null)` | gradients only, of the kinds allowed; every kind when null |
 | `PaintRule::any()` | colors and gradients |
 | `->hex()` | colors, gradient stops included, as hex only |
 | `->stops(int $max)` | at most this many color stops, 8 by default |
-| `->layers(int $max)` | layers too, at most this many |
+| `->layers(int $max)` | layers too, at most this many; refused unless set |
 | `->nullable()` | none too |
 
 ```php
@@ -189,12 +196,12 @@ there is its name, or its name and options:
 Filters that wrap others (`by-role`, `region`, `compound`) are never taken from input; a filter's `only` and `in`
 do what they do.
 
-A shape's own options (`modules.options`, `eyes.outer.options`, `eyes.inner.options`) are refused unless allowed, as
-the registered names already carry theirs:
+A shape's own options (`modules.options`, `eyes.outer.options`, `eyes.inner.options`) are refused unless allowed:
 
 ```php
 ->modules(options: true)
 ->shape(Module::Rounded, radius: [0, 0.4])
+->shape('brand-dots', kind: 'module', diameter: [0.6, 0.9])   // a shape of the application's own
 ```
 
 The rules come from the class: those it states by implementing `HasOptionRules`, or else those its constructor's
@@ -223,7 +230,7 @@ Set the application's rules once, and use them everywhere:
 
 ```php
 // AppServiceProvider::boot()
-StyleRule::defaults(fn () => StyleRule::everything()->except('margin')->scannable());
+StyleRule::useDefaults(fn () => StyleRule::everything()->except('margin')->scannable());
 
 // Elsewhere
 StyleRule::defaults();

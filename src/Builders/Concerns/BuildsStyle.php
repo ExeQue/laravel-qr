@@ -35,6 +35,7 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Writers\Metadata;
+use SplFileInfo;
 
 /**
  * Every styling call a code or a reusable style takes. Each returns a changed copy,
@@ -253,13 +254,13 @@ trait BuildsStyle
     }
 
     /**
-     * A logo over the code: a file path, a data: URI, an SVG, raw image bytes, a
-     * Logo or something providing one, with named options (size, padding, shape,
-     * plate, plateRadius, position) - or a closure, given the logo's builder.
+     * A logo over the code: a file (an uploaded one too) or its path, a data: URI, an SVG, raw image
+     * bytes, a Logo or something providing one, with named options (size, padding, shape, plate,
+     * plateRadius, position) - or a closure, given the logo's builder.
      *
-     * @param Logo|ProvidesQrLogo|Closure(LogoBuilder): LogoBuilder|string $logo
+     * @param Logo|ProvidesQrLogo|SplFileInfo|Closure(LogoBuilder): LogoBuilder|string $logo
      */
-    public function logo(Logo|ProvidesQrLogo|Closure|string $logo, mixed ...$options): static
+    public function logo(Logo|ProvidesQrLogo|SplFileInfo|Closure|string $logo, mixed ...$options): static
     {
         $builder = $logo instanceof Closure
             ? $logo(new LogoBuilder())

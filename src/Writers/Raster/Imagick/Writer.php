@@ -148,13 +148,20 @@ final readonly class Writer implements Fakeable, WriterContract
             $this->fill($canvas, $style->plate, [$layer->area], 1.0, $scene, $layer->area, $scale);
         }
 
+        [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, $layer->box);
+
         $image = new Imagick();
         $image->setBackgroundColor(new ImagickPixel('transparent'));
-        // A density high enough that an SVG is drawn sharp at any size it is placed at.
-        $image->setResolution(300, 300);
+
+        if ($style->logo->isSvg()) {
+            // Drawn at twice the size it is placed at, for sharp edges, whatever size the SVG says it has:
+            // ImageMagick draws an SVG's own units at 96 to the inch.
+            $density = 96 * 2 * max($width / self::svgWidth($style->logo), $height / self::svgHeight($style->logo));
+            $image->setResolution($density, $density);
+        }
+
         $image->readImageBlob(self::readable($style->logo));
 
-        [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, $layer->box);
         $fit = min($width / $image->getImageWidth(), $height / $image->getImageHeight());
         [$imageWidth, $imageHeight] = [(int) max(1, round($image->getImageWidth() * $fit)), (int) max(1, round($image->getImageHeight() * $fit))];
         $image->resizeImage($imageWidth, $imageHeight, Imagick::FILTER_LANCZOS, 1);
@@ -173,6 +180,22 @@ final readonly class Writer implements Fakeable, WriterContract
     /**
      * The logo's bytes, when ImageMagick can read them: raster images always, SVG with its SVG support.
      */
+    /**
+     * The width ImageMagick gives an SVG: its width attribute, else its viewBox's.
+     */
+    private static function svgWidth(Logo $logo): float
+    {
+        return preg_match('/<svg[^>]*\swidth="([\d.]+)/i', $logo->contents, $match) === 1 && (float) $match[1] > 0 ? (float) $match[1] : $logo->width;
+    }
+
+    /**
+     * The height ImageMagick gives an SVG: its height attribute, else its viewBox's.
+     */
+    private static function svgHeight(Logo $logo): float
+    {
+        return preg_match('/<svg[^>]*\sheight="([\d.]+)/i', $logo->contents, $match) === 1 && (float) $match[1] > 0 ? (float) $match[1] : $logo->height;
+    }
+
     private static function readable(Logo $logo): string
     {
         return ! $logo->isSvg() || Imagick::queryFormats('SVG') !== [] ? $logo->contents : throw MissingExtensionException::svgLogos();

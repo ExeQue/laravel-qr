@@ -30,6 +30,9 @@ final class EyeTilt implements EyeFilter, NamedFilter, HasOptionRules
         private float|array $inner = -7,
         private int $seed = 0,
     ) {
+        // Numbers from a form are strings; a range of them is not converted on the way in.
+        $this->outer = is_array($outer) ? array_map(floatval(...), $outer) : $outer;
+        $this->inner = is_array($inner) ? array_map(floatval(...), $inner) : $inner;
     }
 
     public function eye(EyeContext $eye, EyeStyle $style): EyeStyle

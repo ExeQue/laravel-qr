@@ -6,6 +6,7 @@ namespace ExeQue\Qr\Validation;
 
 use Closure;
 use ExeQue\Qr\Builders\Resolve;
+use ExeQue\Qr\Exceptions\InvalidRuleException;
 use ExeQue\Qr\Filters\Enums\Filter;
 use ExeQue\Qr\Logos\Enums\LogoShape;
 use ExeQue\Qr\Logos\Logo;
@@ -75,22 +76,23 @@ final readonly class StyleRule implements ValidationRule
     }
 
     /**
-     * The application's rules, set once with a callback that makes them (such as in a service
-     * provider), and given back without one; everything() until set.
-     *
-     * @param (Closure(): self)|null $callback
+     * The application's rules, as set with useDefaults(); everything() until set.
      */
-    public static function defaults(?Closure $callback = null): ?self
+    public static function defaults(): self
     {
-        static $defaults = null;
+        $callback = self::stored();
 
-        if ($callback !== null) {
-            $defaults = $callback;
+        return $callback === null ? self::everything() : $callback();
+    }
 
-            return null;
-        }
-
-        return $defaults instanceof Closure ? $defaults() : self::everything();
+    /**
+     * Sets the application's rules, such as in a service provider, with a callback that makes them.
+     *
+     * @param Closure(): self $callback
+     */
+    public static function useDefaults(Closure $callback): void
+    {
+        self::stored($callback);
     }
 
     /**
@@ -98,6 +100,8 @@ final readonly class StyleRule implements ValidationRule
      */
     public function only(string ...$fields): self
     {
+        self::checkFields($fields);
+
         return clone($this, ['fields' => array_filter($this->fields, fn (string $field): bool => in_array(self::group($field), $fields, true), ARRAY_FILTER_USE_KEY)]);
     }
 
@@ -106,6 +110,8 @@ final readonly class StyleRule implements ValidationRule
      */
     public function except(string ...$fields): self
     {
+        self::checkFields($fields);
+
         return clone($this, ['fields' => array_filter($this->fields, fn (string $field): bool => ! in_array(self::group($field), $fields, true), ARRAY_FILTER_USE_KEY)]);
     }
 
@@ -223,22 +229,26 @@ final readonly class StyleRule implements ValidationRule
     }
 
     /**
-     * Tighter ranges for a shape's options, by name: `shape(Module::Rounded, radius: [0, 0.4])`.
+     * Tighter ranges for a shape's options: `shape(Module::Rounded, radius: [0, 0.4])`, or by the name
+     * it is registered under, with its kind: `shape('brand-dots', kind: 'module', diameter: [0.6, 0.9])`.
      *
+     * @param 'module'|'outer'|'inner' $kind For a name; an enum case says its own.
      * @param array{float|int, float|int} ...$ranges
      */
-    public function shape(Module|OuterEye|InnerEye $shape, array ...$ranges): self
+    public function shape(Module|OuterEye|InnerEye|string $shape, string $kind = 'module', array ...$ranges): self
     {
         $kind = match (true) {
             $shape instanceof Module => 'module',
             $shape instanceof OuterEye => 'outer',
-            default => 'inner',
+            $shape instanceof InnerEye => 'inner',
+            default => $kind,
         };
+        $name = is_string($shape) ? $shape : $shape->value;
 
-        $current = $this->shapeRanges[$kind][$shape->value] ?? [];
+        $current = $this->shapeRanges[$kind][$name] ?? [];
         /** @var array<string, array{float|int, float|int}> $ranges Named arguments, by option. */
 
-        return clone($this, ['shapeRanges' => array_replace_recursive($this->shapeRanges, [$kind => [$shape->value => [...$current, ...$ranges]]])]);
+        return clone($this, ['shapeRanges' => array_replace_recursive($this->shapeRanges, [$kind => [$name => [...$current, ...$ranges]]])]);
     }
 
     /**
@@ -279,7 +289,7 @@ final readonly class StyleRule implements ValidationRule
      */
     public function for(string $attribute): array
     {
-        $safety = ScanSafety::fromConfig((array) config('qr.scan_safety', []));
+        $safety = $this->scannable['safety'] ?? ScanSafety::fromConfig((array) config('qr.scan_safety', []));
         $rules = [$attribute => ['sometimes', new KnownKeys(array_values(array_unique(array_map(self::group(...), array_keys($this->fields)))))]];
 
         if ($this->scannable !== null) {
@@ -316,7 +326,11 @@ final readonly class StyleRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        foreach (app(Factory::class)->make([$attribute => $value], $this->for($attribute))->errors()->all() as $message) {
+        // Under its own path, so the rules find it under a nested or wildcard attribute too.
+        $data = [];
+        data_set($data, $attribute, $value);
+
+        foreach (app(Factory::class)->make($data, $this->for($attribute))->errors()->all() as $message) {
             $fail($message);
         }
     }
@@ -327,7 +341,7 @@ final readonly class StyleRule implements ValidationRule
      * @param array<array-key, mixed> $validated
      * @param Logo|SplFileInfo|null $logo The logo's image, for input with logo settings.
      */
-    public function toStyle(array $validated, Style|string|null $base = null, Logo|SplFileInfo|null $logo = null): Style
+    public static function toStyle(array $validated, Style|string|null $base = null, Logo|SplFileInfo|null $logo = null): Style
     {
         $style = match (true) {
             $base === null => Style::default(),
@@ -377,6 +391,36 @@ final readonly class StyleRule implements ValidationRule
     private function with(string $field, array $settings): self
     {
         return clone($this, ['fields' => [...$this->fields, $field => $settings]]);
+    }
+
+    /**
+     * Holds the callback that makes the application's rules, setting it when given one.
+     *
+     * @param (Closure(): self)|null $callback
+     *
+     * @return (Closure(): self)|null
+     */
+    private static function stored(?Closure $callback = null): ?Closure
+    {
+        static $stored = null;
+
+        if ($callback !== null) {
+            $stored = $callback;
+        }
+
+        return $stored;
+    }
+
+    /**
+     * @param array<array-key, string> $fields
+     */
+    private static function checkFields(array $fields): void
+    {
+        foreach ($fields as $field) {
+            if (! in_array($field, self::FIELDS, true)) {
+                throw InvalidRuleException::unknownField($field, self::FIELDS);
+            }
+        }
     }
 
     /**
@@ -506,7 +550,7 @@ final readonly class StyleRule implements ValidationRule
             'shape' => self::leaf(Rule::in($shapes)),
             'plate' => $logo['plate'] === false ? null : ['sometimes', $logo['plate'] ?? PaintRule::colors()->nullable()],
             'plateRadius' => $logo['plateRadius'] === false ? null : self::leaf(...Options::between($logo['plateRadius'] ?? [0, 4])),
-            'position' => $logo['position'] === false ? null : self::leaf('array', 'size:2'),
+            'position' => $logo['position'] === false ? null : self::leaf('list', 'size:2'),
             'position.*' => $logo['position'] === false ? null : self::leaf(...Options::between($logo['position'] ?? [0, 177])),
         ], fn (?array $rules): bool => $rules !== null);
 

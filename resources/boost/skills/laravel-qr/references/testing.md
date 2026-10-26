@@ -12,7 +12,7 @@ it('shows the ticket code', function () {
 
     $this->get(route('tickets.show', $ticket))->assertOk();
 
-    Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $ticket->url);
+    Qr::assertRendered(fn (PendingQr $qr) => $qr->text() === $ticket->url);
     Qr::assertRendered(fn (PendingQr $qr, string $format) => $format === 'png');
     Qr::assertRenderedCount(1);
 });

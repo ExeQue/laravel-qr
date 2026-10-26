@@ -265,7 +265,7 @@ class Playground extends Component
             'eyeFilters' => array_map(fn (array $filter): bool => is_subclass_of((string) Qr::filters()->classOf($filter['name']), EyeFilter::class), $this->filters),
             'roles' => array_map(fn (Role $role): string => $role->value, Role::cases()),
             'properties' => array_map(fn (Property $property): string => $property->value, Property::cases()),
-            'logos' => array_map(basename(...), glob(dirname(__DIR__, 2).'/resources/logos/*') ?: []),
+            'logos' => self::logos(),
             'php' => null,
             'warning' => null,
         ];
@@ -346,13 +346,18 @@ class Playground extends Component
             $code = $code->filter($this->filter($filter));
         }
 
+        // Only an uploaded image or one of the logos listed: the value comes from the browser.
+        $logo = match (true) {
+            $this->logo === self::UPLOADED && $this->upload !== null => Logo::fromBytes($this->upload->get()),
+            in_array($this->logo, self::logos(), true) => Logo::fromFile(dirname(__DIR__, 2).'/resources/logos/'.$this->logo),
+            default => null,
+        };
+
         return $code
             ->when($this->mirrored)->mirrored()
             ->scanSafety($this->safety())
-            ->when($this->logo !== '')->logo(
-                $this->logo === self::UPLOADED && $this->upload !== null
-                    ? Logo::fromBytes($this->upload->get())
-                    : dirname(__DIR__, 2)."/resources/logos/{$this->logo}",
+            ->when($logo !== null)->logo(
+                $logo ?? '',
                 size: $this->logoAuto ? 'auto' : $this->logoSize,
                 padding: $this->logoPadding,
                 shape: $this->logoShape,
@@ -568,5 +573,15 @@ class Playground extends Component
         } catch (QrExceptionInterface $exception) {
             return 'does not scan: '.$exception->getMessage();
         }
+    }
+
+    /**
+     * The logos to choose from, by file name.
+     *
+     * @return list<string>
+     */
+    private static function logos(): array
+    {
+        return array_map(basename(...), glob(dirname(__DIR__, 2).'/resources/logos/*') ?: []);
     }
 }

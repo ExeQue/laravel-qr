@@ -96,7 +96,7 @@ Use a named style or color the application already has before writing a new one.
 - A logo can be sized with `size: 'auto'`: as large as the error correction allows. Raise the error correction
   (`->errorCorrection('H')`) for a larger logo.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
-- In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $url)`.
+- In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->text() === $url)`.
 - Validate a style from a form with `StyleRule` (`'style' => StyleRule::defaults()`, or
   `...StyleRule::defaults()->for('style')`), and turn it into a style with `$request->qrStyle('style')`; never pass
   request input to `Style::fromArray()`.
