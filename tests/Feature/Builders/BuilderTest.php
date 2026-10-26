@@ -154,6 +154,14 @@ describe('styling', function (): void {
         expect(array_map(fn ($filter): string => $filter->name(), $code->toStyle()->filters()))->toBe(['mixed-opacity', 'mixed-size', 'mixed-size', 'mixed-size', 'nothing']);
     });
 
+    it('builds no class from a name that is not a shape, filter or style', function (): void {
+        \Tests\Fixtures\ConstructionSpy::$built = 0;
+
+        expect(fn () => Qr::style()->modules(\Tests\Fixtures\ConstructionSpy::class))->toThrow(ResolveException::class)
+            ->and(fn () => Qr::style()->filter(\Tests\Fixtures\ConstructionSpy::class))->toThrow(ResolveException::class)
+            ->and(\Tests\Fixtures\ConstructionSpy::$built)->toBe(0);
+    });
+
     it('says what it could not make sense of', function (callable $build, string $message): void {
         expect($build)->toThrow(ResolveException::class, $message);
     })->with([
