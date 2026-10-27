@@ -43,6 +43,21 @@ final class Figures
     }
 
     /**
+     * A fir tree of three tiers on a short trunk, its tip up, filling a box `$width` by `$height`.
+     */
+    public static function christmasTree(float $x, float $y, float $width, float $height): Path
+    {
+        // The right half, top to bottom, in a 1x1 box about the middle; the left mirrors it.
+        $right = [[0.0, -0.5], [0.3, -0.16], [0.21, -0.16], [0.42, 0.12], [0.32, 0.12], [0.5, 0.36], [0.14, 0.36], [0.14, 0.5]];
+        $left = array_map(fn (array $point): array => [-$point[0], $point[1]], array_reverse(array_slice($right, 1)));
+
+        return Path::polygon(array_map(
+            fn (array $point): array => [$x + $point[0] * $width, $y + $point[1] * $height],
+            [...$right, ...$left],
+        ));
+    }
+
+    /**
      * A star of `$points` points, corners alternating between the two radii, the first pointing up
      * and turned by `$turn` degrees. With equal radii and three points: a hexagon, point up.
      */

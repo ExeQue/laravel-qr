@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegant',
         'bubbles' => 'Bombolles',
         'organic' => 'Orgànic',
+        'garland' => 'Garlanda',
+        'baubles' => 'Boles de Nadal',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Creu',
         'pill' => 'Píndola',
         'blob' => 'Taca',
+        'christmas-tree' => 'Arbre de Nadal',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Espurna',
         'scalloped' => 'Festonejat',
         'organic' => 'Orgànic',
+        'christmas-tree' => 'Arbre de Nadal',
     ],
 
     'filters' => [

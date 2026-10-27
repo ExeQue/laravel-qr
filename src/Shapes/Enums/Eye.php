@@ -31,6 +31,7 @@ enum Eye: string implements ProvidesQrEye
     case Sparkle = 'sparkle';
     case Scalloped = 'scalloped';
     case Organic = 'organic';
+    case ChristmasTree = 'christmas-tree';
 
     public function outer(): OuterEye
     {
@@ -48,7 +49,7 @@ enum Eye: string implements ProvidesQrEye
             self::Octagon => OuterEye::Octagon,
             self::Leaf => OuterEye::Leaf,
             self::Drop => OuterEye::Drop,
-            self::Sparkle, self::Organic => OuterEye::Soft,
+            self::Sparkle, self::Organic, self::ChristmasTree => OuterEye::Soft,
             self::Scalloped => OuterEye::Scalloped,
         };
     }
@@ -72,6 +73,7 @@ enum Eye: string implements ProvidesQrEye
             self::Sparkle => InnerEye::Sparkle,
             self::Scalloped => InnerEye::Circle,
             self::Organic => InnerEye::Blob,
+            self::ChristmasTree => InnerEye::ChristmasTree,
         };
     }
 

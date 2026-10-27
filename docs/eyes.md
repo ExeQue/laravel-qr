@@ -67,8 +67,8 @@ Shown inside the square outer eye.
 | `octagon` | `leaf` | `drop` | `sparkle` |
 | ![clover](images/inner-eyes/clover.png) | ![cross](images/inner-eyes/cross.png) | ![pill](images/inner-eyes/pill.png) | ![blob](images/inner-eyes/blob.png) |
 | `clover` | `cross` | `pill` | `blob` |
-| ![hexagon-standing](images/inner-eyes/hexagon-standing.png) | | | |
-| `hexagon-standing` | | | |
+| ![hexagon-standing](images/inner-eyes/hexagon-standing.png) | ![christmas-tree](images/inner-eyes/christmas-tree.png) | | |
+| `hexagon-standing` | `christmas-tree` | | |
 
 | Name | Class | Options |
 |---|---|---|
@@ -93,6 +93,7 @@ Shown inside the square outer eye.
 | `cross` | `InnerEyes\Cross` | — a plus with broad bars |
 | `pill` | `InnerEyes\Pill` | `vertical` true: standing up, or lying down |
 | `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
+| `christmas-tree` | `InnerEyes\ChristmasTree` | — a fir of three tiers on a trunk, upright on every corner |
 
 The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
 still measures about three modules.
@@ -109,8 +110,8 @@ still measures about three modules.
 | `soft-round-corner` | `squircle` | `hexagon` | `octagon` |
 | ![leaf](images/eyes/leaf.png) | ![drop](images/eyes/drop.png) | ![sparkle](images/eyes/sparkle.png) | ![scalloped](images/eyes/scalloped.png) |
 | `leaf` | `drop` | `sparkle` | `scalloped` |
-| ![organic](images/eyes/organic.png) | ![hexagon-standing](images/eyes/hexagon-standing.png) | | |
-| `organic` | `hexagon-standing` | | |
+| ![organic](images/eyes/organic.png) | ![hexagon-standing](images/eyes/hexagon-standing.png) | ![christmas-tree](images/eyes/christmas-tree.png) | |
+| `organic` | `hexagon-standing` | `christmas-tree` | |
 
 | Preset | Outer | Inner |
 |---|---|---|
@@ -132,6 +133,7 @@ still measures about three modules.
 | `sparkle` | `soft` | `sparkle` |
 | `scalloped` | `scalloped` | `circle` |
 | `organic` | `soft` | `blob` |
+| `christmas-tree` | `soft` | `christmas-tree` |
 
 `Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
 
@@ -143,7 +145,9 @@ all three eyes: the top-right a quarter clockwise, the bottom-left a quarter bac
 
 ![Turned on each corner](images/eyes/round-corner-mirrored.png)
 
-`mirrored()` turns every other eye part the same way, for shapes of your own that should point out too:
+`mirrored()` turns every other eye part the same way, for shapes of your own that should point out too. Parts that
+look the same turned, and the `christmas-tree`, which should stand upright, implement `Shapes\Contracts\Symmetric`
+and are left as they are:
 
 ```php
 Qr::url($url)->eyes('my-arrow')->mirrored();
@@ -188,6 +192,7 @@ turns that are not quarter turns, which distort the pattern scanners look for.
 ![scalloped](images/eyes/scalloped-code.png)
 ![organic](images/eyes/organic-code.png)
 ![hexagon-standing](images/eyes/hexagon-standing-code.png)
+![christmas-tree](images/eyes/christmas-tree-code.png)
 
 ## Eyes of your own
 

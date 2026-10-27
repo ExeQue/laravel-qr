@@ -37,6 +37,8 @@ return [
         'classy' => 'Élégant',
         'bubbles' => 'Bulles',
         'organic' => 'Organique',
+        'garland' => 'Guirlande',
+        'baubles' => 'Boules de Noël',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Croix',
         'pill' => 'Pilule',
         'blob' => 'Tache',
+        'christmas-tree' => 'Sapin de Noël',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Étincelle',
         'scalloped' => 'Festonné',
         'organic' => 'Organique',
+        'christmas-tree' => 'Sapin de Noël',
     ],
 
     'filters' => [

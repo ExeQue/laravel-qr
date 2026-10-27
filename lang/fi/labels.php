@@ -37,6 +37,8 @@ return [
         'classy' => 'Tyylikäs',
         'bubbles' => 'Kuplat',
         'organic' => 'Orgaaninen',
+        'garland' => 'Köynnös',
+        'baubles' => 'Joulupallot',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Risti',
         'pill' => 'Kapseli',
         'blob' => 'Läiskä',
+        'christmas-tree' => 'Joulukuusi',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Kipinä',
         'scalloped' => 'Aaltoreuna',
         'organic' => 'Orgaaninen',
+        'christmas-tree' => 'Joulukuusi',
     ],
 
     'filters' => [

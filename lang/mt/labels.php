@@ -37,6 +37,8 @@ return [
         'classy' => 'Eleganti',
         'bubbles' => 'Bżieżaq',
         'organic' => 'Organiku',
+        'garland' => 'Girlanda',
+        'baubles' => 'Boċċi tal-Milied',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Salib',
         'pill' => 'Pillola',
         'blob' => 'Tebgħa',
+        'christmas-tree' => 'Siġra tal-Milied',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Tleqqija',
         'scalloped' => 'Ondulat',
         'organic' => 'Organiku',
+        'christmas-tree' => 'Siġra tal-Milied',
     ],
 
     'filters' => [

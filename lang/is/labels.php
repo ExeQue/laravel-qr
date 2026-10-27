@@ -37,6 +37,8 @@ return [
         'classy' => 'Fágað',
         'bubbles' => 'Bólur',
         'organic' => 'Lífrænt',
+        'garland' => 'Skrautlengja',
+        'baubles' => 'Jólakúlur',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Kross',
         'pill' => 'Hylki',
         'blob' => 'Klessa',
+        'christmas-tree' => 'Jólatré',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Neisti',
         'scalloped' => 'Bylgjað',
         'organic' => 'Lífrænt',
+        'christmas-tree' => 'Jólatré',
     ],
 
     'filters' => [

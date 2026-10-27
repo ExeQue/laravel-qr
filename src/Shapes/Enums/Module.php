@@ -7,6 +7,7 @@ namespace ExeQue\Qr\Shapes\Enums;
 use ExeQue\Qr\Factory;
 use ExeQue\Qr\Shapes\Contracts\ModuleShape;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
+use ExeQue\Qr\Shapes\Modules\Baubles;
 use ExeQue\Qr\Shapes\Modules\Brick;
 use ExeQue\Qr\Shapes\Modules\Bubbles;
 use ExeQue\Qr\Shapes\Modules\Classy;
@@ -18,6 +19,7 @@ use ExeQue\Qr\Shapes\Modules\Dot;
 use ExeQue\Qr\Shapes\Modules\Drop;
 use ExeQue\Qr\Shapes\Modules\Flower;
 use ExeQue\Qr\Shapes\Modules\Flowing;
+use ExeQue\Qr\Shapes\Modules\Garland;
 use ExeQue\Qr\Shapes\Modules\Heart;
 use ExeQue\Qr\Shapes\Modules\Hexagon;
 use ExeQue\Qr\Shapes\Modules\Leaf;
@@ -71,6 +73,8 @@ enum Module: string implements ProvidesQrModule
     case Classy = 'classy';
     case Bubbles = 'bubbles';
     case Organic = 'organic';
+    case Garland = 'garland';
+    case Baubles = 'baubles';
 
     /**
      * The shape's class, for building it with options.
@@ -105,6 +109,8 @@ enum Module: string implements ProvidesQrModule
             self::Classy => Classy::class,
             self::Bubbles => Bubbles::class,
             self::Organic => Organic::class,
+            self::Garland => Garland::class,
+            self::Baubles => Baubles::class,
         };
     }
 

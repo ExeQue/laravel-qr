@@ -8,6 +8,7 @@ use ExeQue\Qr\Factory;
 use ExeQue\Qr\Shapes\Contracts\InnerEyeShape;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye;
 use ExeQue\Qr\Shapes\InnerEyes\Blob;
+use ExeQue\Qr\Shapes\InnerEyes\ChristmasTree;
 use ExeQue\Qr\Shapes\InnerEyes\Clover;
 use ExeQue\Qr\Shapes\InnerEyes\Cross;
 use ExeQue\Qr\Shapes\InnerEyes\Diamond;
@@ -48,6 +49,7 @@ enum InnerEye: string implements ProvidesQrInnerEye
     case Cross = 'cross';
     case Pill = 'pill';
     case Blob = 'blob';
+    case ChristmasTree = 'christmas-tree';
 
     /**
      * The shape's class, for building it with options.
@@ -70,6 +72,7 @@ enum InnerEye: string implements ProvidesQrInnerEye
             self::Cross => Cross::class,
             self::Pill => Pill::class,
             self::Blob => Blob::class,
+            self::ChristmasTree => ChristmasTree::class,
             default => Rounded::class,
         };
     }

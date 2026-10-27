@@ -37,6 +37,8 @@ return [
         'classy' => 'Galánta',
         'bubbles' => 'Boilgeoga',
         'organic' => 'Orgánach',
+        'garland' => 'Bláthfhleasc',
+        'baubles' => 'Liathróidí Nollag',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Cros',
         'pill' => 'Piolla',
         'blob' => 'Ballóg',
+        'christmas-tree' => 'Crann Nollag',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Drithle',
         'scalloped' => 'Tonnach',
         'organic' => 'Orgánach',
+        'christmas-tree' => 'Crann Nollag',
     ],
 
     'filters' => [

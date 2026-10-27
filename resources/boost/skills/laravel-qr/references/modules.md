@@ -88,6 +88,7 @@ These look at their neighbors, like flowing modules, each in its own way.
 | `classy` | `Modules\Classy` | `radius` 0.5 (0 to 0.5): each group's outer top-left and bottom-right corners rounded |
 | `bubbles` | `Modules\Bubbles` | `smallest` 0.55, `largest` 0.95: a dot that grows with the number of neighbors |
 | `organic` | `Modules\Organic` | `least` 0.28, `most` 0.5: joined like flowing modules, each outer corner rounded by its own amount |
+| `garland` | `Modules\Garland` | `bead` 0.66 (0.4 to 0.9), `droop` 0.08 (up to 0.2): beads strung on a strand along rows and columns, a smaller bead between each two, hanging a little below the middle along a row and in the middle along a column; a module on its own is a bauble |
 
 ## Mixing shapes, and scattered looks
 

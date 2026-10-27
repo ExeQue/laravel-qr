@@ -37,6 +37,8 @@ return [
         'classy' => 'Κομψό',
         'bubbles' => 'Φυσαλίδες',
         'organic' => 'Οργανικό',
+        'garland' => 'Γιρλάντα',
+        'baubles' => 'Χριστουγεννιάτικες μπάλες',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Σταυρός',
         'pill' => 'Κάψουλα',
         'blob' => 'Κηλίδα',
+        'christmas-tree' => 'Χριστουγεννιάτικο δέντρο',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Λάμψη',
         'scalloped' => 'Κυματιστό',
         'organic' => 'Οργανικό',
+        'christmas-tree' => 'Χριστουγεννιάτικο δέντρο',
     ],
 
     'filters' => [
