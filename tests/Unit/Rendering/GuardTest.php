@@ -188,6 +188,8 @@ describe('contrast', function (): void {
         expect(guards($scene))->toBe(['inverted'])
             ->and($scene->adjustments[0]->warning)->toBeTrue()
             ->and($scene->adjustments[0]->detail)->toBe('lighter than its background, which not every reader scans')
+            ->and($scene->adjustments[0]->message())->toBe('The code is lighter than its background, which some phones cannot read.')
+            ->and($scene->adjustments[0]->message('da'))->toBe(trans('qr::guards.inverted', [], 'da'))
             ->and(guarded($inverted, safety: new ScanSafety(inverted: null))->adjustments)->toBe([])
             // Against the white assumed behind a transparent code, a light code is too faint, not lighter.
             ->and(guarded(Style::default()->withPaint(new Hex('#ffffff'))->withBackground(null), safety: new ScanSafety(minContrast: null))->adjustments)->toBe([])

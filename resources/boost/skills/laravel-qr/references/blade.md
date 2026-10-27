@@ -47,3 +47,8 @@ See [Shape icons](https://exeque.github.io/laravel-qr/docs/icons).
 Icons are filled in `currentColor` with no size of their own. They are hidden from screen readers unless given a
 `label`, which makes them `role="img"` with that label. `corner` shows an eye as it sits on that corner in a
 [mirrored](https://exeque.github.io/laravel-qr/docs/eyes#turned-to-point-out) style.
+
+## The manifest
+
+`<x-qr::manifest />` puts what the browser needs to know about the parts in the page, in the request's language, for
+`laravel-qr.js` to read. See [In the browser](https://exeque.github.io/laravel-qr/docs/browser).

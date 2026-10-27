@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => ':from modulról :to modulra növelve',
-    'held_offset' => ':max modulra korlátozva',
-    'held_degrees' => ':max fokra korlátozva',
-    'held_share' => 'a modul :share részére korlátozva',
-    'held_range' => ':min-:max tartományra korlátozva',
-    'held_tilt' => 'a dőlés :max fokra korlátozva',
-    'drawn' => 'mégis kirajzolva',
-    'outer_turned' => 'a külső szem :degrees fokkal tér el a negyed fordulattól',
-    'inner_turned' => 'a belső szem :degrees fokkal tér el a negyed fordulattól',
-    'logo_clears' => ':cleared adatcellát takar ki, többet a megengedett :budget cellánál',
-    'contrast' => 'csak :ratio:1 a háttérhez képest',
-    'inverted' => 'világosabb a hátterénél, amit nem minden olvasó tud beolvasni',
+    'raised_margin' => 'A kód körüli üres szegély szélesebb lett, hogy a telefonok megtalálják a kódot.',
+    'held_offset' => 'Néhány pötty visszakerült a helye felé, hogy a kód továbbra is beolvasható legyen.',
+    'held_degrees' => 'Néhány pötty kissé ki lett egyenesítve, hogy a kód továbbra is beolvasható legyen.',
+    'held_share' => 'Néhány pötty mérete megváltozott, hogy a kód továbbra is beolvasható legyen.',
+    'held_range' => 'A saroknégyzetek mérete megváltozott, hogy a telefonok megtalálják őket.',
+    'held_tilt' => 'A saroknégyzetek kevésbé lettek elforgatva, hogy a telefonok megtalálják őket.',
+    'drawn' => 'Néhány kihagyott pötty mégis megjelenik, hogy a kód továbbra is beolvasható legyen.',
+    'outer_turned' => 'A saroknégyzetek el vannak forgatva, ezért egyes telefonok nehezebben olvassák be őket.',
+    'inner_turned' => 'A saroknégyzetek közepe el van forgatva, ezért egyes telefonok nehezebben olvassák be.',
+    'logo_clears' => 'A logó a kód túl nagy részét takarja ahhoz, hogy megbízhatóan beolvasható legyen.',
+    'contrast' => 'A színek túlságosan hasonlítanak a háttérhez ahhoz, hogy a kód megbízhatóan beolvasható legyen.',
+    'inverted' => 'A kód világosabb a hátterénél, ezt pedig egyes telefonok nem tudják beolvasni.',
 ];

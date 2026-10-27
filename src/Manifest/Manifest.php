@@ -27,13 +27,16 @@ use ExeQue\Qr\Shapes\Contracts\OuterEyeShape;
 use ExeQue\Qr\Shapes\InnerEyes\Square as SquareInner;
 use ExeQue\Qr\Shapes\Modules\Square;
 use ExeQue\Qr\Shapes\OuterEyes\Square as SquareOuter;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Translation\Translator;
 use Throwable;
 
 /**
- * Everything a browser needs to know about the registered parts, as plain data: names, labels, unit
- * paths and the scan guards' limits, for pickers and instant checks. Codes themselves are still drawn
+ * Everything a browser needs to know about the registered parts, as plain data: names, unit paths and
+ * the scan guards' limits, the same in every language, and labels and messages in each language asked
+ * for, for pickers and instant checks. Codes themselves are still drawn
  * on the server.
  *
  * @internal Used through `Qr::manifest()`.
@@ -43,6 +46,7 @@ final readonly class Manifest
     private const int PRECISION = 3;
 
     public function __construct(
+        private CacheFactory $caches,
         private ModuleRegistry $modules,
         private OuterEyeRegistry $outerEyes,
         private InnerEyeRegistry $innerEyes,
@@ -54,44 +58,129 @@ final readonly class Manifest
     }
 
     /**
+     * The parts as data the same in every language, and their labels and the guards' messages in each of
+     * `$locales`: the application's language by default, `'*'` for every language the package comes in.
+     *
+     * @param list<string>|string|null $locales
+     *
      * @return array{
-     *     locale: string,
-     *     modules: array<string, array{label: string, path: string, neighbors: bool, varies: bool}>,
-     *     outerEyes: array<string, array{label: string, path: string, directional: bool}>,
-     *     innerEyes: array<string, array{label: string, path: string, directional: bool}>,
-     *     eyes: array<string, array{label: string, outer: string|null, inner: string|null}>,
-     *     filters: array<string, array{label: string, module: bool, eye: bool, color: bool|null}>,
+     *     locales: list<string>,
+     *     modules: array<string, array{path: string, neighbors: bool, varies: bool}>,
+     *     outerEyes: array<string, array{path: string, directional: bool}>,
+     *     innerEyes: array<string, array{path: string, directional: bool}>,
+     *     eyes: array<string, array{outer: string|null, inner: string|null}>,
+     *     filters: array<string, array{module: bool, eye: bool, color: bool|null}>,
      *     scanSafety: array<string, mixed>,
+     *     labels: array<string, array<string, array<string, string>>>,
+     *     messages: array<string, array<string, string>>,
      * }
      */
-    public function toArray(?string $locale = null): array
+    public function toArray(array|string|null $locales = null): array
     {
-        $previous = $this->translator->getLocale();
+        $locales = match (true) {
+            $locales === null => [$this->translator->getLocale()],
+            $locales === '*' => self::shipped(),
+            default => array_values(array_unique((array) $locales)),
+        };
 
-        if ($locale !== null) {
-            $this->translator->setLocale($locale);
+        if (! (bool) $this->config->get('qr.manifest.cache', false)) {
+            return $this->build($locales);
         }
 
+        $store = $this->store();
+        $key = $this->prefix().':manifest:'.$this->config->get('qr.cache.version', 1).'.'.(int) $store->get($this->prefix().':manifest-generation', 0).':'.implode(',', $locales);
+        $ttl = $this->config->get('qr.manifest.ttl');
+
+        /** @var array{locales: list<string>, modules: array<string, array{path: string, neighbors: bool, varies: bool}>, outerEyes: array<string, array{path: string, directional: bool}>, innerEyes: array<string, array{path: string, directional: bool}>, eyes: array<string, array{outer: string|null, inner: string|null}>, filters: array<string, array{module: bool, eye: bool, color: bool|null}>, scanSafety: array<string, mixed>, labels: array<string, array<string, array<string, string>>>, messages: array<string, array<string, string>>} */
+        return is_int($ttl)
+            ? $store->remember($key, $ttl, fn (): array => $this->build($locales))
+            : $store->rememberForever($key, fn (): array => $this->build($locales));
+    }
+
+    /**
+     * Makes every cached manifest stale.
+     */
+    public function flush(): void
+    {
+        $this->store()->add($this->prefix().':manifest-generation', 0);
+        $this->store()->increment($this->prefix().':manifest-generation');
+    }
+
+    /**
+     * @param list<string> $locales
+     *
+     * @return array{
+     *     locales: list<string>,
+     *     modules: array<string, array{path: string, neighbors: bool, varies: bool}>,
+     *     outerEyes: array<string, array{path: string, directional: bool}>,
+     *     innerEyes: array<string, array{path: string, directional: bool}>,
+     *     eyes: array<string, array{outer: string|null, inner: string|null}>,
+     *     filters: array<string, array{module: bool, eye: bool, color: bool|null}>,
+     *     scanSafety: array<string, mixed>,
+     *     labels: array<string, array<string, array<string, string>>>,
+     *     messages: array<string, array<string, string>>,
+     * }
+     */
+    private function build(array $locales): array
+    {
+        $labels = [];
+        $messages = [];
+        $previous = $this->translator->getLocale();
+
         try {
-            return [
-                'locale' => $this->translator->getLocale(),
-                'modules' => $this->moduleEntries(),
-                'outerEyes' => $this->partEntries($this->outerEyes),
-                'innerEyes' => $this->partEntries($this->innerEyes),
-                'eyes' => $this->eyeEntries(),
-                'filters' => $this->filterEntries(),
-                'scanSafety' => $this->scanSafety(),
-            ];
+            foreach ($locales as $locale) {
+                $this->translator->setLocale($locale);
+                $labels[$locale] = [
+                    'modules' => $this->modules->labels(),
+                    'outerEyes' => $this->outerEyes->labels(),
+                    'innerEyes' => $this->innerEyes->labels(),
+                    'eyes' => $this->eyes->labels(),
+                    'filters' => $this->filters->labels(),
+                ];
+                $messages[$locale] = (array) $this->translator->get('qr::validation.scannable');
+            }
         } finally {
             $this->translator->setLocale($previous);
         }
+
+        return [
+            'locales' => $locales,
+            'modules' => $this->moduleEntries(),
+            'outerEyes' => $this->partEntries($this->outerEyes),
+            'innerEyes' => $this->partEntries($this->innerEyes),
+            'eyes' => $this->eyeEntries(),
+            'filters' => $this->filterEntries(),
+            'scanSafety' => $this->scanSafety(),
+            'labels' => $labels,
+            'messages' => $messages,
+        ];
+    }
+
+    private function store(): Cache
+    {
+        return $this->caches->store($this->config->get('qr.manifest.store'));
+    }
+
+    private function prefix(): string
+    {
+        return (string) $this->config->get('qr.cache.prefix', 'qr');
+    }
+
+    /**
+     * The languages the package comes in.
+     *
+     * @return list<string>
+     */
+    private static function shipped(): array
+    {
+        return array_map(basename(...), glob(dirname(__DIR__, 2).'/lang/*', GLOB_ONLYDIR) ?: []);
     }
 
     /**
      * Each module alone about its middle, (0, 0) in a 1x1 cell; whether it takes its neighbors into account,
      * and whether it is drawn otherwise from cell to cell, in which cases a drawing of one is a likeness only.
      *
-     * @return array<string, array{label: string, path: string, neighbors: bool, varies: bool}>
+     * @return array<string, array{path: string, neighbors: bool, varies: bool}>
      */
     private function moduleEntries(): array
     {
@@ -104,7 +193,6 @@ final readonly class Manifest
             $path = $shape->draw($alone(0))->toSvg(self::PRECISION);
 
             $entries[$name] = [
-                'label' => $this->modules->label($name),
                 'path' => $path,
                 'neighbors' => $shape->draw($surrounded)->toSvg(self::PRECISION) !== $path,
                 'varies' => $shape->draw($alone(5))->toSvg(self::PRECISION) !== $path,
@@ -118,7 +206,7 @@ final readonly class Manifest
      * Each part about its middle: an outer eye within -3.5 to 3.5, an inner within -1.5 to 1.5; whether it
      * has one distinct corner, turned to point out on every corner of the code.
      *
-     * @return array<string, array{label: string, path: string, directional: bool}>
+     * @return array<string, array{path: string, directional: bool}>
      */
     private function partEntries(OuterEyeRegistry|InnerEyeRegistry $registry): array
     {
@@ -128,7 +216,6 @@ final readonly class Manifest
             $shape = $registry->get($name);
 
             $entries[$name] = [
-                'label' => $registry->label($name),
                 'path' => $shape->path()->toSvg(self::PRECISION),
                 'directional' => $shape instanceof Directional && $shape->isDirectional(),
             ];
@@ -140,7 +227,7 @@ final readonly class Manifest
     /**
      * Each preset with its parts by name; null for a part no name stands for.
      *
-     * @return array<string, array{label: string, outer: string|null, inner: string|null}>
+     * @return array<string, array{outer: string|null, inner: string|null}>
      */
     private function eyeEntries(): array
     {
@@ -152,7 +239,6 @@ final readonly class Manifest
             $eye = $this->eyes->get($name);
 
             $entries[$name] = [
-                'label' => $this->eyes->label($name),
                 'outer' => self::nameOf($eye->qrOuterEye(), $outers),
                 'inner' => self::nameOf($eye->qrInnerEye(), $inners),
             ];
@@ -165,7 +251,7 @@ final readonly class Manifest
      * Each filter: whether it changes modules, eyes, or both, and whether it changes colors; null when it cannot
      * be made by its name to tell.
      *
-     * @return array<string, array{label: string, module: bool, eye: bool, color: bool|null}>
+     * @return array<string, array{module: bool, eye: bool, color: bool|null}>
      */
     private function filterEntries(): array
     {
@@ -176,7 +262,6 @@ final readonly class Manifest
             $filter = $this->sample($name);
 
             $entries[$name] = [
-                'label' => $this->filters->label($name),
                 'module' => is_a($filter ?? $class ?? '', ModuleFilter::class, true),
                 'eye' => is_a($filter ?? $class ?? '', EyeFilter::class, true),
                 'color' => $filter === null ? null : self::recolors($filter),

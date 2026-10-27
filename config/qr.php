@@ -75,6 +75,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Manifest
+    |--------------------------------------------------------------------------
+    |
+    | What the browser is told about the parts, by <x-qr::manifest> or
+    | Qr::manifest(), can be cached in a store of its own, for the ttl in
+    | seconds or, with null, until php artisan qr:clear or a new version.
+    |
+    */
+
+    'manifest' => [
+        'cache' => (bool) env('QR_MANIFEST_CACHE', false),
+        'store' => env('QR_MANIFEST_CACHE_STORE'),
+        'ttl' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Attribution
     |--------------------------------------------------------------------------
     |

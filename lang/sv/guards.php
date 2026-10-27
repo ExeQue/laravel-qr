@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'höjd från :from till :to moduler',
-    'held_offset' => 'begränsad till :max moduler',
-    'held_degrees' => 'begränsad till :max grader',
-    'held_share' => 'begränsad till :share av en modul',
-    'held_range' => 'begränsad till :min-:max',
-    'held_tilt' => 'lutning begränsad till :max grader',
-    'drawn' => 'ritad ändå',
-    'outer_turned' => 'det yttre ögat är vridet :degrees grader från ett kvarts varv',
-    'inner_turned' => 'det inre ögat är vridet :degrees grader från ett kvarts varv',
-    'logo_clears' => 'täcker :cleared dataceller, fler än de :budget som tillåts',
-    'contrast' => 'bara :ratio:1 mot bakgrunden',
-    'inverted' => 'ljusare än bakgrunden, vilket inte alla läsare kan skanna',
+    'raised_margin' => 'Den tomma kanten runt koden har gjorts bredare så att telefoner kan hitta den.',
+    'held_offset' => 'Några prickar har flyttats tillbaka mot sina platser så att koden fortfarande går att skanna.',
+    'held_degrees' => 'Några prickar har rätats upp lite så att koden fortfarande går att skanna.',
+    'held_share' => 'Några prickar har fått en annan storlek så att koden fortfarande går att skanna.',
+    'held_range' => 'Hörnrutorna har fått en annan storlek så att telefoner kan hitta dem.',
+    'held_tilt' => 'Hörnrutorna har vridits mindre så att telefoner kan hitta dem.',
+    'drawn' => 'Några prickar som var utelämnade visas ändå så att koden fortfarande går att skanna.',
+    'outer_turned' => 'Hörnrutorna är vridna, vilket gör dem svårare att läsa för vissa telefoner.',
+    'inner_turned' => 'Mitten av hörnrutorna är vriden, vilket gör dem svårare att läsa för vissa telefoner.',
+    'logo_clears' => 'Logotypen täcker för mycket av koden för att den ska gå att skanna säkert.',
+    'contrast' => 'Färgerna ligger för nära bakgrunden för att koden ska gå att skanna säkert.',
+    'inverted' => 'Koden är ljusare än bakgrunden, och det kan vissa telefoner inte läsa.',
 ];

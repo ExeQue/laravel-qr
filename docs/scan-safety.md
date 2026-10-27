@@ -42,7 +42,8 @@ foreach ($scene->adjustments as $adjustment) {
 ```
 
 Each one is also dispatched as a `QrGuardApplied` event, and shown by the [Monocle lens](events.md#monocle).
-`message()` says what it did in the application's language; `detail` is always English, for logs.
+`message()` says what it did in plain words, for the people styling the code, in the application's language;
+`detail` says it to a developer, in English with its numbers, for logs.
 
 ## Asking without drawing
 
@@ -56,7 +57,7 @@ $report = Qr::url($url)->style($settings)->scanSafetyReport();
 
 $report->severity();    // Severity::Fine, Adjusted, Warning or Refused, the worst of it
 $report->isFine();      // nothing to say
-$report->messages();    // ['inverted' => 'lighter than its background, which not every reader scans'], translated
+$report->messages();    // ['inverted' => 'The code is lighter than its background, which some phones cannot read.']
 $report->adjustments;   // every GuardAdjustment, with severityOf($adjustment) for each
 ```
 

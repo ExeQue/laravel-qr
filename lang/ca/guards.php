@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'augmentat de :from a :to mòduls',
-    'held_offset' => 'limitat a :max mòduls',
-    'held_degrees' => 'limitat a :max graus',
-    'held_share' => 'limitat a :share d\'un mòdul',
-    'held_range' => 'limitat a :min-:max',
-    'held_tilt' => 'inclinació limitada a :max graus',
-    'drawn' => 'dibuixat igualment',
-    'outer_turned' => 'ull exterior girat :degrees graus respecte d\'un quart de volta',
-    'inner_turned' => 'ull interior girat :degrees graus respecte d\'un quart de volta',
-    'logo_clears' => 'tapa :cleared cel·les de dades, més de les :budget permeses',
-    'contrast' => 'només :ratio:1 respecte al fons',
-    'inverted' => 'més clar que el fons, cosa que no tots els lectors poden escanejar',
+    'raised_margin' => 'S\'ha eixamplat la vora buida al voltant del codi perquè els mòbils el puguin trobar.',
+    'held_offset' => 'Alguns punts s\'han tornat a acostar al seu lloc perquè el codi es pugui continuar escanejant.',
+    'held_degrees' => 'Alguns punts s\'han redreçat una mica perquè el codi es pugui continuar escanejant.',
+    'held_share' => 'Alguns punts han canviat de mida perquè el codi es pugui continuar escanejant.',
+    'held_range' => 'Els quadrats de les cantonades han canviat de mida perquè els mòbils els puguin trobar.',
+    'held_tilt' => 'Els quadrats de les cantonades s\'han girat menys perquè els mòbils els puguin trobar.',
+    'drawn' => 'Alguns punts que s\'havien tret es mostren igualment perquè el codi es pugui continuar escanejant.',
+    'outer_turned' => 'Els quadrats de les cantonades estan girats, i això en dificulta la lectura en alguns mòbils.',
+    'inner_turned' => 'El centre dels quadrats de les cantonades està girat, i això en dificulta la lectura en alguns mòbils.',
+    'logo_clears' => 'El logotip tapa massa el codi per poder escanejar-lo amb fiabilitat.',
+    'contrast' => 'Els colors s\'assemblen massa al fons per poder escanejar el codi amb fiabilitat.',
+    'inverted' => 'El codi és més clar que el fons, i alguns mòbils no el poden llegir.',
 ];

@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'portée de :from à :to modules',
-    'held_offset' => 'limité à :max modules',
-    'held_degrees' => 'limité à :max degrés',
-    'held_share' => 'limité à :share de module',
-    'held_range' => 'limité à :min-:max',
-    'held_tilt' => 'inclinaison limitée à :max degrés',
-    'drawn' => 'dessiné malgré tout',
-    'outer_turned' => 'œil extérieur décalé de :degrees degrés par rapport à un quart de tour',
-    'inner_turned' => 'œil intérieur décalé de :degrees degrés par rapport à un quart de tour',
-    'logo_clears' => 'masque :cleared cellules de données, au-delà des :budget autorisées',
-    'contrast' => 'seulement :ratio:1 par rapport au fond',
-    'inverted' => 'plus clair que son fond, ce que tous les lecteurs ne savent pas lire',
+    'raised_margin' => 'La marge vide autour du code a été élargie pour que les téléphones puissent le repérer.',
+    'held_offset' => 'Certains points ont été ramenés vers leur place pour que le code reste scannable.',
+    'held_degrees' => 'Certains points ont été légèrement redressés pour que le code reste scannable.',
+    'held_share' => 'Certains points ont été redimensionnés pour que le code reste scannable.',
+    'held_range' => 'Les carrés d\'angle ont été redimensionnés pour que les téléphones puissent les repérer.',
+    'held_tilt' => 'Les carrés d\'angle ont été moins tournés pour que les téléphones puissent les repérer.',
+    'drawn' => 'Certains points qui avaient été retirés sont finalement affichés pour que le code reste scannable.',
+    'outer_turned' => 'Les carrés d\'angle sont tournés, ce qui les rend plus difficiles à lire pour certains téléphones.',
+    'inner_turned' => 'Le centre des carrés d\'angle est tourné, ce qui le rend plus difficile à lire pour certains téléphones.',
+    'logo_clears' => 'Le logo couvre une trop grande partie du code pour qu\'il puisse être scanné de façon fiable.',
+    'contrast' => 'Les couleurs sont trop proches de l\'arrière-plan pour que le code puisse être scanné de façon fiable.',
+    'inverted' => 'Le code est plus clair que son arrière-plan, ce que certains téléphones ne savent pas lire.',
 ];

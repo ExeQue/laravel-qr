@@ -215,8 +215,10 @@ itself refuses, such as a size out of its range, is an error on that option. See
 
 `scannable()` draws the style with the scan guards it will be drawn with, the configured ones unless given, and turns
 whatever a guard would change or throw for into an error on the field it comes from: contrast on the paint or
-background, a logo too large on its size, modules moved or sized too far on the modules or filters, eyes on the eyes.
-Nothing is changed; the style comes back as chosen.
+background, a code lighter than its background on the background, a logo too large on its size, modules moved or
+sized too far on the modules or filters, eyes on the eyes. The errors are in plain words for the people choosing the
+style, such as "The logo is too large for the code to scan reliably." Nothing is changed; the style comes back as
+chosen.
 
 ```php
 ->scannable()

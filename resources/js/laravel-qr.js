@@ -1,7 +1,35 @@
 /**
- * laravel-qr in the browser: instant checks and labels from the manifest `Qr::manifest()` gives.
- * Codes themselves are drawn on the server; these follow the same rules as its scan guards.
+ * laravel-qr in the browser: instant checks, labels and messages from the manifest that
+ * `<x-qr::manifest />` puts in the page, or that `Qr::manifest()` gives. Codes themselves are
+ * drawn on the server; these follow the same rules as its scan guards.
  */
+
+const manifests = new Map()
+
+/**
+ * The manifest `<x-qr::manifest />` put in the page, read once; null when there is none.
+ */
+export function manifest (id = 'laravel-qr-manifest') {
+  if (!manifests.has(id)) {
+    const element = typeof document === 'undefined' ? null : document.getElementById(id)
+
+    manifests.set(id, element === null ? null : JSON.parse(element.textContent))
+  }
+
+  return manifests.get(id)
+}
+
+/**
+ * The manifest's language closest to `locale`, or to the page's `<html lang>`: the same, then the same
+ * language without its region (`da-DK` finds `da`), then the manifest's first.
+ */
+export function localeOf (given, locale = null) {
+  const locales = given?.locales ?? []
+  const wanted = locale ?? (typeof document === 'undefined' ? '' : document.documentElement.lang) ?? ''
+  const language = wanted.split(/[-_]/)[0]
+
+  return locales.find((candidate) => candidate === wanted) ?? locales.find((candidate) => candidate === language) ?? locales[0] ?? null
+}
 
 /** The scan guards' limits when no manifest is given: the package's defaults. */
 export const defaults = {
@@ -93,11 +121,12 @@ export function isLighter (color, background, opacity = 1) {
 /**
  * How a code's colors stand with the scan guards, as the server would judge them: the contrast, whether
  * the code is lighter than its background, and the worst of it - `fine`, `warning` or `refused` - with the
- * guards that spoke. A transparent code is read against `assumed_background`. Give the manifest, or its
- * `scanSafety`, for the application's limits.
+ * guards that spoke and what they say, in the manifest's language closest to `locale`. A transparent code
+ * is read against `assumed_background`. Without a manifest, the one in the page; without one there, the
+ * package's defaults and no messages.
  */
-export function scannability ({ foreground, background = null, transparent = false }, manifest = null) {
-  const limits = { ...defaults, ...(manifest?.scanSafety ?? manifest ?? {}) }
+export function scannability ({ foreground, background = null, transparent = false, locale = null }, given = manifest()) {
+  const limits = { ...defaults, ...(given?.scanSafety ?? {}) }
   const ground = transparent || background === null ? limits.assumed_background : background
   const ratio = contrast(foreground, ground)
   const lighter = isLighter(foreground, ground)
@@ -107,12 +136,14 @@ export function scannability ({ foreground, background = null, transparent = fal
     return { ratio: null, lighter: null, severity: 'unknown', problems }
   }
 
+  const speak = (guard, refuses) => problems.push({ guard, severity: refuses ? 'refused' : 'warning', message: message(guard, { manifest: given, locale }) })
+
   if (limits.min_contrast !== null && ratio < limits.min_contrast) {
-    problems.push({ guard: 'contrast', severity: limits.on_violation === 'throw' ? 'refused' : 'warning' })
+    speak('contrast', limits.on_violation === 'throw')
   }
 
   if (limits.inverted !== null && lighter) {
-    problems.push({ guard: 'inverted', severity: limits.inverted === 'throw' ? 'refused' : 'warning' })
+    speak('inverted', limits.inverted === 'throw')
   }
 
   const severity = problems.some((problem) => problem.severity === 'refused')
@@ -123,9 +154,17 @@ export function scannability ({ foreground, background = null, transparent = fal
 }
 
 /**
- * A part's label from the manifest: `label(manifest, 'modules', 'dots-medium')`; the name itself for
- * one it does not hold. Kinds: modules, outerEyes, innerEyes, eyes, filters.
+ * A part's label in the manifest's language closest to `locale`: `label('modules', 'dots-medium')`; the
+ * name itself for one it does not hold. Kinds: modules, outerEyes, innerEyes, eyes, filters.
  */
-export function label (manifest, kind, name) {
-  return manifest?.[kind]?.[name]?.label ?? name
+export function label (kind, name, { manifest: given = manifest(), locale = null } = {}) {
+  return given?.labels?.[localeOf(given, locale)]?.[kind]?.[name] ?? name
+}
+
+/**
+ * What a guard says about a code it would refuse or warn about, in plain words, in the manifest's
+ * language closest to `locale`; null for a guard it does not hold.
+ */
+export function message (guard, { manifest: given = manifest(), locale = null } = {}) {
+  return given?.messages?.[localeOf(given, locale)]?.[guard] ?? null
 }
