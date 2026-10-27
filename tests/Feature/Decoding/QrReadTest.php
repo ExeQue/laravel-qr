@@ -16,7 +16,7 @@ use ExeQue\Qr\Registries\DecoderRegistry;
 use Illuminate\Support\Facades\Process;
 use stdClass;
 
-covers(\ExeQue\Qr\Qr::class, DecoderRegistry::class, StackDecoder::class, ZxingDecoder::class, DecoderUnavailableException::class, UnreadableCodeException::class, Decoded::class, \ExeQue\Qr\QrServiceProvider::class);
+covers(\ExeQue\Qr\Qr::class, \ExeQue\Qr\Decoding\Native\Bitmap::class, DecoderRegistry::class, StackDecoder::class, ZxingDecoder::class, DecoderUnavailableException::class, UnreadableCodeException::class, Decoded::class, \ExeQue\Qr\QrServiceProvider::class);
 
 pest()->group('decoding');
 
@@ -79,6 +79,14 @@ describe('zxing', function (): void {
             ->and($decoded->version)->toBe(3)
             ->and(fn () => Qr::read('not an image', 'zxing'))->toThrow(UnreadableCodeException::class, 'No QR code');
     })->group('scan');
+
+    it('reads WebP with zxing, which zxing-wasm cannot decode itself, handing it over in gray', function (string $driver): void {
+        config(['qr.raster.driver' => $driver]);
+
+        expect(Qr::read(Qr::make(QR_READ_URL)->webp(300, driver: $driver)->contents(), 'zxing')->text)->toBe(QR_READ_URL)
+            ->and(\ExeQue\Qr\Decoding\Native\Bitmap::fromImage(Qr::make(QR_READ_URL)->png(30)->contents())->toPgm())->toStartWith("P5\n30 30\n255\n")
+            ->and(fn () => Qr::read("RIFF\0\0\0\0WEBPnot an image", 'zxing'))->toThrow(UnreadableCodeException::class);
+    })->with(['imagick', 'gd'])->group('scan');
 
     it('says what zxing needs when it is missing', function (array $zxing, string $message): void {
         config()->set('qr.reading.zxing', [...config('qr.reading.zxing'), ...$zxing]);
