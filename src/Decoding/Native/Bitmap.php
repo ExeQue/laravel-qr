@@ -121,6 +121,14 @@ final readonly class Bitmap
     /**
      * PNG, JPEG, WebP or GIF, by their first bytes.
      */
+    /**
+     * The image as a binary PGM, gray levels as they are: a format every image library reads.
+     */
+    public function toPgm(): string
+    {
+        return "P5\n{$this->width} {$this->height}\n255\n".pack('C*', ...$this->gray);
+    }
+
     private static function isRaster(string $bytes): bool
     {
         return str_starts_with($bytes, "\x89PNG\r\n\x1A\n")

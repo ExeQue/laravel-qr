@@ -104,9 +104,13 @@ final readonly class Style implements Arrayable, JsonSerializable
      * Each eye's outer and inner part merge on their own, filters are added after
      * these ones, and a logo replaces this one's.
      */
-    public function merge(self $over): self
+    /**
+     * `$over` laid over this style: what it changes from the defaults, or from `$from`, the style it was
+     * built from, so a value it set back to the package's default still counts.
+     */
+    public function merge(self $over, ?self $from = null): self
     {
-        return app(StyleSerializer::class)->merge($this, $over);
+        return app(StyleSerializer::class)->merge($this, $over, $from);
     }
 
     public function equals(self $other): bool

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Decoding;
 
 use ExeQue\Qr\Decoding\Contracts\Decoder;
+use ExeQue\Qr\Decoding\Native\Bitmap;
 use ExeQue\Qr\Exceptions\DecoderUnavailableException;
 use ExeQue\Qr\Exceptions\UnreadableCodeException;
 use Illuminate\Process\Factory as Processes;
@@ -35,6 +36,11 @@ final readonly class ZxingDecoder implements Decoder
     {
         // An SVG may start with a byte order mark, a declaration, a doctype and comments.
         $isSvg = stripos(substr($image, 0, 2048), '<svg') !== false && ! str_starts_with($image, "\x89PNG");
+
+        // zxing-wasm reads PNG, JPEG and GIF but not WebP: that is read here and handed over in gray.
+        if (str_starts_with($image, 'RIFF') && substr($image, 8, 4) === 'WEBP') {
+            $image = Bitmap::fromImage($image)->toPgm();
+        }
 
         try {
             $result = $this->processes->newPendingProcess()

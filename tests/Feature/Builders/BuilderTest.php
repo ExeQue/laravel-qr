@@ -238,6 +238,42 @@ describe('styling', function (): void {
             ->and(Qr::style()->background(LinearGradient::make('#fff', '#eee'))->toStyle()->background)->toBeInstanceOf(LinearGradient::class);
     });
 
+    it('takes a style builder\'s error correction, mask, scan safety and metadata with its look', function (): void {
+        $builder = Qr::style()->mask(5)->errorCorrection('H')->scanSafety(\ExeQue\Qr\Rendering\ScanSafety::off())->metadata(title: 'Brand')->paint('#be123c');
+        $code = Qr::make(BUILDER_URL)->metadata(author: 'Acme')->style($builder);
+        $closure = Qr::make(BUILDER_URL)->style(fn (StyleBuilder $style): StyleBuilder => $style->mask(3));
+        $html = \Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => $builder]);
+
+        expect($code->matrix()->mask->value)->toBe(5)
+            ->and($code->matrix()->errorCorrection)->toBe(\ExeQue\Qr\Encoder\Enums\ErrorCorrection::High)
+            ->and(fn () => Qr::make(BUILDER_URL)->paint('#eeeeee')->svg())->toThrow(\ExeQue\Qr\Exceptions\ScanSafetyException::class)
+            ->and($code->paint('#eeeeee')->svg()->contents())->toContain('<svg')
+            ->and($code->svg()->contents())->toContain('Brand')->toContain('Acme')
+            ->and($closure->matrix()->mask->value)->toBe(3)
+            ->and(Qr::make(BUILDER_URL)->style(Qr::style()->paint('#be123c'))->matrix()->errorCorrection)->toBe(Qr::make(BUILDER_URL)->matrix()->errorCorrection)
+            ->and($html)->toBe(\Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => $builder]))
+            ->and($html)->toContain('Brand');
+    });
+
+    it('takes what a style builder changes from the configured defaults, the package\'s defaults included', function (): void {
+        config(['qr.defaults.margin' => 1, 'qr.defaults.paint' => '#1e1b4b', 'qr.defaults.background' => null, 'qr.defaults.style' => null]);
+        Qr::styles()->register('soft', ['filters' => [['name' => 'mixed-opacity', 'options' => ['min' => 0.9]]]]);
+        $back = Qr::style()->margin(4)->paint('#000000')->background('#ffffff');
+        $viewBox = fn (string $svg): string => preg_match('/viewBox="([^"]*)"/', $svg, $match) ? $match[1] : '';
+
+        expect(Qr::make(BUILDER_URL)->style($back)->toStyle()->margin)->toBe(4)
+            ->and(Qr::make(BUILDER_URL)->style($back)->toStyle()->modules->paint->toCss())->toBe('#000000')
+            ->and(Qr::make(BUILDER_URL)->style($back)->toStyle()->background?->toCss())->toBe('#ffffff')
+            ->and(Qr::make(BUILDER_URL)->margin(2)->style(Qr::style()->paint('#be123c'))->toStyle()->margin)->toBe(2)
+            ->and($viewBox(\Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => Qr::style()->margin(4)])))->toBe($viewBox(Qr::style()->margin(4)->for(BUILDER_URL)->svg()->contents()))
+            ->and($viewBox(Qr::style()->margin(4)->for(BUILDER_URL)->svg()->contents()))->not->toBe($viewBox(Qr::make(BUILDER_URL)->svg()->contents()));
+
+        config(['qr.defaults.style' => 'soft']);
+
+        expect(Qr::make(BUILDER_URL)->style(Qr::style()->paint('#be123c'))->toStyle()->filters())->toHaveCount(1)
+            ->and(Qr::make(BUILDER_URL)->style(Qr::style()->filter('mixed-rotation'))->toStyle()->filters())->toHaveCount(2);
+    });
+
     it('merges styles in, later ones and later calls winning', function (): void {
         Qr::styles()->register('brand', ['modules' => ['paint' => '#1c1917'], 'margin' => 2]);
 

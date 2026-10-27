@@ -61,7 +61,9 @@ describe('reading', function (): void {
 
         expect($logo->mimeType)->toBe($mime)
             ->and($logo->aspectRatio())->toEqualWithDelta($ratio, 0.01)
-            ->and($logo->hash)->toBe(Logo::fromFile(fixture($file))->hash);
+            ->and($logo->hash)->toBe(Logo::fromFile(fixture($file))->hash)
+            // A converted image carries no dates it was read on, which would change its hash from second to second.
+            ->and($logo->contents)->not->toContain('date:');
     })->with([
         ['ellipse.png', 'image/png', 2.0],
         ['badge.svg', 'image/svg+xml', 2.0],

@@ -268,22 +268,36 @@ trait BuildsStyle
     /**
      * Merges styles in, in order, each over what is set so far: a Style or a style
      * builder, a provider, a class name, a registered name - or a closure, given a fresh style builder.
+     * A style builder brings what it sets of the code too: error correction, mask, scan safety
+     * and metadata.
      *
      * @param Style|StyleBuilder|ProvidesQrStyle|Closure(StyleBuilder): StyleBuilder|string ...$styles
      */
     public function style(Style|StyleBuilder|ProvidesQrStyle|Closure|string ...$styles): static
     {
-        $style = $this->style;
+        $copy = $this;
 
         foreach ($styles as $other) {
-            $style = $style->merge(match (true) {
-                $other instanceof Closure => $other(app(Qr::class)->style())->toStyle(),
-                $other instanceof StyleBuilder => $other->toStyle(),
-                default => $this->resolve->style($other),
-            });
+            $other = $other instanceof Closure ? $other(app(Qr::class)->style()) : $other;
+
+            if (! $other instanceof StyleBuilder) {
+                $copy = $copy->with(style: $copy->style->merge($this->resolve->style($other)));
+
+                continue;
+            }
+
+            // A style builder starts from the configured defaults: what it changes is measured from those.
+            $state = $other->state();
+            $copy = $copy->with(
+                style: $copy->style->merge($state['style'], app(Qr::class)->style()->toStyle()),
+                errorCorrection: $state['errorCorrection'],
+                mask: $state['mask'],
+                metadata: $copy->metadata->merge($state['metadata']),
+                scanSafety: $state['scanSafety'],
+            );
         }
 
-        return $this->with(style: $style);
+        return $copy;
     }
 
     /**
