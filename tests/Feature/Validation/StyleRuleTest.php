@@ -393,7 +393,7 @@ describe('scannable', function (): void {
         app()->setLocale('da');
         $rule = StyleRule::everything()->margin([0, 8])->scannable();
 
-        expect(styleErrors(['margin' => 1], $rule)['style.margin'][0])->toContain('hævet fra 1 til 2 moduler')
+        expect(styleErrors(['margin' => 1], $rule)['style.margin'][0])->toBe(trans('qr::validation.scannable.margin', [], 'da'))->not->toBe(trans('qr::validation.scannable.margin', [], 'en'))
             ->and(new \ExeQue\Qr\Rendering\GuardAdjustment('margin', 'raised_margin', ['from' => 1, 'to' => 2])->detail)->toBe('raised from 1 to 2 modules');
     });
 

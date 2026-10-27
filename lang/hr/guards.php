@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'povećano s :from na :to modula',
-    'held_offset' => 'ograničeno na :max modula',
-    'held_degrees' => 'ograničeno na :max stupnjeva',
-    'held_share' => 'ograničeno na :share modula',
-    'held_range' => 'ograničeno na :min-:max',
-    'held_tilt' => 'nagib ograničen na :max stupnjeva',
-    'drawn' => 'ipak iscrtano',
-    'outer_turned' => 'vanjsko oko zakrenuto je :degrees stupnjeva od četvrtine okreta',
-    'inner_turned' => 'unutarnje oko zakrenuto je :degrees stupnjeva od četvrtine okreta',
-    'logo_clears' => 'prekriva :cleared podatkovnih ćelija, više od dopuštenih :budget',
-    'contrast' => 'samo :ratio:1 u odnosu na pozadinu',
-    'inverted' => 'svjetlijim od pozadine, što ne može skenirati svaki čitač',
+    'raised_margin' => 'Prazni rub oko koda je proširen kako bi mobiteli mogli pronaći kod.',
+    'held_offset' => 'Neke su točkice vraćene bliže svojim mjestima kako bi se kod i dalje mogao skenirati.',
+    'held_degrees' => 'Neke su točkice malo izravnane kako bi se kod i dalje mogao skenirati.',
+    'held_share' => 'Nekim je točkicama promijenjena veličina kako bi se kod i dalje mogao skenirati.',
+    'held_range' => 'Kutnim kvadratima promijenjena je veličina kako bi ih mobiteli mogli pronaći.',
+    'held_tilt' => 'Kutni kvadrati manje su zakrenuti kako bi ih mobiteli mogli pronaći.',
+    'drawn' => 'Neke izostavljene točkice ipak su prikazane kako bi se kod i dalje mogao skenirati.',
+    'outer_turned' => 'Kutni kvadrati su zakrenuti, pa ih neki mobiteli teže čitaju.',
+    'inner_turned' => 'Sredine kutnih kvadrata su zakrenute, pa ih neki mobiteli teže čitaju.',
+    'logo_clears' => 'Logotip prekriva previše koda da bi se kod mogao pouzdano skenirati.',
+    'contrast' => 'Boje su previše slične pozadini da bi se kod mogao pouzdano skenirati.',
+    'inverted' => 'Kod je svjetliji od pozadine, a to neki mobiteli ne mogu pročitati.',
 ];

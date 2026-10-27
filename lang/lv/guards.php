@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'palielināts no :from līdz :to moduļiem',
-    'held_offset' => 'ierobežots līdz :max moduļiem',
-    'held_degrees' => 'ierobežots līdz :max grādiem',
-    'held_share' => 'ierobežots līdz :share no moduļa',
-    'held_range' => 'ierobežots līdz :min-:max',
-    'held_tilt' => 'slīpums ierobežots līdz :max grādiem',
-    'drawn' => 'tomēr uzzīmēts',
-    'outer_turned' => 'ārējā acs pagriezta par :degrees grādiem attiecībā pret ceturtdaļapgriezienu',
-    'inner_turned' => 'iekšējā acs pagriezta par :degrees grādiem attiecībā pret ceturtdaļapgriezienu',
-    'logo_clears' => 'aizsedz :cleared datu šūnas, vairāk nekā atļautās :budget',
-    'contrast' => 'tikai :ratio:1 pret fonu',
-    'inverted' => 'gaišāku par fonu, un ne katrs lasītājs to spēj noskenēt',
+    'raised_margin' => 'Tukšā mala ap kodu tika paplašināta, lai telefoni to varētu atrast.',
+    'held_offset' => 'Daži punktiņi tika pārvietoti atpakaļ uz savām vietām, lai kodu joprojām varētu noskenēt.',
+    'held_degrees' => 'Daži punktiņi tika nedaudz iztaisnoti, lai kodu joprojām varētu noskenēt.',
+    'held_share' => 'Dažiem punktiņiem tika mainīts izmērs, lai kodu joprojām varētu noskenēt.',
+    'held_range' => 'Stūra kvadrātiem tika mainīts izmērs, lai telefoni tos varētu atrast.',
+    'held_tilt' => 'Stūra kvadrāti tika pagriezti mazāk, lai telefoni tos varētu atrast.',
+    'drawn' => 'Daži izlaistie punktiņi tomēr tiek parādīti, lai kodu joprojām varētu noskenēt.',
+    'outer_turned' => 'Stūra kvadrāti ir pagriezti, tāpēc dažiem telefoniem tos ir grūtāk nolasīt.',
+    'inner_turned' => 'Stūra kvadrātu vidusdaļas ir pagrieztas, tāpēc dažiem telefoniem tās ir grūtāk nolasīt.',
+    'logo_clears' => 'Logotips aizsedz pārāk lielu koda daļu, lai to varētu droši noskenēt.',
+    'contrast' => 'Krāsas ir pārāk līdzīgas fonam, lai kodu varētu droši noskenēt.',
+    'inverted' => 'Kods ir gaišāks par fonu, un daži telefoni to nespēj nolasīt.',
 ];

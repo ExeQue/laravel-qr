@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 return [
-    'raised_margin' => 'kasvatettu :from moduulista :to moduuliin',
-    'held_offset' => 'rajattu :max moduuliin',
-    'held_degrees' => 'rajattu :max asteeseen',
-    'held_share' => 'rajattu :share moduuliin',
-    'held_range' => 'rajattu välille :min-:max',
-    'held_tilt' => 'kallistus rajattu :max asteeseen',
-    'drawn' => 'piirretty kuitenkin',
-    'outer_turned' => 'ulompi silmä on kääntynyt :degrees astetta neljänneskierroksesta',
-    'inner_turned' => 'sisempi silmä on kääntynyt :degrees astetta neljänneskierroksesta',
-    'logo_clears' => 'peittää :cleared datasolua, enemmän kuin sallitut :budget',
-    'contrast' => 'vain :ratio:1 taustaa vasten',
-    'inverted' => 'taustaansa vaaleamman, mitä kaikki lukijat eivät pysty skannaamaan',
+    'raised_margin' => 'Koodin ympärillä olevaa tyhjää reunaa levennettiin, jotta puhelimet löytävät koodin.',
+    'held_offset' => 'Joitakin pisteitä siirrettiin takaisin kohti paikkojaan, jotta koodi on yhä skannattavissa.',
+    'held_degrees' => 'Joitakin pisteitä suoristettiin hieman, jotta koodi on yhä skannattavissa.',
+    'held_share' => 'Joidenkin pisteiden kokoa muutettiin, jotta koodi on yhä skannattavissa.',
+    'held_range' => 'Kulmaneliöiden kokoa muutettiin, jotta puhelimet löytävät ne.',
+    'held_tilt' => 'Kulmaneliöitä käännettiin vähemmän, jotta puhelimet löytävät ne.',
+    'drawn' => 'Osa pois jätetyistä pisteistä näytetään sittenkin, jotta koodi on yhä skannattavissa.',
+    'outer_turned' => 'Kulmaneliöt on käännetty, mikä vaikeuttaa niiden lukemista joillakin puhelimilla.',
+    'inner_turned' => 'Kulmaneliöiden keskiosat on käännetty, mikä vaikeuttaa niiden lukemista joillakin puhelimilla.',
+    'logo_clears' => 'Logo peittää liian suuren osan koodista, jotta sen voisi skannata luotettavasti.',
+    'contrast' => 'Värit ovat liian lähellä taustaa, jotta koodin voisi skannata luotettavasti.',
+    'inverted' => 'Koodi on taustaansa vaaleampi, eivätkä kaikki puhelimet pysty lukemaan sitä.',
 ];

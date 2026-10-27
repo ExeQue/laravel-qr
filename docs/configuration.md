@@ -31,6 +31,14 @@ What every code starts from.
 
 See [Caching](caching.md).
 
+## manifest
+
+| Key | Default | |
+|---|---|---|
+| `cache` | `false` (`QR_MANIFEST_CACHE`) | keep the [manifest](browser.md#caching) across requests |
+| `store` | `null` (`QR_MANIFEST_CACHE_STORE`) | a cache store by name; the default store when null |
+| `ttl` | `null` | seconds; until `qr:clear` or a new `cache.version` when null |
+
 ## scan_safety
 
 | Key | Default |
@@ -47,6 +55,7 @@ See [Caching](caching.md).
 | `outer_eye_scale` | [0.93, 1.0] |
 | `inner_eye_scale` | [0.6, 1.15] |
 | `eye_rotation_warning` | 10 |
+| `inverted` | `warn`, or `throw` |
 
 `null` turns a guard off. See [Scan safety](scan-safety.md).
 

@@ -36,7 +36,8 @@ describe('the scan safety report', function (): void {
 
         expect($adjusted->severity())->toBe(Severity::Adjusted)
             ->and($warned->severity())->toBe(Severity::Warning)
-            ->and($warned->messages())->toBe(['inverted' => 'lighter than its background, which not every reader scans'])
+            ->and($warned->messages())->toBe(['inverted' => 'The code is lighter than its background, which some phones cannot read.'])
+            ->and($warned->adjustments[0]->detail)->toBe('lighter than its background, which not every reader scans')
             ->and($refused->severity())->toBe(Severity::Refused)
             ->and($warnedContrast->severity())->toBe(Severity::Warning)
             ->and(Qr::url(REPORT_URL)->paint('#ffffff')->background('#111111')->scanSafety(new ScanSafety(inverted: Violation::Throw))->scanSafetyReport()->severity())->toBe(Severity::Refused);
@@ -47,8 +48,9 @@ describe('the scan safety report', function (): void {
         app()->setLocale('da');
 
         expect(array_keys($report->messages()))->toBe(['margin', 'eye-rotation', 'scale'])
-            ->and($report->messages()['margin'])->toBe('hævet fra 0 til 2 moduler')
-            ->and($report->messages('en')['margin'])->toBe('raised from 0 to 2 modules')
+            ->and($report->messages()['margin'])->toBe(trans('qr::guards.raised_margin', [], 'da'))->not->toBe($report->messages('en')['margin'])
+            ->and($report->messages('en')['margin'])->toBe('The empty border around the code was made wider, so phones can find it.')
+            ->and($report->adjustments[0]->detail)->toBe('raised from 0 to 2 modules')
             ->and($report->severity())->toBe(Severity::Warning)
             ->and(Severity::Refused->rank())->toBeGreaterThan(Severity::Warning->rank());
     });

@@ -229,22 +229,26 @@ final class Qr
     }
 
     /**
-     * Makes every cached code stale.
+     * Makes every cached code, and every cached manifest, stale.
      */
     public function flush(): void
     {
         $this->container->make(Pipeline::class)->flush();
+        $this->container->make(Manifest::class)->flush();
     }
 
     /**
-     * The registered parts, their labels in the application's language or `$locale`, unit paths and
-     * the scan guards' limits, as plain data for a browser. See `Manifest`.
+     * The registered parts, unit paths and the scan guards' limits, as plain data for a browser, with
+     * labels and messages in each of `$locales`: the application's language by default, `'*'` for every
+     * language the package comes in. See `Manifest`.
+     *
+     * @param list<string>|string|null $locales
      *
      * @return array<string, mixed>
      */
-    public function manifest(?string $locale = null): array
+    public function manifest(array|string|null $locales = null): array
     {
-        return $this->container->make(Manifest::class)->toArray($locale);
+        return $this->container->make(Manifest::class)->toArray($locales);
     }
 
     /**

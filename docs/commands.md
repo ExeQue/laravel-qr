@@ -18,7 +18,7 @@ Parts that need options to be built (a palette needs its colors) are checked whe
 php artisan qr:clear
 ```
 
-Makes every cached code stale. See [Caching](caching.md).
+Makes every cached code, and every cached [manifest](browser.md#caching), stale. See [Caching](caching.md).
 
 ## qr:install
 
@@ -47,8 +47,10 @@ own instead, which also ship ready-made. See [Shape icons](icons.md).
 
 ```bash
 php artisan qr:manifest --path=resources/js/qr-manifest.json
-php artisan qr:manifest --locale=da
+php artisan qr:manifest --locale=da --locale=en
+php artisan qr:manifest --all-locales
 ```
 
-Writes the [manifest](browser.md#the-manifest) of registered parts, labels and scan guard limits as JSON, to the file
-or the console, with labels in the application's language or `--locale`.
+Writes the [manifest](browser.md#the-manifest) of registered parts, scan guard limits, labels and messages as JSON,
+to the file or the console, with labels and messages in the application's language, in each `--locale`, or in every
+language the package comes in. In a page, [`<x-qr::manifest />`](browser.md#in-the-page) needs no file.

@@ -22,8 +22,9 @@ final class ManifestCommand extends Command
 
     public function handle(Qr $qr, Filesystem $files): int
     {
-        $locale = $this->option('locale');
-        $json = json_encode($qr->manifest(is_string($locale) ? $locale : null), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        /** @var list<string> $locales */
+        $locales = (array) $this->option('locale');
+        $json = json_encode($qr->manifest($this->option('all-locales') === true ? '*' : ($locales === [] ? null : $locales)), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $path = $this->option('path');
 
         if (! is_string($path)) {
@@ -46,7 +47,8 @@ final class ManifestCommand extends Command
     {
         return [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The file to write to (default: the console)'),
-            new InputOption('locale', null, InputOption::VALUE_REQUIRED, 'The language of the labels (default: the application\'s)'),
+            new InputOption('locale', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A language to give labels and messages in, once for each (default: the application\'s)'),
+            new InputOption('all-locales', null, InputOption::VALUE_NONE, 'Give labels and messages in every language the package comes in'),
         ];
     }
 }

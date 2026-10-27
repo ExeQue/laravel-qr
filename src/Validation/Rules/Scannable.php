@@ -71,7 +71,7 @@ final readonly class Scannable implements ValidationRule
 
             if (! isset($reported[$adjustment->guard])) {
                 $reported[$adjustment->guard] = true;
-                $fail($field === null ? $attribute : "{$attribute}.{$field}", trans('qr::validation.scannable.'.$adjustment->guard, ['detail' => $adjustment->message()]));
+                $fail($field === null ? $attribute : "{$attribute}.{$field}", trans('qr::validation.scannable.'.$adjustment->guard));
             }
         }
     }

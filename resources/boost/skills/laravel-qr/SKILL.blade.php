@@ -119,7 +119,7 @@ Read the one that fits before going further than the steps above; each is the pa
 - `references/scan-safety.md` - the guards and their limits, and `scanSafetyReport()` to ask without drawing
 - `references/blade.md` - the components
 - `references/validation.md` - `StyleRule` for styles from forms: fields, `Allow`, `PaintRule`, `scannable()`, `toStyle()`
-- `references/browser.md` - `Qr::manifest()`, `qr:manifest`, and the JS module's `scannability()` and labels
+- `references/browser.md` - `<x-qr::manifest />`, `Qr::manifest()`, `qr:manifest`, caching, and the JS module's `scannability()`, `label()` and `message()`
 - `references/reading.md` - `Qr::read()`, decoders, `qr:install`
 - `references/caching.md`, `references/testing.md` - caching, and `Qr::fake()` with its assertions
 - `references/configuration.md` - every config key
