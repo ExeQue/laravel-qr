@@ -15,6 +15,8 @@ use ExeQue\Qr\Colors\ColorNames;
 use ExeQue\Qr\Decoding\Decoded;
 use ExeQue\Qr\Exceptions\ResolveException;
 use ExeQue\Qr\Exceptions\UnreadableCodeException;
+use ExeQue\Qr\Filters\Contracts\NamedFilter;
+use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
 use ExeQue\Qr\Icons\Icon;
 use ExeQue\Qr\Icons\Icons;
 use ExeQue\Qr\Payloads\Contracts\Payload;
@@ -235,8 +237,8 @@ final class Qr
 
     /**
      * A shape on its own as a small SVG: a module (or a whole eye preset) first, an eye preset by
-     * name, or an outer and/or inner eye by name. `Qr::icon(Module::Square)`, `Qr::icon(eye: 'heart')`,
-     * `Qr::icon(outer: 'square')`.
+     * name, or an outer and/or inner eye by name; or what a filter does. `Qr::icon(Module::Square)`,
+     * `Qr::icon(eye: 'heart')`, `Qr::icon(outer: 'square')`, `Qr::icon(filter: 'wave')`.
      */
     public function icon(
         ModuleShape|ProvidesQrModule|ProvidesQrEye|string|null $shape = null,
@@ -245,11 +247,13 @@ final class Qr
         bool $withOuter = true,
         Corner|string|null $corner = null,
         ProvidesQrEye|string|null $eye = null,
+        NamedFilter|ProvidesQrFilter|string|null $filter = null,
     ): Icon {
         $icons = $this->container->make(Icons::class);
         $corner = is_string($corner) ? Corner::from($corner) : $corner;
 
         return match (true) {
+            $filter !== null => $icons->filter($filter),
             $eye !== null => $icons->eye($eye, corner: $corner),
             $shape instanceof ProvidesQrEye && ! $shape instanceof ProvidesQrModule => $icons->eye($shape, corner: $corner),
             $shape !== null => $icons->module($shape),

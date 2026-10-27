@@ -56,7 +56,7 @@ describe('the icons command', function (): void {
         Qr::outerEyes()->register('own-square', \ExeQue\Qr\Shapes\OuterEyes\Square::class);
 
         $this->artisan('qr:icons', ['--path' => $this->directory])
-            ->expectsOutputToContain('3 QR code shape icons written')
+            ->expectsOutputToContain('3 QR code icons written')
             ->assertSuccessful();
 
         expect(file_get_contents("{$this->directory}/modules/diamond.svg"))->toContain('viewBox="0 0 3 3"')
@@ -66,6 +66,18 @@ describe('the icons command', function (): void {
             ->and(Qr::modules()->isBuiltIn('square'))->toBeFalse()
             ->and(Qr::innerEyes()->isBuiltIn('square'))->toBeTrue()
             ->and(Qr::innerEyes()->isBuiltIn('nope'))->toBeFalse();
+    });
+
+    it('writes the application\'s own filters, and names those it cannot draw without options', function (): void {
+        Qr::filters()->register('soft-turn', [\ExeQue\Qr\Filters\MixedRotation::class, 'min' => -5, 'max' => 5]);
+        Qr::filters()->register('brand-palette', \ExeQue\Qr\Filters\Palette::class);
+
+        $this->artisan('qr:icons', ['--path' => $this->directory])
+            ->expectsOutputToContain('No icon for filters/brand-palette')
+            ->expectsOutputToContain('1 QR code icons written')
+            ->assertSuccessful();
+
+        expect(file_get_contents("{$this->directory}/filters/soft-turn.svg"))->toContain('viewBox="0 0 5 5"');
     });
 
     it('writes to resources/svg/qr by default', function (): void {

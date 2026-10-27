@@ -29,7 +29,8 @@ default label is translatable: `php artisan vendor:publish --tag=qr-translations
 
 ## Shape icons
 
-Every module shape, outer eye, inner eye and preset can be shown on its own, for style pickers and settings screens.
+Every module shape, outer eye, inner eye, preset and filter can be shown on its own, for style pickers and settings
+screens.
 See [Shape icons](icons.md).
 
 ```blade
@@ -40,6 +41,7 @@ See [Shape icons](icons.md).
 <x-qr::eye :eye="Eye::Heart" class="size-8" />
 <x-qr::eye outer="soft" inner="heart" class="size-8" />
 <x-qr::eye :eye="$settings" :corner="Corner::TopRight" class="size-8" />
+<x-qr::filter filter="wave" class="size-8" />
 ```
 
 Icons are filled in `currentColor` with no size of their own. They are hidden from screen readers unless given a
