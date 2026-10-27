@@ -238,6 +238,23 @@ describe('styling', function (): void {
             ->and(Qr::style()->background(LinearGradient::make('#fff', '#eee'))->toStyle()->background)->toBeInstanceOf(LinearGradient::class);
     });
 
+    it('takes a style builder\'s error correction, mask, scan safety and metadata with its look', function (): void {
+        $builder = Qr::style()->mask(5)->errorCorrection('H')->scanSafety(\ExeQue\Qr\Rendering\ScanSafety::off())->metadata(title: 'Brand')->paint('#be123c');
+        $code = Qr::make(BUILDER_URL)->metadata(author: 'Acme')->style($builder);
+        $closure = Qr::make(BUILDER_URL)->style(fn (StyleBuilder $style): StyleBuilder => $style->mask(3));
+        $html = \Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => $builder]);
+
+        expect($code->matrix()->mask->value)->toBe(5)
+            ->and($code->matrix()->errorCorrection)->toBe(\ExeQue\Qr\Encoder\Enums\ErrorCorrection::High)
+            ->and(fn () => Qr::make(BUILDER_URL)->paint('#eeeeee')->svg())->toThrow(\ExeQue\Qr\Exceptions\ScanSafetyException::class)
+            ->and($code->paint('#eeeeee')->svg()->contents())->toContain('<svg')
+            ->and($code->svg()->contents())->toContain('Brand')->toContain('Acme')
+            ->and($closure->matrix()->mask->value)->toBe(3)
+            ->and(Qr::make(BUILDER_URL)->style(Qr::style()->paint('#be123c'))->matrix()->errorCorrection)->toBe(Qr::make(BUILDER_URL)->matrix()->errorCorrection)
+            ->and($html)->toBe(\Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => $builder]))
+            ->and($html)->toContain('Brand');
+    });
+
     it('merges styles in, later ones and later calls winning', function (): void {
         Qr::styles()->register('brand', ['modules' => ['paint' => '#1c1917'], 'margin' => 2]);
 

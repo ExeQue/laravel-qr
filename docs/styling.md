@@ -118,6 +118,9 @@ $brand->for($event->url)->svg();
 Qr::url($url)->style($brand)->png(600);
 ```
 
+A style builder brings what it sets of the code along, wherever it is given: its error correction, mask, scan
+safety and metadata, as in `<x-qr :content="$url" :style="$brand" />`.
+
 ### Named styles
 
 Register a style by name in a service provider:
