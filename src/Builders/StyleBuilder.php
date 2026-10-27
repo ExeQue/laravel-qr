@@ -43,7 +43,7 @@ final class StyleBuilder implements Arrayable
     }
 
     /**
-     * @return array{style: Style, errorCorrection: \ExeQue\Qr\Encoder\Enums\ErrorCorrection|null, minVersion: int, mask: \ExeQue\Qr\Encoder\Enums\Mask|null, metadata: Metadata, scanSafety: \ExeQue\Qr\Rendering\ScanSafety|null}
+     * @return array{style: Style, errorCorrection: \ExeQue\Qr\Encoder\Enums\ErrorCorrection|null, mask: \ExeQue\Qr\Encoder\Enums\Mask|null, metadata: Metadata, scanSafety: \ExeQue\Qr\Rendering\ScanSafety|null}
      *
      * @internal
      */
@@ -52,7 +52,6 @@ final class StyleBuilder implements Arrayable
         return [
             'style' => $this->style,
             'errorCorrection' => $this->errorCorrection,
-            'minVersion' => $this->minVersion,
             'mask' => $this->mask,
             'metadata' => $this->metadata,
             'scanSafety' => $this->scanSafety,

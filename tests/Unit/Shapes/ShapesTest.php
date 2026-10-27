@@ -148,6 +148,16 @@ describe('every shape', function (): void {
             ->and(boundsOf(Figures::hexagon(1, 1, 2, 2)))->toBe([0.0, 0.0, 2.0, 2.0]);
     });
 
+    it('draws a flower as the arcs of its circles that lie outside the others', function (): void {
+        $kinds = fn (Path $path): string => implode('', array_column($path->commands(), 0));
+
+        // Petals meeting each other; petals meeting only the heart, which shows between them; petals on their own.
+        expect($kinds(Figures::flower(0, 0, 0.19, 0.31, 0.25, 6)))->toBe('M'.str_repeat('C', 12).'Z')
+            ->and($kinds(Figures::flower(0, 0, 0.15, 0.4, 0.3, 4)))->toMatch('/^M(C+)+Z$/')->toContain('CC')
+            ->and(boundsOf(Figures::flower(0, 0, 0.15, 0.4, 0.3, 4)))->toBe([-0.55, -0.55, 0.55, 0.55])
+            ->and(substr_count($kinds(Figures::flower(0, 0, 0.1, 0.45, 0.0, 6)), 'M'))->toBe(7);
+    });
+
     it('draws the new figures about their middle', function (): void {
         expect(boundsOf(Figures::sparkle(0, 0, 1, 0.5)))->toBe([-1.0, -1.0, 1.0, 1.0])
             ->and(boundsOf(Figures::cross(1, 1, 1, 0.3)))->toBe([0.0, 0.0, 2.0, 2.0])

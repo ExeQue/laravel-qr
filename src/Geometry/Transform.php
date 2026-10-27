@@ -78,6 +78,21 @@ final readonly class Transform
     }
 
     /**
+     * Turned in depth, in degrees, and seen straight on: about the horizontal axis first, which
+     * shortens the height, then about the vertical one, which shortens the width.
+     */
+    public function tilt(float $x, float $y = 0.0): self
+    {
+        if ($x === 0.0 && $y === 0.0) {
+            return $this;
+        }
+
+        [$aboutX, $aboutY] = [deg2rad($x), deg2rad($y)];
+
+        return $this->then([cos($aboutY), 0, sin($aboutX) * sin($aboutY), cos($aboutX), 0, 0], 'tilt('.Number::format($x).' '.Number::format($y).')');
+    }
+
+    /**
      * @return array{float, float}
      */
     public function apply(float $x, float $y): array

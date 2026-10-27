@@ -81,6 +81,21 @@ Paints each module a color from a list, optionally weighted. `Palette(colors: [.
 
 A little of everything: rotation, size and offset. `Jitter(rotate: 10, size: 0.1, offset: 0.05, seed: 0)`.
 
+### jitter-3d
+
+![jitter-3d](images/filters/jitter-3d.png)
+
+Each module tilted in depth by an amount of its own, about both axes, like tiles laid by hand. `Jitter3d(tilt: 25,
+rotate: 0, seed: 0)`; degrees either way about each axis, and on the screen.
+
+### rotation-3d
+
+![rotation-3d](images/filters/rotation-3d.png)
+
+Turns each module in depth, seen straight on: about the horizontal axis (`x`), the vertical axis (`y`) and the screen
+(`z`). `Rotation3d(x: 30, y: 0, z: 0, seed: 0)`, in degrees, or a range such as `[-30, 30]` to pick from per module.
+A tilt about the horizontal axis shortens a module's height, one about the vertical axis its width.
+
 ### gradient-fill
 
 ![gradient-fill](images/filters/gradient-fill.png)
@@ -171,6 +186,20 @@ hue: 0, seed: 0)`; lightness in percent, hue in degrees either way. Gradients ar
 
 Each eye part turned, sized and faded by an amount of its own. `EyeJitter(rotate: 6, size: 0.06, opacity: 0, seed:
 0)`; degrees either way, and shares either way and to fade by.
+
+### eye-jitter-3d
+
+![eye-jitter-3d](images/filters/eye-jitter-3d.png)
+
+Each eye part tilted in depth by an amount of its own, about both axes. `EyeJitter3d(tilt: 12, rotate: 0, seed: 0)`;
+degrees either way about each axis, and on the screen.
+
+### eye-rotation-3d
+
+![eye-rotation-3d](images/filters/eye-rotation-3d.png)
+
+Turns each eye in depth as one, seen straight on. `EyeRotation3d(x: 15, y: 0, z: 0, seed: 0)`, in degrees, or a range
+such as `[-15, 15]` to pick from per corner.
 
 ### eye-twist
 
@@ -281,4 +310,6 @@ stored and cached, and register it by name. See [Extending](extending.md#filters
 ## Filters and scan safety
 
 Filters change exactly what makes codes hard to read. The [scan guards](scan-safety.md) run after all filters and
-hold the result within limits: offsets, sizes, skews, how many modules may be left out, contrast.
+hold the result within limits: offsets, sizes, skews, tilts, how many modules may be left out, contrast. A tilt
+shortens what it turns, so it is held where a module would be smaller than `min_scale`, or an eye smaller than the
+least of its scale range: by default about 53 degrees for a module and 21 for an outer eye.

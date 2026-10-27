@@ -6,7 +6,6 @@ namespace ExeQue\Qr\Writers\Raster\Concerns;
 
 use ExeQue\Qr\Contracts\Color as ColorContract;
 use ExeQue\Qr\Contracts\Paint;
-use ExeQue\Qr\Geometry\Path;
 use ExeQue\Qr\Gradients\Contracts\Gradient;
 use ExeQue\Qr\Gradients\Enums\GradientBox;
 use ExeQue\Qr\Gradients\Enums\Sampling;
@@ -27,7 +26,7 @@ trait GroupsItems
      * Items with the same paint and opacity share one path. A gradient in each
      * shape's own box needs each shape on its own; one sampled per module, a color per shape.
      *
-     * @return list<array{paint: Paint, opacity: float, paths: list<Path>, item: SceneItem}>
+     * @return list<array{paint: Paint, opacity: float, items: non-empty-list<SceneItem>}>
      */
     private function groups(Scene $scene): array
     {
@@ -52,8 +51,8 @@ trait GroupsItems
                     default => (string) spl_object_id($paint),
                 }.'@'.$opacity;
 
-                $groups[$key] ??= ['paint' => $paint, 'opacity' => $opacity, 'paths' => [], 'item' => $item];
-                $groups[$key]['paths'][] = $item->path();
+                $groups[$key] ??= ['paint' => $paint, 'opacity' => $opacity, 'items' => []];
+                $groups[$key]['items'][] = $item;
             }
         }
 

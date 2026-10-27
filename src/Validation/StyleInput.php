@@ -202,8 +202,8 @@ final class StyleInput
      */
     private static function modulesOf(ModuleStyle $modules, ModuleStyle $default): array
     {
-        if ([$modules->offsetX, $modules->offsetY, $modules->skewX, $modules->skewY, $modules->skip] !== [0.0, 0.0, 0.0, 0.0, false]) {
-            throw InvalidStyleException::notInput("modules' offset, skew or skip");
+        if ([$modules->offsetX, $modules->offsetY, $modules->skewX, $modules->skewY, $modules->tiltX, $modules->tiltY, $modules->skip] !== [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false]) {
+            throw InvalidStyleException::notInput("modules' offset, skew, tilt or skip");
         }
 
         return array_filter([
@@ -266,6 +266,10 @@ final class StyleInput
      */
     private static function partOf(EyePartStyle $part, OuterEyeRegistry|InnerEyeRegistry $registry, string $what): array
     {
+        if ([$part->tiltX, $part->tiltY] !== [0.0, 0.0]) {
+            throw InvalidStyleException::notInput("{$what}s' tilt");
+        }
+
         return array_filter([
             ...self::shapeOf($part->shape, $registry, $what),
             'paint' => $part->paint === null ? null : Normalizer::value($part->paint),

@@ -137,13 +137,15 @@ final readonly class StyleSerializer
             'offsetY' => $module->offsetY,
             'skewX' => $module->skewX,
             'skewY' => $module->skewY,
+            'tiltX' => $module->tiltX,
+            'tiltY' => $module->tiltY,
             'opacity' => $module->opacity,
             'skip' => $module->skip,
         ], [
             'shape' => Normalizer::value(Style::default()->modules->shape),
             'paint' => Normalizer::value(Style::default()->modules->paint),
             'rotation' => 0.0, 'scaleX' => 1.0, 'scaleY' => 1.0, 'offsetX' => 0.0, 'offsetY' => 0.0,
-            'skewX' => 0.0, 'skewY' => 0.0, 'opacity' => 1.0, 'skip' => false,
+            'skewX' => 0.0, 'skewY' => 0.0, 'tiltX' => 0.0, 'tiltY' => 0.0, 'opacity' => 1.0, 'skip' => false,
         ]);
     }
 
@@ -161,9 +163,11 @@ final readonly class StyleSerializer
             'scaleX' => $part->scaleX,
             'scaleY' => $part->scaleY,
             'opacity' => $part->opacity,
+            'tiltX' => $part->tiltX,
+            'tiltY' => $part->tiltY,
         ], [
             'shape' => Normalizer::value($default->shape),
-            'paint' => null, 'rotation' => 0.0, 'scaleX' => 1.0, 'scaleY' => 1.0, 'opacity' => 1.0,
+            'paint' => null, 'rotation' => 0.0, 'scaleX' => 1.0, 'scaleY' => 1.0, 'opacity' => 1.0, 'tiltX' => 0.0, 'tiltY' => 0.0,
         ]);
     }
 
@@ -182,6 +186,8 @@ final readonly class StyleSerializer
             (float) ($data['offsetY'] ?? $module->offsetY),
             (float) ($data['skewX'] ?? $module->skewX),
             (float) ($data['skewY'] ?? $module->skewY),
+            (float) ($data['tiltX'] ?? $module->tiltX),
+            (float) ($data['tiltY'] ?? $module->tiltY),
             (float) ($data['opacity'] ?? $module->opacity),
             (bool) ($data['skip'] ?? $module->skip),
         );
@@ -200,6 +206,8 @@ final readonly class StyleSerializer
             (float) ($data['scaleX'] ?? $part->scaleX),
             (float) ($data['scaleY'] ?? $part->scaleY),
             (float) ($data['opacity'] ?? $part->opacity),
+            (float) ($data['tiltX'] ?? $part->tiltX),
+            (float) ($data['tiltY'] ?? $part->tiltY),
         );
     }
 

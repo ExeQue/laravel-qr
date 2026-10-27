@@ -17,6 +17,8 @@ final readonly class ModuleStyle
      * @param float $rotation Degrees, about the cell's middle.
      * @param float $offsetX In modules.
      * @param float $skewX Degrees.
+     * @param float $tiltX Degrees turned in depth about the horizontal axis, which shortens the height.
+     * @param float $tiltY Degrees turned in depth about the vertical axis, which shortens the width.
      * @param bool $skip Draw nothing.
      */
     public function __construct(
@@ -29,6 +31,8 @@ final readonly class ModuleStyle
         public float $offsetY = 0.0,
         public float $skewX = 0.0,
         public float $skewY = 0.0,
+        public float $tiltX = 0.0,
+        public float $tiltY = 0.0,
         public float $opacity = 1.0,
         public bool $skip = false,
     ) {
@@ -64,6 +68,11 @@ final readonly class ModuleStyle
         return clone($this, ['skewX' => $x, 'skewY' => $y]);
     }
 
+    public function withTilt(float $x, float $y = 0.0): self
+    {
+        return clone($this, ['tiltX' => $x, 'tiltY' => $y]);
+    }
+
     public function withOpacity(float $opacity): self
     {
         return clone($this, ['opacity' => $opacity]);
@@ -80,6 +89,14 @@ final readonly class ModuleStyle
     public function rotateBy(float $degrees): self
     {
         return $this->withRotation($this->rotation + $degrees);
+    }
+
+    /**
+     * Tilts further, on top of the tilt so far.
+     */
+    public function tiltBy(float $x, float $y = 0.0): self
+    {
+        return $this->withTilt($this->tiltX + $x, $this->tiltY + $y);
     }
 
     /**
@@ -107,13 +124,14 @@ final readonly class ModuleStyle
     }
 
     /**
-     * Size, skew and rotation about the cell's middle, then the offset.
+     * Size, skew, tilt and rotation about the cell's middle, then the offset.
      */
     public function transform(): Transform
     {
         return Transform::identity()
             ->scale($this->scaleX, $this->scaleY)
             ->skew($this->skewX, $this->skewY)
+            ->tilt($this->tiltX, $this->tiltY)
             ->rotate($this->rotation)
             ->translate($this->offsetX, $this->offsetY);
     }

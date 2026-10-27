@@ -181,7 +181,8 @@ describe('to input', function (): void {
     it('refuses what the input has no field for', function (Style $style, string $message): void {
         expect(fn () => StyleRule::toPayload($style))->toThrow(InvalidStyleException::class, $message);
     })->with([
-        'a skew' => [fn () => Style::default()->withModules(Style::default()->modules->withSkew(10)), "modules' offset, skew or skip"],
+        'a skew' => [fn () => Style::default()->withModules(Style::default()->modules->withSkew(10)), "modules' offset, skew, tilt or skip"],
+        'an eye tilt' => [fn () => Style::default()->withEye(Corner::TopLeft, Style::default()->eye(Corner::TopLeft)->withInner(Style::default()->eye(Corner::TopLeft)->inner->withTilt(10))), "inner eyes' tilt"],
         'two regions' => [fn () => Style::default()->withFilters(new \ExeQue\Qr\Filters\InRegion(\ExeQue\Qr\Filters\Region::circle(5, 5, 3), new \ExeQue\Qr\Filters\MixedOpacity()->in(\ExeQue\Qr\Filters\Region::circle(1, 1, 1)))), 'filter in two regions'],
     ]);
 

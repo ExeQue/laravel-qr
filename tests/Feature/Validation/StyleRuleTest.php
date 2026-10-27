@@ -10,9 +10,11 @@ use ExeQue\Qr\Filters\Enums\Filter;
 use ExeQue\Qr\Filters\EyeEcho;
 use ExeQue\Qr\Filters\EyeFlip;
 use ExeQue\Qr\Filters\EyeJitter;
+use ExeQue\Qr\Filters\EyeJitter3d;
 use ExeQue\Qr\Filters\EyeMix;
 use ExeQue\Qr\Filters\EyePaint;
 use ExeQue\Qr\Filters\EyePalette;
+use ExeQue\Qr\Filters\EyeRotation3d;
 use ExeQue\Qr\Filters\EyeSample;
 use ExeQue\Qr\Filters\EyeShade;
 use ExeQue\Qr\Filters\EyeSize;
@@ -21,6 +23,7 @@ use ExeQue\Qr\Filters\EyeTilt;
 use ExeQue\Qr\Filters\EyeTwist;
 use ExeQue\Qr\Filters\GradientFill;
 use ExeQue\Qr\Filters\Jitter;
+use ExeQue\Qr\Filters\Jitter3d;
 use ExeQue\Qr\Filters\MixedOffset;
 use ExeQue\Qr\Filters\MixedOpacity;
 use ExeQue\Qr\Filters\MixedRotation;
@@ -30,6 +33,7 @@ use ExeQue\Qr\Filters\MixedSize;
 use ExeQue\Qr\Filters\MixedSkew;
 use ExeQue\Qr\Filters\Palette;
 use ExeQue\Qr\Filters\Radial;
+use ExeQue\Qr\Filters\Rotation3d;
 use ExeQue\Qr\Filters\Wave;
 use ExeQue\Qr\Qr as QrService;
 use ExeQue\Qr\QrServiceProvider;
@@ -78,6 +82,10 @@ covers(
     EyeEcho::class,
     EyeFlip::class,
     EyeJitter::class,
+    EyeJitter3d::class,
+    EyeRotation3d::class,
+    Jitter3d::class,
+    Rotation3d::class,
     EyeMix::class,
     EyePaint::class,
     EyePalette::class,
@@ -373,6 +381,10 @@ describe('filters', function (): void {
         [Filter::EyeEcho, []],
         [Filter::EyeStretch, []],
         [Filter::EyeFlip, ['vertical' => true]],
+        [Filter::Jitter3d, ['tilt' => 20, 'rotate' => 5]],
+        [Filter::Rotation3d, ['x' => [-20, 20], 'y' => 10, 'z' => 0]],
+        [Filter::EyeJitter3d, ['tilt' => 8]],
+        [Filter::EyeRotation3d, ['x' => 10, 'y' => [-5, 5]]],
     ]);
 });
 

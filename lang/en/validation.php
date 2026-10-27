@@ -57,6 +57,7 @@ return [
         'offset' => 'The :attribute field moves modules too far to scan: :detail.',
         'scale' => 'The :attribute field sizes modules beyond what scans: :detail.',
         'skew' => 'The :attribute field skews modules too far to scan: :detail.',
+        'tilt' => 'The :attribute field tilts modules too far to scan: :detail.',
         'skip' => 'The :attribute field leaves out more modules than scan: :detail.',
         'outer-eye-scale' => 'The :attribute field sizes the outer eyes beyond what scans: :detail.',
         'inner-eye-scale' => 'The :attribute field sizes the inner eyes beyond what scans: :detail.',

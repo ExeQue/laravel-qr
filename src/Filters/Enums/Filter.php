@@ -13,9 +13,11 @@ use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
 use ExeQue\Qr\Filters\EyeEcho;
 use ExeQue\Qr\Filters\EyeFlip;
 use ExeQue\Qr\Filters\EyeJitter;
+use ExeQue\Qr\Filters\EyeJitter3d;
 use ExeQue\Qr\Filters\EyeMix;
 use ExeQue\Qr\Filters\EyePaint;
 use ExeQue\Qr\Filters\EyePalette;
+use ExeQue\Qr\Filters\EyeRotation3d;
 use ExeQue\Qr\Filters\EyeSample;
 use ExeQue\Qr\Filters\EyeShade;
 use ExeQue\Qr\Filters\EyeSize;
@@ -25,6 +27,7 @@ use ExeQue\Qr\Filters\EyeTwist;
 use ExeQue\Qr\Filters\GradientFill;
 use ExeQue\Qr\Filters\InRegion;
 use ExeQue\Qr\Filters\Jitter;
+use ExeQue\Qr\Filters\Jitter3d;
 use ExeQue\Qr\Filters\MixedOffset;
 use ExeQue\Qr\Filters\MixedOpacity;
 use ExeQue\Qr\Filters\MixedRotation;
@@ -34,6 +37,7 @@ use ExeQue\Qr\Filters\MixedSize;
 use ExeQue\Qr\Filters\MixedSkew;
 use ExeQue\Qr\Filters\Palette;
 use ExeQue\Qr\Filters\Radial;
+use ExeQue\Qr\Filters\Rotation3d;
 use ExeQue\Qr\Filters\Wave;
 
 /**
@@ -50,6 +54,8 @@ enum Filter: string implements ProvidesQrFilter
     case MixedShape = 'mixed-shape';
     case Palette = 'palette';
     case Jitter = 'jitter';
+    case Jitter3d = 'jitter-3d';
+    case Rotation3d = 'rotation-3d';
     case GradientFill = 'gradient-fill';
     case ByRole = 'by-role';
     case Region = 'region';
@@ -67,6 +73,8 @@ enum Filter: string implements ProvidesQrFilter
     case EyeEcho = 'eye-echo';
     case EyeStretch = 'eye-stretch';
     case EyeFlip = 'eye-flip';
+    case EyeJitter3d = 'eye-jitter-3d';
+    case EyeRotation3d = 'eye-rotation-3d';
     case Compound = 'compound';
 
     /**
@@ -86,6 +94,8 @@ enum Filter: string implements ProvidesQrFilter
             self::MixedShape => MixedShape::class,
             self::Palette => Palette::class,
             self::Jitter => Jitter::class,
+            self::Jitter3d => Jitter3d::class,
+            self::Rotation3d => Rotation3d::class,
             self::GradientFill => GradientFill::class,
             self::ByRole => ByRole::class,
             self::Region => InRegion::class,
@@ -103,6 +113,8 @@ enum Filter: string implements ProvidesQrFilter
             self::EyeEcho => EyeEcho::class,
             self::EyeStretch => EyeStretch::class,
             self::EyeFlip => EyeFlip::class,
+            self::EyeJitter3d => EyeJitter3d::class,
+            self::EyeRotation3d => EyeRotation3d::class,
             self::Compound => Compound::class,
         };
     }

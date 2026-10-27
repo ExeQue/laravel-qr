@@ -55,8 +55,6 @@ trait BuildsStyle
      */
     protected ?ErrorCorrection $errorCorrection = null;
 
-    protected int $minVersion = 1;
-
     protected ?Mask $mask = null;
 
     protected Metadata $metadata;
@@ -208,14 +206,6 @@ trait BuildsStyle
             ?? throw InvalidOptionException::notOneOf(ErrorCorrection::class, 'level', array_column(ErrorCorrection::cases(), 'value'), $level)));
     }
 
-    /**
-     * The smallest version to use, so a design keeps one size.
-     */
-    public function minVersion(int $version): static
-    {
-        return $this->with(minVersion: $version);
-    }
-
     public function mask(Mask|int $mask): static
     {
         return $this->with(mask: $mask instanceof Mask ? $mask : (Mask::tryFrom($mask)
@@ -343,12 +333,11 @@ trait BuildsStyle
     private function with(
         ?Style $style = null,
         ?ErrorCorrection $errorCorrection = null,
-        ?int $minVersion = null,
         ?Mask $mask = null,
         ?Metadata $metadata = null,
         ?ScanSafety $scanSafety = null,
     ): static {
-        $changes = compact('style', 'errorCorrection', 'minVersion', 'mask', 'metadata', 'scanSafety');
+        $changes = compact('style', 'errorCorrection', 'mask', 'metadata', 'scanSafety');
 
         return clone($this, array_filter($changes, fn (mixed $value): bool => $value !== null));
     }

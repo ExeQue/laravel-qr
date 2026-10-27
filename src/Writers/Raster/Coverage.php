@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ExeQue\Qr\Writers\Raster;
 
 use ExeQue\Qr\Geometry\Path;
+use ExeQue\Qr\Rendering\SceneItem;
 
 /**
  * How much of each pixel a set of paths covers, filled with the nonzero rule: what GD
@@ -25,44 +26,46 @@ final class Coverage
     private const float SEGMENT = 1.5;
 
     /**
-     * @param list<Path> $paths
+     * @param list<Path|SceneItem> $paths Items are placed on the canvas one at a time, as they are read.
      *
      * @return array<int, array{int, non-empty-list<float>}> Row => the first column covered, and how much of it
      *                                                       and of each column after it is covered, 0-1.
      */
     public static function of(array $paths, float $scale, int $width, int $height): array
     {
-        $edges = self::edges($paths, $scale);
+        [$tops, $bottoms, $xs, $slopes, $windings] = self::edges($paths, $scale);
 
-        if ($edges === []) {
+        if ($tops === []) {
             return [];
         }
 
-        usort($edges, fn (array $a, array $b): int => $a[0] <=> $b[0]);
-
-        $top = max(0, (int) floor($edges[0][0]));
-        $bottom = min($height - 1, (int) ceil(max(array_column($edges, 1))));
+        $top = max(0, (int) floor(min($tops)));
+        $bottom = min($height - 1, (int) ceil(max($bottoms ?: [0.0])));
         $rows = [];
-        $next = 0;
         $active = [];
+
+        // Each edge by the row it starts in, rather than sorted: sorting copies them all.
+        $starts = [];
+
+        foreach ($tops as $edge => $y) {
+            $starts[max($top, (int) floor($y))][] = $edge;
+        }
 
         for ($row = $top; $row <= $bottom; $row++) {
             // The pixels a stretch only partly covers, and where whole ones start and stop.
             [$partial, $whole] = [[], []];
+            $active = [...$active, ...$starts[$row] ?? []];
+            unset($starts[$row]);
 
             for ($sample = 0; $sample < self::SAMPLES; $sample++) {
                 $y = $row + ($sample + 0.5) / self::SAMPLES;
 
-                while ($next < count($edges) && $edges[$next][0] <= $y) {
-                    $active[] = $edges[$next++];
-                }
-
-                $active = array_values(array_filter($active, fn (array $edge): bool => $edge[1] > $y));
+                $active = array_values(array_filter($active, fn (int $edge): bool => $bottoms[$edge] > $y));
                 $crossings = [];
 
-                foreach ($active as [$yMin, , $x, $slope, $winding]) {
-                    if ($yMin <= $y) {
-                        $crossings[] = [$x + ($y - $yMin) * $slope, $winding];
+                foreach ($active as $edge) {
+                    if ($tops[$edge] <= $y) {
+                        $crossings[] = [$xs[$edge] + ($y - $tops[$edge]) * $slopes[$edge], $windings[$edge]];
                     }
                 }
 
@@ -160,18 +163,19 @@ final class Coverage
     }
 
     /**
-     * Every outline as straight edges in pixels, each closed: `[top, bottom, x at the top, x per y, winding]`.
+     * Every outline as straight edges in pixels, each closed: their tops, bottoms, x at the top,
+     * x per y and winding, a list each; a large code has hundreds of thousands.
      *
-     * @param list<Path> $paths
+     * @param list<Path|SceneItem> $paths
      *
-     * @return list<array{float, float, float, float, int}>
+     * @return array{list<float>, list<float>, list<float>, list<float>, list<int>}
      */
     private static function edges(array $paths, float $scale): array
     {
-        $edges = [];
+        $edges = [[], [], [], [], []];
 
         foreach ($paths as $path) {
-            foreach (self::outlines($path, $scale) as $points) {
+            foreach (self::outlines($path instanceof SceneItem ? $path->path() : $path, $scale) as $points) {
                 $count = count($points);
 
                 for ($index = 0; $index < $count; $index++) {
@@ -182,9 +186,12 @@ final class Coverage
                         continue;
                     }
 
-                    $edges[] = $y0 < $y1
-                        ? [$y0, $y1, $x0, ($x1 - $x0) / ($y1 - $y0), 1]
-                        : [$y1, $y0, $x1, ($x0 - $x1) / ($y0 - $y1), -1];
+                    [$top, $bottom, $x, $winding] = $y0 < $y1 ? [$y0, $y1, $x0, 1] : [$y1, $y0, $x1, -1];
+                    $edges[0][] = $top;
+                    $edges[1][] = $bottom;
+                    $edges[2][] = $x;
+                    $edges[3][] = ($x1 - $x0) / ($y1 - $y0);
+                    $edges[4][] = $winding;
                 }
             }
         }
