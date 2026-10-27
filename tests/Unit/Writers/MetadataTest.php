@@ -44,10 +44,31 @@ describe('images', function (): void {
             ->and($xmp)->toContain('<xmpRights:WebStatement>https://acme.example/license</xmpRights:WebStatement>');
 
         if ($format === ImageFormat::Png) {
+            // Plain text chunks hold Latin-1, which ImageMagick hands back as it is.
             expect($image->getImageProperty('Author'))->toBe('Acme & Co')
-                ->and($image->getImageProperty('Copyright'))->toBe('© 2026 Acme');
+                ->and(mb_convert_encoding((string) $image->getImageProperty('Copyright'), 'UTF-8', 'ISO-8859-1'))->toBe('© 2026 Acme');
         }
     })->with(ImageFormat::cases());
+
+    it('writes PNG fields as plain text, which Windows shows, and as international text beyond Latin-1, before the image data', function (string $driver): void {
+        $png = \ExeQue\Qr\Facades\Qr::make('hi')->metadata(title: 'Kort', author: 'Zoë 東京', copyright: '© 2026 Acme')->png(100, driver: $driver)->contents();
+        $chunks = [];
+
+        for ($at = 8; $at < strlen($png); $at += 12 + unpack('N', substr($png, $at, 4))[1]) {
+            $chunks[] = [substr($png, $at + 4, 4), substr($png, $at + 8, unpack('N', substr($png, $at, 4))[1])];
+        }
+
+        $types = array_column($chunks, 0);
+        $text = fn (string $type, string $keyword): ?string => array_values(array_filter($chunks, fn (array $chunk): bool => $chunk[0] === $type && str_starts_with($chunk[1], "{$keyword}\0")))[0][1] ?? null;
+
+        expect($text('tEXt', 'Title'))->toBe("Title\0Kort")
+            ->and($text('tEXt', 'Copyright'))->toBe("Copyright\0\xA9 2026 Acme")
+            ->and($text('iTXt', 'Author'))->toBe("Author\0\0\0\0\0Zoë 東京")
+            ->and($text('iTXt', 'XML:com.adobe.xmp'))->not->toBeNull()
+            ->and(array_search('tEXt', $types, true))->toBeLessThan(array_search('IDAT', $types, true))
+            ->and(array_search('iTXt', $types, true))->toBeLessThan(array_search('IDAT', $types, true))
+            ->and($png)->not->toContain('Raw profile type');
+    })->with(['imagick', 'gd']);
 
     it('says why images cannot be written without Imagick', function (): void {
         expect(\ExeQue\Qr\Exceptions\MissingExtensionException::imagick()->getMessage())->toContain('needs the imagick PHP extension')

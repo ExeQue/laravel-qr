@@ -16,7 +16,7 @@ use ExeQue\Qr\Shapes\Enums\OuterEye;
 use ExeQue\Qr\View\Components;
 use Illuminate\Support\Facades\Blade;
 
-covers(Icon::class, Icons::class, \ExeQue\Qr\Qr::class, Components\Module::class, Components\OuterEye::class, Components\InnerEye::class, Components\Eye::class, Components\Concerns\RendersIcon::class);
+covers(Icon::class, Icons::class, \ExeQue\Qr\Qr::class, Components\Module::class, Components\OuterEye::class, Components\InnerEye::class, Components\Eye::class, Components\Filter::class, Components\Concerns\RendersIcon::class, \ExeQue\Qr\Console\IconsCommand::class);
 
 pest()->group('view');
 
@@ -45,6 +45,37 @@ describe('drawing', function (): void {
             ->and((string) Qr::icon(inner: 'square', corner: Corner::TopRight))->toContain('viewBox');
     });
 
+    it('draws a module filter on a sample of modules, and an eye filter on an eye', function (): void {
+        $plain = (string) app(Icons::class)->filter(new \ExeQue\Qr\Filters\Compound());
+
+        expect((string) Qr::icon(filter: 'mixed-rotation'))->toContain('viewBox="0 0 5 5"')->toContain('fill="currentColor"')
+            ->and((string) Qr::icon(filter: 'eye-tilt'))->toContain('viewBox="0 0 8 8"')
+            ->and((string) Qr::icon(filter: new \ExeQue\Qr\Filters\Compound(new \ExeQue\Qr\Filters\EyeTilt())))->toContain('viewBox="0 0 8 8"')
+            ->and($plain)->toContain('viewBox="0 0 8 8"')
+            ->and((string) Qr::icon(filter: \ExeQue\Qr\Filters\Enums\Filter::Wave))->toBe((string) Qr::icon(filter: new \ExeQue\Qr\Filters\Wave()));
+    });
+
+    it('draws every built-in filter by name as an icon of its own, stronger than its defaults', function (): void {
+        $icons = array_map(fn (string $name): string => (string) Qr::icon(filter: $name), Qr::filters()->names());
+
+        expect(array_unique($icons))->toHaveCount(count($icons))
+            ->and((string) Qr::icon(filter: 'mixed-size'))->not->toBe((string) Qr::icon(filter: new \ExeQue\Qr\Filters\MixedSize()));
+    });
+
+    it('shows colors as how dark they are, and leaves out what a filter skips', function (): void {
+        $palette = (string) Qr::icon(filter: new \ExeQue\Qr\Filters\Palette(['#000000', '#ffffff']));
+        $layered = (string) Qr::icon(filter: new \ExeQue\Qr\Filters\ClosureFilter(fn ($cell, $style) => $style->withPaint(new \ExeQue\Qr\Paints\Layered([new \ExeQue\Qr\Paints\Layer(new \ExeQue\Qr\Colors\Hex('#ffffff'))])), 'layered'));
+        $skipping = (string) Qr::icon(filter: new \ExeQue\Qr\Filters\ClosureFilter(fn ($cell, $style) => $style->withSkip(), 'skip-all'));
+
+        $nested = (string) Qr::icon(filter: new \ExeQue\Qr\Filters\ClosureFilter(fn ($cell, $style) => $style->withPaint(new class () implements \ExeQue\Qr\Contracts\Paint {}), 'nested'));
+
+        // A paint of the application's own, no color where it is read, is drawn whole.
+        expect($nested)->not->toContain('opacity')
+            ->and($palette)->toContain('opacity="0.2"')
+            ->and($layered)->toContain('opacity="0.2"')
+            ->and($skipping)->toContain('<svg')->not->toContain('d="M');
+    });
+
     it('needs a shape', function (): void {
         expect(fn () => Qr::icon())->toThrow(ResolveException::class);
     });
@@ -61,6 +92,7 @@ describe('components', function (): void {
         'inner eye' => ['<x-qr::inner-eye shape="square" :with-outer="false" label="Middle" />', 'role="img" aria-label="Middle"'],
         'preset' => ['<x-qr::eye eye="square" :corner="$corner" />', 'aria-hidden="true"'],
         'apart' => ['<x-qr::eye outer="square" inner="square" />', '<path d='],
+        'filter' => ['<x-qr::filter filter="wave" label="Wave" class="size-8" />', 'role="img" aria-label="Wave" class="size-8"'],
     ]);
 
     it('leaves an icon alone given no attributes', function (): void {

@@ -29,8 +29,8 @@ final class EyeRotation3d implements EyeFilter, NamedFilter, HasOptionRules
      * @param float|array{float, float} $z Degrees, or a range to pick from per corner.
      */
     public function __construct(
-        private float|array $x = 15,
-        private float|array $y = 0,
+        private float|array $x = [-15, 15],
+        private float|array $y = [-15, 15],
         private float|array $z = 0,
         private int $seed = 0,
     ) {

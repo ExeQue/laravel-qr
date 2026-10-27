@@ -23,6 +23,7 @@ use ExeQue\Qr\Writers\Raster\Concerns\GroupsItems;
 use ExeQue\Qr\Writers\Raster\Coverage;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
 use ExeQue\Qr\Writers\Raster\Image;
+use ExeQue\Qr\Writers\Raster\Metadata;
 use ExeQue\Qr\Writers\Raster\Options;
 use ExeQue\Qr\Writers\StreamBuffer;
 use ExeQue\Qr\Writers\StreamFactory;
@@ -260,12 +261,9 @@ final readonly class Writer implements Fakeable, WriterContract
 
         $metadata = $this->options->metadata;
 
-        if (! $metadata->isEmpty()) {
+        // PNG metadata is written into the file afterward, as GD's is.
+        if (! $metadata->isEmpty() && $format !== ImageFormat::Png) {
             $canvas->setImageProfile('xmp', $metadata->toXmp());
-
-            foreach ($format === ImageFormat::Png ? $metadata->toTextChunks() : [] as $keyword => $value) {
-                $canvas->setImageProperty($keyword, $value);
-            }
         }
 
         if ($this->options->dpi !== null) {
@@ -273,6 +271,8 @@ final readonly class Writer implements Fakeable, WriterContract
             $canvas->setImageResolution($this->options->dpi, $this->options->dpi);
         }
 
-        return $this->streams->buffer()->write($canvas->getImageBlob());
+        $bytes = $canvas->getImageBlob();
+
+        return $this->streams->buffer()->write($format === ImageFormat::Png && ! $metadata->isEmpty() ? Metadata::intoPng($bytes, $metadata) : $bytes);
     }
 }

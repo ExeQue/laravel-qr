@@ -118,7 +118,8 @@ codes do not sit in PHP strings until you ask for them.
 ## Attribution
 
 Codes can carry who made them, written into the file: `<title>`, `<desc>` and RDF metadata in SVG; XMP in PNG,
-JPEG and WebP; and text chunks in PNG.
+JPEG and WebP; and text chunks in PNG, which Windows shows in a file's details. A PNG field Latin-1 can hold is plain
+text, as Windows reads it; one beyond Latin-1 is international text.
 
 ```php
 Qr::url($url)

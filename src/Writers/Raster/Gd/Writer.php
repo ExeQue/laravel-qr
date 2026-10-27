@@ -21,6 +21,7 @@ use ExeQue\Qr\Writers\Raster\Concerns\GroupsItems;
 use ExeQue\Qr\Writers\Raster\Coverage;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
 use ExeQue\Qr\Writers\Raster\Image;
+use ExeQue\Qr\Writers\Raster\Metadata;
 use ExeQue\Qr\Writers\Raster\Options;
 use ExeQue\Qr\Writers\StreamBuffer;
 use ExeQue\Qr\Writers\StreamFactory;

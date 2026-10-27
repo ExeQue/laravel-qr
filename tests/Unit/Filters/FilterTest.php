@@ -438,6 +438,13 @@ describe('eye filters', function (): void {
             ->and($outer->opacity)->toBeLessThanOrEqual(1.0)->toBeGreaterThanOrEqual(0.5);
     });
 
+    it('stretches each eye from a range of its own, or all alike', function (): void {
+        $widths = fn (EyeStretch $filter): array => array_map(fn (Corner $corner): string => eye(filtered($filter), $corner)[0]->transform->toString(), Corner::cases());
+
+        expect(array_unique($widths(new EyeStretch(width: [0.9, 1.2], height: ['0.9', '1.1']))))->toHaveCount(3)
+            ->and(array_unique(array_map(fn (string $steps): string => strtok($steps, ')'), $widths(new EyeStretch()))))->toHaveCount(1);
+    });
+
     it('tilts each part in depth by an amount of its own', function (): void {
         [$outer, $inner] = eye(filtered(new EyeJitter3d(tilt: 10, rotate: 3)), Corner::TopRight);
 

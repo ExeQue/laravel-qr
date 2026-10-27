@@ -389,6 +389,14 @@ describe('filters', function (): void {
 });
 
 describe('scannable', function (): void {
+    it('says what the guard would do in the application\'s language', function (): void {
+        app()->setLocale('da');
+        $rule = StyleRule::everything()->margin([0, 8])->scannable();
+
+        expect(styleErrors(['margin' => 1], $rule)['style.margin'][0])->toContain('hævet fra 1 til 2 moduler')
+            ->and(new \ExeQue\Qr\Rendering\GuardAdjustment('margin', 'raised_margin', ['from' => 1, 'to' => 2])->detail)->toBe('raised from 1 to 2 modules');
+    });
+
     it('refuses what the guards would change or throw for, on the field it comes from', function (array $style, string $field): void {
         $rule = StyleRule::everything()->modules(size: [0.1, 3])->outer(rotation: [-90, 90])->logo(size: [0.05, 0.9])->margin([0, 8])->scannable();
 

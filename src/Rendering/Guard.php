@@ -58,7 +58,7 @@ final class Guard
             return $margin;
         }
 
-        $this->adjustments[] = new GuardAdjustment('margin', "raised from {$margin} to {$min} modules");
+        $this->adjustments[] = new GuardAdjustment('margin', 'raised_margin', ['from' => $margin, 'to' => $min]);
 
         return $min;
     }
@@ -72,7 +72,7 @@ final class Guard
             [$x, $y] = [max(-$max, min($max, $style->offsetX)), max(-$max, min($max, $style->offsetY))];
 
             if ([$x, $y] !== [$style->offsetX, $style->offsetY]) {
-                $this->adjustments[] = new GuardAdjustment('offset', 'held to '.Number::format($max).' modules', $where);
+                $this->adjustments[] = new GuardAdjustment('offset', 'held_offset', ['max' => Number::format($max)], $where);
                 $style = $style->withOffset($x, $y);
             }
         }
@@ -90,13 +90,13 @@ final class Guard
             [$x, $y] = [max(-$max, min($max, $style->skewX)), max(-$max, min($max, $style->skewY))];
 
             if ([$x, $y] !== [$style->skewX, $style->skewY]) {
-                $this->adjustments[] = new GuardAdjustment('skew', 'held to '.Number::format($max).' degrees', $where);
+                $this->adjustments[] = new GuardAdjustment('skew', 'held_degrees', ['max' => Number::format($max)], $where);
                 $style = $style->withSkew($x, $y);
             }
         }
 
         if ($style->skip && ! $this->maySkip($cell)) {
-            $this->adjustments[] = new GuardAdjustment('skip', 'drawn after all', $where);
+            $this->adjustments[] = new GuardAdjustment('skip', 'drawn', cell: $where);
             $style = $style->withSkip(false);
         }
 
@@ -114,7 +114,7 @@ final class Guard
             $offQuarter = abs($partStyle->rotation - round($partStyle->rotation / 90) * 90);
 
             if ($this->safety->eyeRotationWarning !== null && $offQuarter > $this->safety->eyeRotationWarning) {
-                $this->adjustments[] = new GuardAdjustment('eye-rotation', "{$part} eye turned ".Number::format($offQuarter).' degrees off a quarter turn', corner: $eye->corner, warning: true);
+                $this->adjustments[] = new GuardAdjustment('eye-rotation', "{$part}_turned", ['degrees' => Number::format($offQuarter)], corner: $eye->corner, warning: true);
             }
         }
 
@@ -142,7 +142,7 @@ final class Guard
             throw ScanSafetyException::logoTooLarge($knockout->clearedDataCells, $budget);
         }
 
-        $this->adjustments[] = new GuardAdjustment('logo', "clears {$knockout->clearedDataCells} data cells, more than the {$budget} it may", warning: true);
+        $this->adjustments[] = new GuardAdjustment('logo', 'logo_clears', ['cleared' => $knockout->clearedDataCells, 'budget' => $budget], warning: true);
     }
 
     /**
@@ -185,7 +185,7 @@ final class Guard
             throw ScanSafetyException::lowContrast($worst, $this->safety->minContrast);
         }
 
-        $this->adjustments[] = new GuardAdjustment('contrast', 'only '.Number::format($worst, 2).':1 against the background', warning: true);
+        $this->adjustments[] = new GuardAdjustment('contrast', 'contrast', ['ratio' => Number::format($worst, 2)], warning: true);
     }
 
     /**
@@ -215,7 +215,7 @@ final class Guard
             return $style;
         }
 
-        $this->adjustments[] = new GuardAdjustment('scale', 'held to '.Number::format(min($x * $width, $y * $height)).' of a module', $where);
+        $this->adjustments[] = new GuardAdjustment('scale', 'held_share', ['share' => Number::format(min($x * $width, $y * $height))], $where);
 
         return $style->withSize($x, $y);
     }
@@ -284,7 +284,7 @@ final class Guard
             return $style;
         }
 
-        $this->adjustments[] = new GuardAdjustment('tilt', 'held to '.Number::format(max(abs($x), abs($y))).' degrees', $where);
+        $this->adjustments[] = new GuardAdjustment('tilt', 'held_degrees', ['max' => Number::format(max(abs($x), abs($y)))], $where);
 
         return $style->withTilt($x, $y);
     }
@@ -301,7 +301,7 @@ final class Guard
             return $part;
         }
 
-        $this->adjustments[] = new GuardAdjustment($guard, 'tilt held to '.Number::format(max(abs($x), abs($y))).' degrees', corner: $eye->corner);
+        $this->adjustments[] = new GuardAdjustment($guard, 'held_tilt', ['max' => Number::format(max(abs($x), abs($y)))], corner: $eye->corner);
 
         return $part->withTilt($x, $y);
     }
@@ -335,7 +335,7 @@ final class Guard
             return $part;
         }
 
-        $this->adjustments[] = new GuardAdjustment($guard, 'held to '.Number::format($range[0]).'-'.Number::format($range[1]), corner: $eye->corner);
+        $this->adjustments[] = new GuardAdjustment($guard, 'held_range', ['min' => Number::format($range[0]), 'max' => Number::format($range[1])], corner: $eye->corner);
 
         return $part->withSize($x, $y);
     }

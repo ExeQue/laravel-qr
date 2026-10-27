@@ -9,10 +9,11 @@ use ExeQue\Qr\Qr;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 
 /**
- * Writes an SVG icon for every registered shape to a directory: modules/, outer-eyes/,
- * inner-eyes/ and eyes/, one file per name.
+ * Writes an SVG icon for every registered shape and filter to a directory: modules/, outer-eyes/,
+ * inner-eyes/, eyes/ and filters/, one file per name.
  *
  * @internal Registered by the service provider.
  */
@@ -20,7 +21,7 @@ final class IconsCommand extends Command
 {
     protected $name = 'qr:icons';
 
-    protected $description = 'Write SVG icons of the registered QR code shapes to a directory';
+    protected $description = 'Write SVG icons of the registered QR code shapes and filters to a directory';
 
     public function handle(Qr $qr, Icons $icons, Filesystem $files): int
     {
@@ -32,6 +33,7 @@ final class IconsCommand extends Command
             'outer-eyes' => [$qr->outerEyes(), $icons->outerEye(...)],
             'inner-eyes' => [$qr->innerEyes(), $icons->innerEye(...)],
             'eyes' => [$qr->eyes(), $icons->eye(...)],
+            'filters' => [$qr->filters(), $icons->filter(...)],
         ];
 
         $written = 0;
@@ -45,13 +47,22 @@ final class IconsCommand extends Command
                 // A name becomes a file name in the directory, nothing more.
                 $file = trim((string) preg_replace('/[^A-Za-z0-9._-]+/', '-', $name), '.-');
 
+                try {
+                    $icon = $draw($name)->toHtml();
+                } catch (Throwable $exception) {
+                    // A filter that needs options, such as a palette's colors, cannot be drawn by its name alone.
+                    $this->components->warn("No icon for {$directory}/{$name}: {$exception->getMessage()}");
+
+                    continue;
+                }
+
                 $files->ensureDirectoryExists("{$path}/{$directory}");
-                $files->put("{$path}/{$directory}/{$file}.svg", $draw($name)->toHtml()."\n");
+                $files->put("{$path}/{$directory}/{$file}.svg", $icon."\n");
                 $written++;
             }
         }
 
-        $this->components->info("{$written} QR code shape icons written to [{$path}].");
+        $this->components->info("{$written} QR code icons written to [{$path}].");
 
         return self::SUCCESS;
     }

@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ExeQue\Qr\Writers\Raster\Gd;
+namespace ExeQue\Qr\Writers\Raster;
 
 use ExeQue\Qr\Writers\Metadata as Attribution;
 
 /**
- * Writes metadata into the files GD made, which GD itself cannot.
+ * Writes metadata into PNG and JPEG files, the same way whichever driver drew them: GD cannot, and
+ * ImageMagick writes PNG text after the image data and XMP in a form of its own.
  *
  * @internal
  */
@@ -19,16 +20,22 @@ final class Metadata
     private const int PNG_HEADER = 8 + 4 + 4 + 13 + 4;
 
     /**
-     * The text chunks and XMP as international text chunks, right after the header.
+     * The fields as plain text chunks, which Windows shows in a file's details, where Latin-1 holds
+     * them, international ones otherwise; then XMP; all right after the header, before the image data.
      */
     public static function intoPng(string $png, Attribution $metadata): string
     {
         $chunks = '';
 
-        foreach ([...$metadata->toTextChunks(), 'XML:com.adobe.xmp' => $metadata->toXmp()] as $keyword => $text) {
-            // Keyword, no compression, no language, no translated keyword, the text in UTF-8.
-            $chunks .= self::chunk('iTXt', "{$keyword}\0\0\0\0\0{$text}");
+        foreach ($metadata->toTextChunks() as $keyword => $text) {
+            $latin = mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
+
+            $chunks .= mb_convert_encoding($latin, 'UTF-8', 'ISO-8859-1') === $text
+                ? self::chunk('tEXt', "{$keyword}\0{$latin}")
+                : self::international($keyword, $text);
         }
+
+        $chunks .= self::international('XML:com.adobe.xmp', $metadata->toXmp());
 
         return str_starts_with($png, self::PNG_SIGNATURE)
             ? substr($png, 0, self::PNG_HEADER).$chunks.substr($png, self::PNG_HEADER)
@@ -47,6 +54,14 @@ final class Metadata
         $at = substr($jpeg, 2, 2) === "\xFF\xE0" ? 4 + (unpack('n', substr($jpeg, 4, 2)) ?: [1 => 0])[1] : 2;
 
         return substr($jpeg, 0, $at).$segment.substr($jpeg, $at);
+    }
+
+    /**
+     * Keyword, no compression, no language, no translated keyword, the text in UTF-8.
+     */
+    private static function international(string $keyword, string $text): string
+    {
+        return self::chunk('iTXt', "{$keyword}\0\0\0\0\0{$text}");
     }
 
     private static function chunk(string $type, string $data): string
