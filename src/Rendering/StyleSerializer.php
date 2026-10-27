@@ -84,10 +84,33 @@ final readonly class StyleSerializer
         return $this->withLogo($style->withFilters(...$filters), $data['logo'] ?? null);
     }
 
-    public function merge(Style $base, Style $over): Style
+    /**
+     * `$over` laid over `$base`: what `$over` changes from the defaults, or from `$from` when it was
+     * built from that, so a value it set back to the package's default still counts.
+     */
+    public function merge(Style $base, Style $over, ?Style $from = null): Style
     {
         [$under, $top] = [$this->dehydrate($base), $this->dehydrate($over)];
         unset($under['logo'], $top['logo']);
+
+        if ($from !== null) {
+            $start = $this->dehydrate($from);
+            unset($start['logo']);
+            [$top, $reset] = self::changes($top, $start, ['modules' => 1, 'eyes' => 2]);
+
+            // What it set back to the default is cleared below it, so the default shows.
+            foreach ($reset as $path) {
+                $under = self::without($under, $path);
+            }
+
+            // Filters it started with are not added a second time.
+            $started = (array) ($start['filters'] ?? []);
+            $own = (array) ($top['filters'] ?? []);
+
+            if ($started !== [] && array_slice($own, 0, count($started)) === $started) {
+                $top['filters'] = array_slice($own, count($started));
+            }
+        }
 
         // A background, or none, replaces the other.
         if (isset($top['background']) || isset($top['transparent'])) {
@@ -103,6 +126,56 @@ final readonly class StyleSerializer
         ];
 
         return $this->hydrate($merged)->withLogo($over->logo ?? $base->logo);
+    }
+
+    /**
+     * What `$top` holds that `$from` does not, and the paths `$from` holds that `$top` no longer does,
+     * looking as many levels into each key as `$levels` says: one number for every key, or a number by key.
+     *
+     * @param array<array-key, mixed> $top
+     * @param array<array-key, mixed> $from
+     * @param int|array<string, int> $levels
+     *
+     * @return array{array<array-key, mixed>, list<list<array-key>>}
+     */
+    private static function changes(array $top, array $from, int|array $levels): array
+    {
+        [$changed, $reset] = [[], []];
+
+        foreach (array_keys([...$from, ...$top]) as $key) {
+            $deeper = is_int($levels) ? $levels : ($levels[$key] ?? 0);
+
+            if ($deeper > 0) {
+                [$inner, $innerReset] = self::changes((array) ($top[$key] ?? []), (array) ($from[$key] ?? []), $deeper - 1);
+                $changed += $inner === [] ? [] : [$key => $inner];
+                $reset = [...$reset, ...array_map(fn (array $path): array => [$key, ...$path], $innerReset)];
+            } elseif (! array_key_exists($key, $top)) {
+                $reset[] = [$key];
+            } elseif (! array_key_exists($key, $from) || $top[$key] !== $from[$key]) {
+                $changed[$key] = $top[$key];
+            }
+        }
+
+        return [$changed, $reset];
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     * @param non-empty-list<array-key>|list<array-key> $path
+     *
+     * @return array<array-key, mixed>
+     */
+    private static function without(array $data, array $path): array
+    {
+        $key = array_shift($path);
+
+        if ($path === []) {
+            unset($data[$key]);
+        } elseif (is_array($data[$key] ?? null)) {
+            $data[$key] = self::without($data[$key], $path);
+        }
+
+        return $data;
     }
 
     /**

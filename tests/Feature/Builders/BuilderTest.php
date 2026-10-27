@@ -255,6 +255,25 @@ describe('styling', function (): void {
             ->and($html)->toContain('Brand');
     });
 
+    it('takes what a style builder changes from the configured defaults, the package\'s defaults included', function (): void {
+        config(['qr.defaults.margin' => 1, 'qr.defaults.paint' => '#1e1b4b', 'qr.defaults.background' => null, 'qr.defaults.style' => null]);
+        Qr::styles()->register('soft', ['filters' => [['name' => 'mixed-opacity', 'options' => ['min' => 0.9]]]]);
+        $back = Qr::style()->margin(4)->paint('#000000')->background('#ffffff');
+        $viewBox = fn (string $svg): string => preg_match('/viewBox="([^"]*)"/', $svg, $match) ? $match[1] : '';
+
+        expect(Qr::make(BUILDER_URL)->style($back)->toStyle()->margin)->toBe(4)
+            ->and(Qr::make(BUILDER_URL)->style($back)->toStyle()->modules->paint->toCss())->toBe('#000000')
+            ->and(Qr::make(BUILDER_URL)->style($back)->toStyle()->background?->toCss())->toBe('#ffffff')
+            ->and(Qr::make(BUILDER_URL)->margin(2)->style(Qr::style()->paint('#be123c'))->toStyle()->margin)->toBe(2)
+            ->and($viewBox(\Illuminate\Support\Facades\Blade::render('<x-qr :content="$url" :style="$style" />', ['url' => BUILDER_URL, 'style' => Qr::style()->margin(4)])))->toBe($viewBox(Qr::style()->margin(4)->for(BUILDER_URL)->svg()->contents()))
+            ->and($viewBox(Qr::style()->margin(4)->for(BUILDER_URL)->svg()->contents()))->not->toBe($viewBox(Qr::make(BUILDER_URL)->svg()->contents()));
+
+        config(['qr.defaults.style' => 'soft']);
+
+        expect(Qr::make(BUILDER_URL)->style(Qr::style()->paint('#be123c'))->toStyle()->filters())->toHaveCount(1)
+            ->and(Qr::make(BUILDER_URL)->style(Qr::style()->filter('mixed-rotation'))->toStyle()->filters())->toHaveCount(2);
+    });
+
     it('merges styles in, later ones and later calls winning', function (): void {
         Qr::styles()->register('brand', ['modules' => ['paint' => '#1c1917'], 'margin' => 2]);
 

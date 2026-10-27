@@ -195,8 +195,9 @@ Qr::url($url)->style('brand', 'seasonal')->svg();   // several, each over the la
 A registered style can also be a `Style`, a class implementing `ExeQue\Qr\Rendering\Contracts\ProvidesQrStyle`, or an
 enum of such styles, every case under its value. `qr.defaults.style` names a style every code starts from.
 
-Styles are merged in order, each one's changes from the defaults laid over what came before. A value set back to its
-default in a later style is not a change, so set it after the styles:
+Styles are merged in order, each one's changes from the defaults laid over what came before. A style builder's changes
+are measured from the configured defaults it starts from, so whatever it sets counts, the package's defaults included.
+For other styles, a value set back to its default in a later style is not a change, so set it after the styles:
 
 ```php
 Qr::url($url)->style('brand')->margin(4);

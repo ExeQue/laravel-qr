@@ -195,6 +195,24 @@ describe('reading back', function (): void {
     });
 });
 
+describe('merging from a starting point', function (): void {
+    it('counts what a style changes from where it started, a value set back to the default included', function (): void {
+        $circle = Style::default()->eye(Corner::TopLeft)->withOuter(Style::default()->eye(Corner::TopLeft)->outer->withShape(new \ExeQue\Qr\Shapes\OuterEyes\Rounded(3.5, 2.5)));
+        $from = Style::default()->withMargin(1)->withBackground(null)->withPaint(new Hex('#1e1b4b'))->withEyes($circle)->withFilters(new MixedOpacity(min: 0.9));
+        $over = Style::default()->withMargin(4)->withFilters(new MixedOpacity(min: 0.9), new EyeTilt());
+        $base = Style::default()->withMargin(2)->withBackground(null)->withPaint(new Hex('#be123c'))->withEyes($circle)->withFilter(new Jitter());
+
+        $merged = $base->merge($over, $from);
+
+        expect($merged->margin)->toBe(4)
+            ->and($merged->background?->toCss())->toBe('#ffffff')
+            ->and($merged->modules->paint->toCss())->toBe('#000000')
+            ->and($merged->eye(Corner::TopLeft)->outer->shape)->toEqual(Style::default()->eye(Corner::TopLeft)->outer->shape)
+            ->and(array_map(fn (NamedFilter $filter): string => $filter->name(), $merged->filters()))->toBe(['jitter', 'eye-tilt'])
+            ->and($base->merge($from, $from)->toArray())->toBe($base->toArray());
+    });
+});
+
 describe('invalid input', function (): void {
     it('refuses a logo it cannot read back', function (): void {
         Style::fromArray(['logo' => ['hash' => 'abc', 'size' => 0.2]]);

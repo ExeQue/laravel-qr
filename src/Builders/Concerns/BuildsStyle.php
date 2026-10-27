@@ -286,9 +286,10 @@ trait BuildsStyle
                 continue;
             }
 
+            // A style builder starts from the configured defaults: what it changes is measured from those.
             $state = $other->state();
             $copy = $copy->with(
-                style: $copy->style->merge($state['style']),
+                style: $copy->style->merge($state['style'], app(Qr::class)->style()->toStyle()),
                 errorCorrection: $state['errorCorrection'],
                 mask: $state['mask'],
                 metadata: $copy->metadata->merge($state['metadata']),
