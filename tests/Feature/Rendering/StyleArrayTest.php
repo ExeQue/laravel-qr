@@ -182,6 +182,17 @@ describe('reading back', function (): void {
             ->and(renders(roundTrip($style)))->toBe(renders($style))
             ->and($style->toArray())->toMatchSnapshot();
     });
+
+    it('reads back tilts in depth', function (): void {
+        $eye = Style::default()->eye(Corner::TopLeft);
+        $style = Style::default()
+            ->withModules(Style::default()->modules->withTilt(20, -10))
+            ->withEye(Corner::BottomLeft, $eye->withOuter($eye->outer->withTilt(5, 15))->withInner($eye->inner->tiltBy(-5)));
+
+        expect($style->toArray()['modules'])->toBe(['tiltX' => 20.0, 'tiltY' => -10.0])
+            ->and(roundTrip($style)->toArray())->toBe($style->toArray())
+            ->and(renders(roundTrip($style)))->toBe(renders($style));
+    });
 });
 
 describe('invalid input', function (): void {

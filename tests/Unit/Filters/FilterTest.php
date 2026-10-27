@@ -22,9 +22,11 @@ use ExeQue\Qr\Filters\Enums\Property;
 use ExeQue\Qr\Filters\EyeEcho;
 use ExeQue\Qr\Filters\EyeFlip;
 use ExeQue\Qr\Filters\EyeJitter;
+use ExeQue\Qr\Filters\EyeJitter3d;
 use ExeQue\Qr\Filters\EyeMix;
 use ExeQue\Qr\Filters\EyePaint;
 use ExeQue\Qr\Filters\EyePalette;
+use ExeQue\Qr\Filters\EyeRotation3d;
 use ExeQue\Qr\Filters\EyeSample;
 use ExeQue\Qr\Filters\EyeShade;
 use ExeQue\Qr\Filters\EyeSize;
@@ -34,6 +36,7 @@ use ExeQue\Qr\Filters\EyeTwist;
 use ExeQue\Qr\Filters\GradientFill;
 use ExeQue\Qr\Filters\InRegion;
 use ExeQue\Qr\Filters\Jitter;
+use ExeQue\Qr\Filters\Jitter3d;
 use ExeQue\Qr\Filters\MixedOffset;
 use ExeQue\Qr\Filters\MixedOpacity;
 use ExeQue\Qr\Filters\MixedRotation;
@@ -44,6 +47,7 @@ use ExeQue\Qr\Filters\MixedSkew;
 use ExeQue\Qr\Filters\Palette;
 use ExeQue\Qr\Filters\Radial;
 use ExeQue\Qr\Filters\Region;
+use ExeQue\Qr\Filters\Rotation3d;
 use ExeQue\Qr\Filters\Wave;
 use ExeQue\Qr\Gradients\LinearGradient;
 use ExeQue\Qr\Rendering\Enums\Corner;
@@ -73,6 +77,10 @@ covers(
     MixedShape::class,
     Palette::class,
     Jitter::class,
+    Jitter3d::class,
+    Rotation3d::class,
+    EyeJitter3d::class,
+    EyeRotation3d::class,
     GradientFill::class,
     ByRole::class,
     InRegion::class,
@@ -157,6 +165,11 @@ dataset('filters', [
     'eye-echo' => [fn () => new Compound(new EyePaint('#be123c'), new EyeEcho())],
     'eye-stretch' => [fn () => new EyeStretch()],
     'eye-flip' => [fn () => new EyeFlip(vertical: true)],
+    'jitter-3d' => [fn () => new Jitter3d(rotate: 5)],
+    'rotation-3d' => [fn () => new Rotation3d()],
+    'rotation-3d, ranges' => [fn () => new Rotation3d(x: [-30, 30], y: ['-20', '20'], z: [-10, 10])],
+    'eye-jitter-3d' => [fn () => new EyeJitter3d(rotate: 4)],
+    'eye-rotation-3d' => [fn () => new EyeRotation3d(y: [-10, 10], z: 5)],
     'compound' => [fn () => new Compound(new MixedOpacity(min: 0.8), new EyeTilt())],
 ]);
 
@@ -174,7 +187,7 @@ describe('every filter', function (): void {
     it('names itself and lists its options as plain values', function (NamedFilter $filter): void {
         $options = $filter->options();
 
-        expect($filter->name())->toMatch('/^[a-z-]+$/')
+        expect($filter->name())->toMatch('/^[a-z][a-z0-9-]*$/')
             ->and(json_decode((string) json_encode($options), true))->toEqual($options);
     })->with('filters');
 
@@ -190,6 +203,14 @@ describe('stacking', function (): void {
 
         expect($a->transform->toString())->toStartWith('rotate(15)')
             ->and($b->transform->toString())->toStartWith('scale(0.81)');
+    });
+
+    it('tilts modules in depth, by fixed angles or a range per module', function (): void {
+        $fixed = array_map(fn (SceneItem $item): string => $item->transform->toString(), modules(filtered(new Rotation3d(x: 20, y: -10, z: 5))));
+        $ranged = array_map(fn (SceneItem $item): string => $item->transform->toString(), modules(filtered(new Jitter3d(tilt: 20, rotate: 5))));
+
+        expect($fixed[0])->toStartWith('tilt(20 -10) rotate(5)')
+            ->and(count(array_unique(array_map(fn (string $steps): string => strtok($steps, ')'), $ranged))))->toBeGreaterThan(10);
     });
 
     it('gives other values for another seed', function (): void {
@@ -264,7 +285,7 @@ describe('scope', function (): void {
 
         expect($scoped->items[2]->transform->toString())->toBe($plain->items[2]->transform->toString())
             ->and($scoped->items[2]->paint)->toEqual($plain->items[2]->paint);
-    })->with([[new EyeTilt()], [new EyeSize()], [new EyePaint('#be123c')], [new Compound(new EyeTilt())], [fn () => new EyeMix()], [new EyePalette(['#be123c'])], [new EyeShade()], [new EyeJitter()], [new EyeTwist()], [new EyeStretch()], [new EyeFlip()]]);
+    })->with([[new EyeTilt()], [new EyeSize()], [new EyePaint('#be123c')], [new Compound(new EyeTilt())], [fn () => new EyeMix()], [new EyePalette(['#be123c'])], [new EyeShade()], [new EyeJitter()], [new EyeTwist()], [new EyeStretch()], [new EyeFlip()], [new EyeJitter3d()], [new EyeRotation3d()]]);
 
     it('describes regions', function (): void {
         expect(Region::rect(1, 2, 3, 4)->toArray())->toBe(['kind' => 'rect', 'x' => 1.0, 'y' => 2.0, 'width' => 3.0, 'height' => 4.0])
@@ -415,6 +436,20 @@ describe('eye filters', function (): void {
 
         expect($outer->transform->toString())->not->toBe($inner->transform->toString())
             ->and($outer->opacity)->toBeLessThanOrEqual(1.0)->toBeGreaterThanOrEqual(0.5);
+    });
+
+    it('tilts each part in depth by an amount of its own', function (): void {
+        [$outer, $inner] = eye(filtered(new EyeJitter3d(tilt: 10, rotate: 3)), Corner::TopRight);
+
+        expect($outer->transform->toString())->toContain('tilt(')->toContain('rotate(')
+            ->and($outer->transform->toString())->not->toBe($inner->transform->toString());
+    });
+
+    it('turns each eye in depth as one', function (): void {
+        [$outer, $inner] = eye(filtered(new EyeRotation3d(x: 10, y: [-5, 5], z: 2)), Corner::BottomLeft);
+        $steps = fn (SceneItem $item): string => (string) preg_replace('/ translate\(.*$/', '', $item->transform->toString());
+
+        expect($steps($outer))->toBe($steps($inner))->toContain('tilt(10 ')->toContain('rotate(2)');
     });
 
     it('twists each corner a step further', function (): void {

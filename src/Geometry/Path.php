@@ -67,6 +67,39 @@ final readonly class Path
     }
 
     /**
+     * Along a circle from one angle to another, in degrees (0 pointing right, y down, so growing
+     * clockwise), as a cubic curve per quarter turn or less; from a line to its start, or a move
+     * to it on an empty path.
+     */
+    public function arc(float $centerX, float $centerY, float $radius, float $from, float $to): self
+    {
+        $point = fn (float $degrees): array => [$centerX + $radius * cos(deg2rad($degrees)), $centerY + $radius * sin(deg2rad($degrees))];
+        $path = $this->commands === [] ? $this->moveTo(...$point($from)) : $this->lineTo(...$point($from));
+        $pieces = max(1, (int) ceil(abs($to - $from) / 90 - 1e-9));
+        $step = ($to - $from) / $pieces;
+
+        // The control points lie along the tangents, 4/3 tan(θ/4) of the radius out.
+        $handle = 4 / 3 * tan(deg2rad($step) / 4) * $radius;
+
+        for ($piece = 0; $piece < $pieces; $piece++) {
+            [$start, $end] = [deg2rad($from + $step * $piece), deg2rad($from + $step * ($piece + 1))];
+            [$x0, $y0] = $point(rad2deg($start));
+            [$x1, $y1] = $point(rad2deg($end));
+
+            $path = $path->curveTo(
+                $x0 - $handle * sin($start),
+                $y0 + $handle * cos($start),
+                $x1 + $handle * sin($end),
+                $y1 - $handle * cos($end),
+                $x1,
+                $y1,
+            );
+        }
+
+        return $path;
+    }
+
+    /**
      * Closes the outline back to where it started; a last line back there is left to the close.
      */
     public function close(): self

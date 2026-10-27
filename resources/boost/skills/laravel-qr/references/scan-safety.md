@@ -8,12 +8,12 @@ see it.
 |---|---|---|
 | `min_margin` | 2 | raises the quiet zone to at least this many modules |
 | `max_offset` | 0.15 | holds a module within this many modules of its cell |
-| `min_scale` | 0.6 | keeps a module at least this share of a module, its shape's own size counted |
+| `min_scale` | 0.6 | keeps a module at least this share of a module, its shape's own size and a tilt counted |
 | `max_scale` | 1.25 | keeps a module from growing over its neighbors |
 | `max_skew` | 20 | holds a module's skew to this many degrees each way |
 | `max_skip` | 0.25 | lets left-out modules use at most this share of what the error correction can still restore, after a logo |
-| `outer_eye_scale` | [0.93, 1.0] | keeps an outer eye about seven modules wide |
-| `inner_eye_scale` | [0.6, 1.15] | keeps an inner eye in proportion |
+| `outer_eye_scale` | [0.93, 1.0] | keeps an outer eye about seven modules wide, a tilt counted |
+| `inner_eye_scale` | [0.6, 1.15] | keeps an inner eye in proportion, a tilt counted |
 | `eye_rotation_warning` | 10 | warns about an eye turned this many degrees or more off a quarter turn |
 | `min_contrast` | 3.0 | the least WCAG contrast of any drawn color against the background |
 | `max_logo_share` | 0.6 | the share of what the error correction can restore that a logo may clear |

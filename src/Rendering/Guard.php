@@ -81,6 +81,10 @@ final class Guard
             $style = $this->moduleScale($cell, $style, $where);
         }
 
+        if ($this->safety->minScale !== null && [$style->tiltX, $style->tiltY] !== [0.0, 0.0]) {
+            $style = $this->moduleTilt($cell, $style, $where);
+        }
+
         if ($this->safety->maxSkew !== null) {
             $max = $this->safety->maxSkew;
             [$x, $y] = [max(-$max, min($max, $style->skewX)), max(-$max, min($max, $style->skewY))];
@@ -265,6 +269,54 @@ final class Guard
     }
 
     /**
+     * A tilt shortens a module by its cosine: held to where it is still `minScale` of a module.
+     *
+     * @param array{int, int} $where
+     */
+    private function moduleTilt(ModuleContext $cell, ModuleStyle $style, array $where): ModuleStyle
+    {
+        [$width, $height] = $this->extent($cell, $style);
+        $least = (float) $this->safety->minScale;
+        $x = self::heldTilt($style->tiltX, $least / max(1e-9, abs($style->scaleY) * $height));
+        $y = self::heldTilt($style->tiltY, $least / max(1e-9, abs($style->scaleX) * $width));
+
+        if ([$x, $y] === [$style->tiltX, $style->tiltY]) {
+            return $style;
+        }
+
+        $this->adjustments[] = new GuardAdjustment('tilt', 'held to '.Number::format(max(abs($x), abs($y))).' degrees', $where);
+
+        return $style->withTilt($x, $y);
+    }
+
+    /**
+     * An eye part's tilt, held to where it is still the least of its scale range.
+     */
+    private function eyeTilt(EyeContext $eye, EyePartStyle $part, float $least, string $guard): EyePartStyle
+    {
+        $x = self::heldTilt($part->tiltX, $least / max(1e-9, abs($part->scaleY)));
+        $y = self::heldTilt($part->tiltY, $least / max(1e-9, abs($part->scaleX)));
+
+        if ([$x, $y] === [$part->tiltX, $part->tiltY]) {
+            return $part;
+        }
+
+        $this->adjustments[] = new GuardAdjustment($guard, 'tilt held to '.Number::format(max(abs($x), abs($y))).' degrees', corner: $eye->corner);
+
+        return $part->withTilt($x, $y);
+    }
+
+    /**
+     * A tilt whose cosine is at least `$share`, its direction kept.
+     */
+    private static function heldTilt(float $degrees, float $share): float
+    {
+        $most = $share >= 1 ? 0.0 : rad2deg(acos(max(0.0, $share)));
+
+        return abs(cos(deg2rad($degrees))) >= $share - 1e-9 ? $degrees : ($degrees <=> 0) * $most;
+    }
+
+    /**
      * @param array{float, float}|null $range
      */
     private function eyeScale(EyeContext $eye, EyePartStyle $part, ?array $range, string $guard): EyePartStyle
@@ -272,6 +324,8 @@ final class Guard
         if ($range === null) {
             return $part;
         }
+
+        $part = $this->eyeTilt($eye, $part, $range[0], $guard);
 
         // A negative scale is a flip: its size is held, its direction kept.
         $x = (($part->scaleX <=> 0) ?: 1) * max($range[0], min($range[1], abs($part->scaleX)));

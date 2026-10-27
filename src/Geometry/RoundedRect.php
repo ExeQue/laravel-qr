@@ -43,32 +43,10 @@ final class RoundedRect
     }
 
     /**
-     * A quarter circle clockwise from `$startAngle` (degrees, 0 pointing right, y down), as two cubic curves.
+     * A quarter circle clockwise from `$startAngle` (degrees, 0 pointing right, y down).
      */
     private static function corner(Path $path, float $centerX, float $centerY, float $radius, float $startAngle): Path
     {
-        if ($radius === 0.0) {
-            return $path;
-        }
-
-        // The control point distance for a 45 degree arc: 4/3 tan(θ/4).
-        $handle = 4 / 3 * tan(deg2rad(45) / 4) * $radius;
-
-        foreach ([$startAngle, $startAngle + 45] as $from) {
-            [$fromRadians, $toRadians] = [deg2rad($from), deg2rad($from + 45)];
-
-            $start = [$centerX + $radius * cos($fromRadians), $centerY + $radius * sin($fromRadians)];
-            $end = [$centerX + $radius * cos($toRadians), $centerY + $radius * sin($toRadians)];
-
-            $path = $path->curveTo(
-                $start[0] - $handle * sin($fromRadians),
-                $start[1] + $handle * cos($fromRadians),
-                $end[0] + $handle * sin($toRadians),
-                $end[1] - $handle * cos($toRadians),
-                ...$end,
-            );
-        }
-
-        return $path;
+        return $radius === 0.0 ? $path : $path->arc($centerX, $centerY, $radius, $startAngle, $startAngle + 90);
     }
 }

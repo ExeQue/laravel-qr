@@ -61,7 +61,7 @@ final readonly class Writer implements Fakeable, WriterContract
         }
 
         foreach ($this->groups($scene) as $group) {
-            $this->fill($canvas, $group['paint'], $group['paths'], $group['opacity'], $scene, $group['item'], $scale);
+            $this->fill($canvas, $group['paint'], $group['items'], $group['opacity'], $scene, $group['items'][0], $scale);
         }
 
         if ($scene->logo !== null) {
@@ -82,7 +82,7 @@ final readonly class Writer implements Fakeable, WriterContract
     }
 
     /**
-     * @param list<Path>|null $paths Null for the whole canvas.
+     * @param list<Path|SceneItem>|null $paths Null for the whole canvas.
      * @param SceneItem|Path|null $shape The first of the items painted, or the logo's plate; null for the background.
      */
     private function fill(GdImage $canvas, Paint $paint, ?array $paths, float $opacity, Scene $scene, SceneItem|Path|null $shape, float $scale): void

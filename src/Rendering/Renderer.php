@@ -106,6 +106,7 @@ final readonly class Renderer
     private function modules(Matrix $matrix, Style $style, Guard $guard, ?Knockout $knockout): array
     {
         $items = [];
+        $shapes = [];
 
         for ($row = 0; $row < $matrix->size; $row++) {
             for ($column = 0; $column < $matrix->size; $column++) {
@@ -131,13 +132,18 @@ final readonly class Renderer
 
                 $center = [$cell->x + $style->margin, $cell->y + $style->margin];
 
+                // Most modules draw one of a few outlines: drawn alike, they share one path, which keeps a
+                // large code with detailed shapes small.
+                $shape = $module->shape->draw($cell);
+                $shape = $shapes[hash('xxh3', serialize($shape))] ??= $shape;
+
                 $items[] = new SceneItem(
                     part: Part::Module,
                     role: $cell->role,
                     corner: null,
                     cell: [$column, $row],
                     shapeName: self::shapeName($module->shape),
-                    shape: $module->shape->draw($cell),
+                    shape: $shape,
                     transform: $module->transform()->translate(...$center),
                     center: $center,
                     paint: $module->paint,

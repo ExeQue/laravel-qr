@@ -11,6 +11,7 @@ use ExeQue\Qr\Encoder\Encoder;
 use ExeQue\Qr\Encoder\Enums\ErrorCorrection;
 use ExeQue\Qr\Exceptions\ScanSafetyException;
 use ExeQue\Qr\Filters\ClosureFilter;
+use ExeQue\Qr\Filters\EyeRotation3d;
 use ExeQue\Qr\Filters\EyeSize;
 use ExeQue\Qr\Filters\EyeTilt;
 use ExeQue\Qr\Filters\MixedOpacity;
@@ -94,6 +95,23 @@ describe('modules', function (): void {
             ->and($module->transform->toString())->toContain('skew(20 -20)');
     });
 
+    it('holds a tilt to where a module is still its smallest size, either way', function (): void {
+        $scene = guarded(Style::default()->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withTilt(80, -80))));
+        $module = array_values(array_filter($scene->items, fn (SceneItem $item): bool => $item->part === Part::Module))[0];
+
+        expect(guards($scene))->toBe(['tilt'])
+            ->and($scene->adjustments[0]->detail)->toBe('held to 53.13 degrees')
+            ->and($module->transform->toString())->toStartWith('tilt(53.13 -53.13)')
+            ->and(guards(guarded(Style::default()->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withTilt(30, 30))))))->toBe([]);
+    });
+
+    it('tilts not at all a module already at its smallest size', function (): void {
+        $scene = guarded(Style::default()->withFilter(every(fn (ModuleStyle $style): ModuleStyle => $style->withSize(0.6)->withTilt(10))));
+
+        expect(guards($scene))->toBe(['tilt'])
+            ->and($scene->adjustments[0]->detail)->toBe('held to 0 degrees');
+    });
+
     it('counts a shape\'s own size towards the smallest a module may be', function (): void {
         $scene = guarded(Style::default()->withModules(Style::default()->modules->withShape(new \ExeQue\Qr\Shapes\Modules\Dot(0.2))));
 
@@ -128,6 +146,15 @@ describe('layout', function (): void {
             ->and($scene->items[1]->transform->toString())->toBe('scale(0.6) translate(7.5 7.5)')
             ->and(guards($scene))->toBe(['outer-eye-scale', 'inner-eye-scale', 'eye-rotation'])
             ->and(array_values(array_filter($scene->adjustments, fn (GuardAdjustment $a): bool => $a->warning))[0]->detail)->toBe('outer eye turned 30 degrees off a quarter turn');
+    });
+
+    it('holds a tilted eye to the least of its size', function (): void {
+        $scene = guarded(Style::default()->withFilter(new EyeRotation3d(x: 0, y: 45)));
+
+        expect($scene->items[0]->transform->toString())->toBe('tilt(0 21.565) translate(7.5 7.5)')
+            ->and($scene->items[1]->transform->toString())->toBe('tilt(0 45) translate(7.5 7.5)')
+            ->and(array_values(array_unique(guards($scene))))->toBe(['outer-eye-scale'])
+            ->and($scene->adjustments[0]->detail)->toBe('tilt held to 21.565 degrees');
     });
 
     it('does not warn about quarter turns', function (): void {

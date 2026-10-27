@@ -74,6 +74,16 @@ describe('layout', function (): void {
             ->and(array_filter($items, fn (SceneItem $item): bool => $item->part === Part::InnerEye))->toHaveCount(3);
     });
 
+    it('shares one path between modules drawn alike', function (): void {
+        $paths = fn (Scene $scene): int => count(array_unique(array_map(
+            fn (SceneItem $item): int => spl_object_id($item->shape),
+            array_filter($scene->items, fn (SceneItem $item): bool => $item->part === Part::Module),
+        )));
+
+        expect($paths(scene()))->toBe(1)
+            ->and($paths(scene(Style::default()->withModules(Style::default()->modules->withShape(Module::FlowingSoft->qrModule())))))->toBeGreaterThan(1)->toBeLessThanOrEqual(256);
+    });
+
     it('places each shape on the canvas', function (): void {
         $eye = scene()->items[0];
 

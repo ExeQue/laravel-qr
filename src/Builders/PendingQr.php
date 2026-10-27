@@ -56,6 +56,8 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
      */
     private DateInterval|DateTimeInterface|int|false|null $cache = null;
 
+    private int $minVersion = 1;
+
     public function __construct(
         public readonly string|Payload|ProvidesQrContent $content,
         Resolve $resolve,
@@ -253,6 +255,14 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
     public function sceneOf(Matrix $matrix): Scene
     {
         return $this->factory->make(Renderer::class)->render($matrix, $this->style, $this->scanSafety ?? $this->configuredSafety());
+    }
+
+    /**
+     * The smallest version to use, so a design keeps one size.
+     */
+    public function minVersion(int $version): self
+    {
+        return clone($this, ['minVersion' => $version]);
     }
 
     /**

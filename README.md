@@ -16,7 +16,7 @@
 
 Customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back.
 
-| 33 | 15 | 21 | 18 | 24 | 5 |
+| 33 | 15 | 21 | 18 | 28 | 5 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | module shapes | outer eyes | inner eyes | eye presets | filters | gradients |
 

@@ -92,6 +92,17 @@ describe('paths', function (): void {
         ]);
     });
 
+    it('draws arcs a curve per quarter turn, from where the path is', function (): void {
+        $quarter = Path::make()->arc(0, 0, 1, 0, 90);
+        $more = Path::make()->moveTo(2, 0)->arc(0, 0, 1, -45, 135);
+        $middle = $quarter->commands()[1];
+
+        expect(array_column($quarter->commands(), 0))->toBe(['M', 'C'])
+            ->and(array_slice($middle, -2))->toEqualWithDelta([0, 1], 1e-9)
+            ->and(array_column($more->commands(), 0))->toBe(['M', 'L', 'C', 'C'])
+            ->and(array_slice($more->commands()[3], -2))->toEqualWithDelta([cos(deg2rad(135)), sin(deg2rad(135))], 1e-9);
+    });
+
     it('reverses a path of nothing but a close as it is', function (): void {
         expect(Path::make()->close()->reversed()->toSvg())->toBe('Z');
     });
@@ -122,8 +133,18 @@ describe('transforms', function (): void {
             ->and(Transform::identity()->scale(2, 3)->toString())->toBe('scale(2 3)');
     });
 
+    it('tilts in depth, seen straight on', function (): void {
+        $tilted = Transform::identity()->tilt(60, 60);
+
+        // About the horizontal axis first, which halves the height, then about the vertical one, which halves the width.
+        expect(Transform::identity()->tilt(60)->apply(1, 1))->toEqualWithDelta([1, 0.5], 0.0001)
+            ->and(Transform::identity()->tilt(0, 60)->apply(1, 1))->toEqualWithDelta([0.5, 1], 0.0001)
+            ->and($tilted->apply(0, 1))->toEqualWithDelta([0.75, 0.5], 0.0001)
+            ->and($tilted->toString())->toBe('tilt(60 60)');
+    });
+
     it('leaves out steps that change nothing', function (): void {
-        expect(Transform::identity()->rotate(360)->scale(1)->skew(0)->translate(0, 0)->isIdentity())->toBeTrue();
+        expect(Transform::identity()->rotate(360)->scale(1)->skew(0)->tilt(0)->translate(0, 0)->isIdentity())->toBeTrue();
     });
 });
 

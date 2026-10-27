@@ -24,6 +24,7 @@ use ExeQue\Qr\Paints\Layer;
 use ExeQue\Qr\Paints\Layered;
 use ExeQue\Qr\Rendering\LogoLayer;
 use ExeQue\Qr\Rendering\Scene;
+use ExeQue\Qr\Rendering\SceneItem;
 use ExeQue\Qr\Support\Number;
 use ExeQue\Qr\Writers\Boxes;
 use ExeQue\Qr\Writers\Contracts\Fakeable;
@@ -97,7 +98,7 @@ final class Writer implements Fakeable, WriterContract
         $stream->write($background);
 
         foreach ($groups as $group) {
-            $this->writePath($stream, $group['fill'], $group['paths']);
+            $this->writePath($stream, $group['fill'], $group['items']);
         }
 
         $stream->write($logo);
@@ -110,7 +111,7 @@ final class Writer implements Fakeable, WriterContract
     /**
      * Items with the same fill share one path, in the order their fills first appear.
      *
-     * @return array<string, array{fill: string, paths: list<Path>}>
+     * @return array<string, array{fill: string, items: list<SceneItem>}>
      */
     private function groups(Scene $scene): array
     {
@@ -119,8 +120,8 @@ final class Writer implements Fakeable, WriterContract
         foreach ($scene->items as $index => $item) {
             if ($this->options->currentColor && $item->inheritsPaint) {
                 $fill = $this->colorFill(new Named(Named::CURRENT_COLOR), $item->opacity);
-                $groups[$fill] ??= ['fill' => $fill, 'paths' => []];
-                $groups[$fill]['paths'][] = $item->path();
+                $groups[$fill] ??= ['fill' => $fill, 'items' => []];
+                $groups[$fill]['items'][] = $item;
 
                 continue;
             }
@@ -132,8 +133,8 @@ final class Writer implements Fakeable, WriterContract
                 // of a layered paint stay apart from plain fills, so each lands above the one under it.
                 $key = ($item->paint instanceof Layered ? "layer {$layer} " : '').($this->isOwnBox($paint) ? "{$fill}#{$index}" : $fill);
 
-                $groups[$key] ??= ['fill' => $fill, 'paths' => []];
-                $groups[$key]['paths'][] = $item->path();
+                $groups[$key] ??= ['fill' => $fill, 'items' => []];
+                $groups[$key]['items'][] = $item;
             }
         }
 
@@ -257,16 +258,17 @@ final class Writer implements Fakeable, WriterContract
     }
 
     /**
-     * One `<path>` for a group, its shapes written one by one.
+     * One `<path>` for a group, its shapes placed and written one by one.
      *
-     * @param list<Path> $paths
+     * @param list<SceneItem> $items
      */
-    private function writePath(StreamBuffer $stream, string $fill, array $paths): void
+    private function writePath(StreamBuffer $stream, string $fill, array $items): void
     {
         $stream->write("<path {$fill} fill-rule=\"nonzero\" d=\"");
         $compact = new CompactPathData($this->options->precision, $this->scale);
 
-        foreach ($paths as $index => $path) {
+        foreach ($items as $index => $item) {
+            $path = $item->path();
             $stream->write($this->options->compact
                 ? $compact->encode($path)
                 : ($index === 0 ? '' : ' ').$path->toSvg($this->options->precision, $this->scale));

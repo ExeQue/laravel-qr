@@ -93,7 +93,7 @@ final readonly class Scannable implements ValidationRule
             },
             'logo' => 'logo.size',
             'margin' => 'margin',
-            'offset', 'scale', 'skew', 'skip' => isset($input['filters']) ? 'filters' : 'modules',
+            'offset', 'scale', 'skew', 'tilt', 'skip' => isset($input['filters']) ? 'filters' : 'modules',
             default => 'eyes',
         };
     }

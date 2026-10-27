@@ -14,25 +14,19 @@ final class Figures
      */
     public static function squircle(float $x, float $y, float $width, float $height): Path
     {
-        $points = [];
+        // A curve per quarter: its handles, 0.909 of the way along each side, put its middle on
+        // the superellipse.
+        [$w, $h, $k] = [$width / 2, $height / 2, 0.909];
 
-        for ($step = 0; $step < 64; $step++) {
-            $angle = 2 * M_PI * $step / 64;
-            [$cos, $sin] = [cos($angle), sin($angle)];
-
-            $points[] = [
-                $x + $width / 2 * self::signedRoot($cos),
-                $y + $height / 2 * self::signedRoot($sin),
-            ];
-        }
-
-        return Path::polygon($points);
+        return Path::make()
+            ->moveTo($x + $w, $y)
+            ->curveTo($x + $w, $y + $k * $h, $x + $k * $w, $y + $h, $x, $y + $h)
+            ->curveTo($x - $k * $w, $y + $h, $x - $w, $y + $k * $h, $x - $w, $y)
+            ->curveTo($x - $w, $y - $k * $h, $x - $k * $w, $y - $h, $x, $y - $h)
+            ->curveTo($x + $k * $w, $y - $h, $x + $w, $y - $k * $h, $x + $w, $y)
+            ->close();
     }
 
-    /**
-     * An upright heart, 3.4 units tall before `$scale`. `$shift` moves the drawing toward its point
-     * before it is scaled, so its weight sits on the middle; `$lean` turns it, in degrees.
-     */
     public static function heart(float $x, float $y, float $scale, float $lean = 0.0, float $shift = 0.0): Path
     {
         $heart = Path::make()
@@ -121,39 +115,51 @@ final class Figures
 
     /**
      * One outline around a heart circle and `$petals` petal circles, `$reach` from the middle, the first up:
-     * along each of 72 rays the edge is the farthest of the circles.
+     * the arcs of each that lie outside the others.
      */
     public static function flower(float $x, float $y, float $petal, float $reach, float $heart, int $petals = 6): Path
     {
-        $points = [];
+        $half = 180 / $petals;
+        $petalAt = fn (int $index): float => -90 + 2 * $half * $index;
+        $edge = fn (float $degrees, float $distance): array => [$x + $distance * cos(deg2rad($degrees)), $y + $distance * sin(deg2rad($degrees))];
+        $angleOn = fn (array $point, array $center): float => rad2deg(atan2($point[1] - $center[1], $point[0] - $center[0]));
 
-        for ($ray = 0; $ray < 72; $ray++) {
-            $angle = deg2rad(-90 + 5 * $ray);
-            [$dx, $dy] = [cos($angle), sin($angle)];
-            $edge = $heart;
+        // Neighboring petals meet on the line between them, unless the heart reaches past where they do.
+        $along = $reach * cos(deg2rad($half));
+        $left = $petal ** 2 - $reach ** 2 + $along ** 2;
+        $meet = $left >= 0 ? $along + sqrt($left) : null;
 
-            for ($index = 0; $index < $petals; $index++) {
-                $petalAngle = deg2rad(-90 + 360 / $petals * $index);
-                [$cx, $cy] = [$reach * cos($petalAngle), $reach * sin($petalAngle)];
+        // Otherwise each petal leaves the heart this many degrees to either side of its own line.
+        $cos = $reach > 0 && $heart > 0 ? ($reach ** 2 + $heart ** 2 - $petal ** 2) / (2 * $reach * $heart) : null;
 
-                // Where the ray leaves the petal circle, if it meets it.
-                $along = $dx * $cx + $dy * $cy;
-                $left = $petal ** 2 - ($cx ** 2 + $cy ** 2 - $along ** 2);
-
-                if ($left >= 0) {
-                    $edge = max($edge, $along + sqrt($left));
-                }
-            }
-
-            $points[] = [$x + $edge * $dx, $y + $edge * $dy];
+        if ($meet !== null && $meet >= $heart) {
+            [$from, $to, $distance, $heartShows] = [-$half, $half, $meet, false];
+        } elseif ($cos !== null && abs($cos) <= 1) {
+            [$from, $to, $distance, $heartShows] = [-rad2deg(acos($cos)), rad2deg(acos($cos)), $heart, true];
+        } else {
+            // A heart over every petal, or petals apart from it and each other: the circles as they are.
+            return Path::merge([
+                RoundedRect::circle($x, $y, $heart),
+                ...array_map(fn (int $index): Path => RoundedRect::circle(...[...$edge($petalAt($index), $reach), $petal]), range(0, $petals - 1)),
+            ]);
         }
 
-        return Path::polygon($points);
+        $path = Path::make();
+
+        for ($index = 0; $index < $petals; $index++) {
+            $center = $edge($petalAt($index), $reach);
+            $start = $angleOn($edge($petalAt($index) + $from, $distance), $center);
+            $end = $angleOn($edge($petalAt($index) + $to, $distance), $center);
+            $path = $path->arc($center[0], $center[1], $petal, $start, $end > $start ? $end : $end + 360);
+
+            if ($heartShows) {
+                $path = $path->arc($x, $y, $heart, $petalAt($index) + $to, $petalAt($index + 1) + $from);
+            }
+        }
+
+        return $path->close();
     }
 
-    /**
-     * Six arms of `$width` out to `$reach`, the first pointing up, as one outline.
-     */
     public static function snowflake(float $x, float $y, float $reach, float $width): Path
     {
         $points = [];
@@ -253,10 +259,5 @@ final class Figures
         }
 
         return Path::polygon($points);
-    }
-
-    private static function signedRoot(float $value): float
-    {
-        return ($value <=> 0) * sqrt(abs($value));
     }
 }

@@ -27,7 +27,6 @@ use ExeQue\Qr\Rendering\ScanSafety;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
-use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -169,14 +168,6 @@ class Playground extends Component
 
     public bool $checkScan = true;
 
-    /**
-     * The last code drawn, shown while the settings cannot draw one.
-     *
-     * @var array<string, mixed>
-     */
-    #[Locked]
-    public array $last = [];
-
     public function mount(): void
     {
         $this->paint = self::paintSpec('#1c1917');
@@ -285,11 +276,12 @@ class Playground extends Component
             $data = [...$data, ...$this->draw($this->code()->scanSafety(ScanSafety::off()), $started)];
             $data['warning'] = $exception->getMessage().' Drawn without the scan guards, so it may not scan.';
         } catch (QrExceptionInterface|TypeError|ValueError|InvalidArgumentException $exception) {
-            $data = [...$data, ...$this->last, 'error' => $exception->getMessage()];
+            // The last code drawn, kept in the session: in the component, a large one outgrows what Livewire takes back.
+            $data = [...$data, ...session('playground.last', []), 'error' => $exception->getMessage()];
         }
 
         if ($data['error'] === null) {
-            $this->last = array_intersect_key($data, array_flip(['code', 'image', 'bytes', 'modules', 'adjustments', 'milliseconds', 'scans']));
+            session()->put('playground.last', array_intersect_key($data, array_flip(['code', 'image', 'bytes', 'modules', 'adjustments', 'milliseconds', 'scans'])));
         }
 
         return view('livewire.playground', $data);
