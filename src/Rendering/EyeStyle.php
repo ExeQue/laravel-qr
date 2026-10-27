@@ -37,9 +37,9 @@ final readonly class EyeStyle
     /**
      * Turns both parts.
      */
-    public function withRotate(float $degrees): self
+    public function withRotation(float $degrees): self
     {
-        return new self($this->outer->withRotate($degrees), $this->inner->withRotate($degrees));
+        return new self($this->outer->withRotation($degrees), $this->inner->withRotation($degrees));
     }
 
     /**

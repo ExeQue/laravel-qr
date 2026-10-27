@@ -20,7 +20,7 @@ use ImagickDraw;
 use ImagickPixel;
 use SplFileInfo;
 
-covers(\ExeQue\Qr\Qr::class, NativeDecoder::class, Bitmap::class, FinderLocator::class, Sampler::class, Perspective::class, SymbolReader::class, UnreadableCodeException::class);
+covers(\ExeQue\Qr\Qr::class, \ExeQue\Qr\Decoding\Decoded::class, \ExeQue\Qr\Decoding\Native\SegmentParser::class, NativeDecoder::class, Bitmap::class, FinderLocator::class, Sampler::class, Perspective::class, SymbolReader::class, UnreadableCodeException::class);
 
 pest()->group('decoding');
 
@@ -76,6 +76,23 @@ describe('images', function (): void {
         expect(fn () => new FinderLocator()->locate($stripes, 20, 1))->toThrow(UnreadableCodeException::class);
     });
 
+});
+
+describe('animations', function (): void {
+    it('refuses an animated GIF whose frames have too many pixels together', function (): void {
+        Qr::read(manyFrames(), 'native');
+    })->throws(UnreadableCodeException::class)
+        ->skip(! extension_loaded('imagick'), 'Imagick reads the frames.');
+});
+
+describe('binary content', function (): void {
+    it('gives binary content back byte for byte, and text as text', function (): void {
+        $binary = "\x00\xFF\x80qr\xC3";
+        $decoded = Qr::read(Qr::make($binary)->png(400), 'native');
+
+        expect($decoded->bytes)->toBe($binary)
+            ->and(Qr::read(Qr::make('Blåbær 42')->png(400), 'native'))->text->toBe('Blåbær 42')->bytes->toBe('Blåbær 42');
+    });
 });
 
 describe('inputs', function (): void {

@@ -32,6 +32,7 @@ use ExeQue\Qr\Writers\Metadata;
 use ExeQue\Qr\Writers\StreamBuffer;
 use ExeQue\Qr\Writers\StreamFactory;
 use ExeQue\Qr\Writers\Svg\Enums\ColorNotation;
+use WeakMap;
 
 /**
  * Writes a scene as SVG: one `<path>` per paint, filled with the nonzero rule.
@@ -46,6 +47,11 @@ final class Writer implements Fakeable, WriterContract
      * @var array<string, string> Gradient definitions by id, in the order first used.
      */
     private array $definitions = [];
+
+    /**
+     * @var WeakMap<LinearGradient|RadialGradient, string>|null A gradient's stops as elements, worked out once.
+     */
+    private ?WeakMap $stops = null;
 
     private float $scale = 1.0;
 
@@ -301,7 +307,9 @@ final class Writer implements Fakeable, WriterContract
             ? $this->linearAttributes($gradient, $box)
             : $this->radialAttributes($gradient, $box);
 
-        $stops = implode('', array_map($this->stopElement(...), $gradient->srgbStops()));
+        // The stops in sRGB take a while to work out, and a paint's gradient comes back for every shape.
+        $this->stops ??= new WeakMap();
+        $stops = $this->stops[$gradient] ??= implode('', array_map($this->stopElement(...), $gradient->srgbStops()));
         $element = $gradient instanceof LinearGradient ? 'linearGradient' : 'radialGradient';
         $body = "{$attributes}{$units}{$spread}>{$stops}</{$element}>";
 

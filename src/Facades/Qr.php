@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static \ExeQue\Qr\Builders\PendingQr make(string|\ExeQue\Qr\Payloads\Contracts\Payload|\ExeQue\Qr\Payloads\Contracts\ProvidesQrContent $content)
  * @method static \ExeQue\Qr\Builders\StyleBuilder style()
+ * @method static \ExeQue\Qr\Validation\StyleRule rule()
  * @method static \ExeQue\Qr\Builders\PendingQr url(string $url)
  * @method static \ExeQue\Qr\Builders\PendingQr wifi(?string $ssid = null, ?string $password = null, \ExeQue\Qr\Payloads\Enums\WifiSecurity|string $security = \ExeQue\Qr\Payloads\Enums\WifiSecurity::Wpa, bool $hidden = false)
  * @method static \ExeQue\Qr\Builders\PendingQr vcard(?string $name = null, ?string $phone = null, ?string $email = null, ?string $organization = null)
@@ -35,7 +36,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \ExeQue\Qr\Colors\ColorNames colors()
  * @method static \ExeQue\Qr\Decoding\Decoded read(\ExeQue\Qr\Builders\Rendered|\ExeQue\Qr\Writers\Contracts\Output|\SplFileInfo|string $image, ?string $using = null)
  * @method static \ExeQue\Qr\Registries\DecoderRegistry decoders()
- * @method static \ExeQue\Qr\Icons\Icon icon(\ExeQue\Qr\Shapes\Contracts\ModuleShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrModule|\ExeQue\Qr\Shapes\Contracts\ProvidesQrEye|string|null $shape = null, \ExeQue\Qr\Shapes\Contracts\OuterEyeShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye|string|null $outer = null, \ExeQue\Qr\Shapes\Contracts\InnerEyeShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye|string|null $inner = null, bool $withOuter = true, ?\ExeQue\Qr\Rendering\Enums\Corner $corner = null)
+ * @method static \ExeQue\Qr\Icons\Icon icon(\ExeQue\Qr\Shapes\Contracts\ModuleShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrModule|\ExeQue\Qr\Shapes\Contracts\ProvidesQrEye|string|null $shape = null, \ExeQue\Qr\Shapes\Contracts\OuterEyeShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye|string|null $outer = null, \ExeQue\Qr\Shapes\Contracts\InnerEyeShape|\ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye|string|null $inner = null, bool $withOuter = true, \ExeQue\Qr\Rendering\Enums\Corner|string|null $corner = null, \ExeQue\Qr\Shapes\Contracts\ProvidesQrEye|string|null $eye = null)
  *
  * @method static \ExeQue\Qr\Testing\QrFake assertRendered(?\Closure $callback = null)
  * @method static \ExeQue\Qr\Testing\QrFake assertNotRendered(?\Closure $callback = null)

@@ -15,6 +15,7 @@ use ExeQue\Qr\Builders\StyleBuilder;
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Encoder\Enums\ErrorCorrection;
 use ExeQue\Qr\Encoder\Enums\Mask;
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
 use ExeQue\Qr\Logos\Contracts\ProvidesQrLogo;
@@ -35,6 +36,7 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Writers\Metadata;
+use SplFileInfo;
 
 /**
  * Every styling call a code or a reusable style takes. Each returns a changed copy,
@@ -143,13 +145,14 @@ trait BuildsStyle
      * @param Paint|string|array<string, mixed>|null $paint
      */
     public function eye(
-        Corner $corner,
+        Corner|string $corner,
         ProvidesQrEye|Closure|string|null $eye = null,
         OuterEyeShape|ProvidesQrOuterEye|string|null $outer = null,
         InnerEyeShape|ProvidesQrInnerEye|string|null $inner = null,
-        ?float $rotate = null,
+        ?float $rotation = null,
         Paint|string|array|null $paint = null,
     ): static {
+        $corner = is_string($corner) ? Corner::from($corner) : $corner;
         $builder = new EyeBuilder($this->style->eye($corner), $this->resolve);
 
         $builder = match (true) {
@@ -160,7 +163,7 @@ trait BuildsStyle
                 ->when($eye !== null)->whole($eye)
                 ->when($outer !== null)->outer($outer)
                 ->when($inner !== null)->inner($inner)
-                ->when($rotate !== null)->rotate((float) $rotate)
+                ->when($rotation !== null)->rotate((float) $rotation)
                 ->when($paint !== null)->paint($paint),
         };
 
@@ -184,7 +187,7 @@ trait BuildsStyle
     }
 
     /**
-     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outwards on each.
+     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outward on each.
      */
     public function mirrored(): static
     {
@@ -201,7 +204,8 @@ trait BuildsStyle
 
     public function errorCorrection(ErrorCorrection|string $level): static
     {
-        return $this->with(errorCorrection: $level instanceof ErrorCorrection ? $level : ErrorCorrection::from($level));
+        return $this->with(errorCorrection: $level instanceof ErrorCorrection ? $level : (ErrorCorrection::tryFrom(strtoupper($level))
+            ?? throw InvalidOptionException::notOneOf(ErrorCorrection::class, 'level', array_column(ErrorCorrection::cases(), 'value'), $level)));
     }
 
     /**
@@ -214,7 +218,8 @@ trait BuildsStyle
 
     public function mask(Mask|int $mask): static
     {
-        return $this->with(mask: $mask instanceof Mask ? $mask : Mask::from($mask));
+        return $this->with(mask: $mask instanceof Mask ? $mask : (Mask::tryFrom($mask)
+            ?? throw InvalidOptionException::notOneOf(Mask::class, 'mask', array_map(strval(...), array_column(Mask::cases(), 'value')), (string) $mask)));
     }
 
     /**
@@ -253,17 +258,19 @@ trait BuildsStyle
     }
 
     /**
-     * A logo over the code: a file path, a data: URI, an SVG, raw image bytes, a
-     * Logo or something providing one, with named options (size, padding, shape,
-     * plate, plateRadius, position) - or a closure, given the logo's builder.
+     * A logo over the code: a file (an uploaded one too), a data: URI, an SVG, raw image bytes, a Logo
+     * or something providing one - or a file by path as `file:` - with named options (size, padding,
+     * shape, plate, plateRadius, position); or a closure, given the logo's builder.
      *
-     * @param Logo|ProvidesQrLogo|Closure(LogoBuilder): LogoBuilder|string $logo
+     * @param Logo|ProvidesQrLogo|SplFileInfo|Closure(LogoBuilder): LogoBuilder|string|null $logo
      */
-    public function logo(Logo|ProvidesQrLogo|Closure|string $logo, mixed ...$options): static
+    public function logo(Logo|ProvidesQrLogo|SplFileInfo|Closure|string|null $logo = null, mixed ...$options): static
     {
-        $builder = $logo instanceof Closure
-            ? $logo(new LogoBuilder())
-            : new LogoBuilder()->from($logo)->with(...$options);
+        $builder = match (true) {
+            $logo instanceof Closure => $logo(new LogoBuilder()),
+            $logo === null => new LogoBuilder()->with(...$options),
+            default => new LogoBuilder()->from($logo)->with(...$options),
+        };
 
         return $this->with(style: $this->style->withLogo($builder->toLogoStyle()));
     }

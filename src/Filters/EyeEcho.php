@@ -10,11 +10,13 @@ use ExeQue\Qr\Filters\Contracts\EyeFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Paints each eye's inner part as a lighter or darker echo of its outer part's color.
  */
-final class EyeEcho implements EyeFilter, NamedFilter
+final class EyeEcho implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -35,6 +37,13 @@ final class EyeEcho implements EyeFilter, NamedFilter
         }
 
         return $style->withInner($style->inner->withPaint($this->lightness < 0 ? $outer->darken(-$this->lightness) : $outer->lighten($this->lightness)));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'lightness' => Options::number(-100, 100),
+        ];
     }
 
     public function name(): string

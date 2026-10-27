@@ -71,7 +71,8 @@ final readonly class Knockout
                 return $knockout;
             }
 
-            if ($style->position !== null) {
+            // Shrunk to nothing without coming clear: a position, or a symbol with no room for one.
+            if ($style->position !== null || (float) $style->size < self::AUTO_MIN / 2) {
                 throw InvalidLogoException::coversFunctionPatterns();
             }
 
@@ -204,12 +205,12 @@ final readonly class Knockout
         foreach ($visible as [$column, $row]) {
             for ($dy = -$padding; $dy <= $padding; $dy++) {
                 for ($dx = -$padding; $dx <= $padding; $dx++) {
-                    $cells["{$column},{$row}"] = [$column + $dx, $row + $dy];
+                    $cells[($column + $dx).','.($row + $dy)] = [$column + $dx, $row + $dy];
                 }
             }
         }
 
-        return Region::cells(array_values(array_unique($cells, SORT_REGULAR)));
+        return Region::cells(array_values($cells));
     }
 
     private function coversFunctionPatterns(Matrix $matrix): bool
@@ -217,7 +218,9 @@ final readonly class Knockout
         foreach (array_keys($this->cleared) as $cell) {
             [$column, $row] = array_map(intval(...), explode(',', $cell));
 
-            if ($matrix->role($column, $row) !== Role::Data) {
+            // An alignment pattern may go: from version 7 one sits in the middle, under any centered
+            // logo, and readers find the code by its finder patterns and timing.
+            if (! in_array($matrix->role($column, $row), [Role::Data, Role::Alignment], true)) {
                 return true;
             }
         }

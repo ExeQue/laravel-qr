@@ -39,6 +39,7 @@ enum InnerEye: string implements ProvidesQrInnerEye
     case Flower = 'flower';
     case Diamond = 'diamond';
     case Hexagon = 'hexagon';
+    case HexagonStanding = 'hexagon-standing';
     case Octagon = 'octagon';
     case Leaf = 'leaf';
     case Drop = 'drop';
@@ -62,7 +63,7 @@ enum InnerEye: string implements ProvidesQrInnerEye
             self::Star => Star::class,
             self::Flower => Flower::class,
             self::Diamond => Diamond::class,
-            self::Hexagon => Hexagon::class,
+            self::Hexagon, self::HexagonStanding => Hexagon::class,
             self::Octagon => Octagon::class,
             self::Sparkle => Sparkle::class,
             self::Clover => Clover::class,
@@ -88,6 +89,7 @@ enum InnerEye: string implements ProvidesQrInnerEye
             self::SoftRoundCorner => ['radius' => [0.7, 0.7, 0.7, 1.5]],
             self::Leaf => ['radius' => [1.3, 0.0, 1.3, 0.0]],
             self::Drop => ['radius' => [1.3, 1.3, 1.3, 0.0]],
+            self::HexagonStanding => ['standing' => true],
             default => [],
         };
     }

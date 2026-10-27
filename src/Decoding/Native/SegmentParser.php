@@ -40,6 +40,11 @@ final class SegmentParser
     private ?string $charset = null;
 
     /**
+     * The content as the symbol holds it: byte segments as their bytes, read in no character set.
+     */
+    private string $raw = '';
+
+    /**
      * @param list<int> $data
      */
     public function parse(array $data, int $version): string
@@ -47,7 +52,7 @@ final class SegmentParser
         $this->bits = implode('', array_map(fn (int $byte): string => str_pad(decbin($byte), 8, '0', STR_PAD_LEFT), $data));
         $this->position = 0;
 
-        [$this->text, $this->bytes, $this->charset] = ['', '', null];
+        [$this->text, $this->bytes, $this->charset, $this->raw] = ['', '', null, ''];
         $gs1 = false;
 
         // A short tail of zeros is a terminator cut short by the end of the data.
@@ -61,20 +66,22 @@ final class SegmentParser
                     return $this->text;
                 case Mode::Numeric->indicator():
                     $this->flush();
-                    $this->text .= $this->numeric($this->take(Mode::Numeric->countBits($version)));
+                    $this->append($this->numeric($this->take(Mode::Numeric->countBits($version))));
                     break;
                 case Mode::Alphanumeric->indicator():
                     $this->flush();
                     $characters = $this->alphanumeric($this->take(Mode::Alphanumeric->countBits($version)));
                     // In GS1 data a % separates fields and %% is a percent sign.
-                    $this->text .= $gs1 ? strtr($characters, ['%%' => '%', '%' => "\x1D"]) : $characters;
+                    $this->append($gs1 ? strtr($characters, ['%%' => '%', '%' => "\x1D"]) : $characters);
                     break;
                 case Mode::Byte->indicator():
-                    $this->bytes .= $this->bytes($this->take(Mode::Byte->countBits($version)));
+                    $bytes = $this->bytes($this->take(Mode::Byte->countBits($version)));
+                    $this->bytes .= $bytes;
+                    $this->raw .= $bytes;
                     break;
                 case 0b1000:
                     $this->flush();
-                    $this->text .= $this->kanji($this->take($version <= 9 ? 8 : ($version <= 26 ? 10 : 12)));
+                    $this->append($this->kanji($this->take($version <= 9 ? 8 : ($version <= 26 ? 10 : 12))));
                     break;
                 case 0b0111:
                     $this->flush();
@@ -100,6 +107,21 @@ final class SegmentParser
         $this->flush();
 
         return $this->text;
+    }
+
+    /**
+     * The content of the symbol last parsed as it holds it: what its byte segments held, byte for byte,
+     * where `parse()` reads them as text.
+     */
+    public function raw(): string
+    {
+        return $this->raw;
+    }
+
+    private function append(string $text): void
+    {
+        $this->text .= $text;
+        $this->raw .= $text;
     }
 
     private function flush(): void

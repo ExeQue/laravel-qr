@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Writers\Raster\Enums;
 
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Exceptions\MissingExtensionException;
 
 /**
@@ -20,7 +21,8 @@ enum Driver: string
      */
     public static function resolve(self|string|null $driver = null): self
     {
-        $driver = $driver instanceof self ? $driver : self::from($driver ?? (string) config('qr.raster.driver', 'auto'));
+        $name = $driver instanceof self ? $driver->value : ($driver ?? (string) config('qr.raster.driver', 'auto'));
+        $driver = self::tryFrom($name) ?? throw InvalidOptionException::notOneOf(self::class, 'driver', array_column(self::cases(), 'value'), $name);
 
         return match (true) {
             $driver !== self::Auto => $driver,

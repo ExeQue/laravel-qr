@@ -119,6 +119,8 @@ final class BasicSvgSanitizer implements SvgSanitizer
         foreach (iterator_to_array($element->childNodes) as $child) {
             /** @var DOMNode $child */
             match (true) {
+                // A style sheet is text only: an element in it would hide its text from the checks below.
+                $child instanceof DOMElement && $element->localName === 'style' => $element->removeChild($child),
                 $child instanceof DOMElement && self::isSvgElement($child, self::ELEMENTS) => self::cleanElement($child),
                 $child->nodeType === XML_TEXT_NODE, $child->nodeType === XML_CDATA_SECTION_NODE => self::cleanText($child, $element),
                 default => $element->removeChild($child),
@@ -144,13 +146,14 @@ final class BasicSvgSanitizer implements SvgSanitizer
 
     /**
      * Text stays text: a CDATA section becomes plain text, escaped when written. Style text
-     * may only reference what is inside the SVG, and holds no at-rules.
+     * may only reference what is inside the SVG, and holds no at-rules, comments or quoted strings.
      */
     private static function cleanText(DOMNode $text, DOMElement $parent): void
     {
         $value = (string) $text->nodeValue;
 
-        if ($parent->localName === 'style' && (self::hasUnsafeReference($value) || str_contains($value, '@'))) {
+        // Comments and quoted strings could hide braces from the scoping the sheet gets when inlined.
+        if ($parent->localName === 'style' && (self::hasUnsafeReference($value) || preg_match('/[@"\']|\/\*|\{[^}]*\{/', $value) === 1)) {
             $parent->removeChild($text);
 
             return;
@@ -162,14 +165,18 @@ final class BasicSvgSanitizer implements SvgSanitizer
     }
 
     /**
-     * `javascript:` anywhere, a `url(...)` that points outside the SVG, or a CSS escape, which
-     * could spell either without the letters.
+     * `javascript:` anywhere, a `url(...)` that points outside the SVG, a CSS function that loads an
+     * image another way, or a CSS escape, which could spell any of them without the letters.
      */
     private static function hasUnsafeReference(string $value): bool
     {
         $squashed = strtolower((string) preg_replace('/\s+/', '', $value));
 
         if (str_contains($squashed, '\\') || str_contains($squashed, 'javascript:') || str_contains($squashed, 'expression(')) {
+            return true;
+        }
+
+        if (preg_match('/(^|[^\w-])(-webkit-)?(image-set|image|cross-fade|element|src)\(/', $squashed) === 1) {
             return true;
         }
 

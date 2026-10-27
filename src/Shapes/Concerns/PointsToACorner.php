@@ -16,10 +16,13 @@ use ExeQue\Qr\Support\Seed;
  */
 trait PointsToACorner
 {
-    private function corner(ModuleContext $cell): Direction
+    /**
+     * @param list<Direction> $corners The corners a random one is picked from.
+     */
+    private function corner(ModuleContext $cell, array $corners = []): Direction
     {
         return $this->point === Direction::Random
-            ? Seed::pick($cell->seed, Direction::corners(), purpose: static::class.":{$this->seed}")
+            ? Seed::pick($cell->seed, $corners === [] ? Direction::corners() : $corners, purpose: static::class.":{$this->seed}")
             : $this->point;
     }
 

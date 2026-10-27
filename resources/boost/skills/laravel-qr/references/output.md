@@ -21,6 +21,7 @@ Without a size, raster formats use `qr.defaults.size` (600). PNG, JPEG and WebP 
 ```php
 $code->svg(
     size: 300,              // width and height attributes; none by default, so CSS sizes the code
+    pixels: true,           // coordinates in pixels rather than modules; needs a size
     currentColor: true,     // the dark modules in the text color around the code
     symbol: 'ticket-code',  // wrap it in a <symbol> with this id, to <use> it many times on a page
     precision: 2,           // decimals in the path data
@@ -38,10 +39,12 @@ Dark modules of the same paint are merged into a single `<path>`, so a plain cod
 ```php
 $code->png(1200, dpi: 300);      // a print resolution in the file
 $code->png(600, compressionLevel: 9);   // 0-9: smaller and slower; the image is the same (6 by default)
-$code->jpeg(1200, quality: 85);
+$code->jpeg(1200, quality: 85);  // 1-100, 90 by default
 $code->webp(800, quality: 90);
 $code->png(600, driver: 'gd');   // draw with GD rather than Imagick, for this code only
 ```
+
+Images are at most 16384 pixels wide.
 
 ## Drivers
 
@@ -89,7 +92,7 @@ $png->contents();       // the bytes
 $png->chunks(8192);     // the bytes in pieces, for streaming
 $png->toResource();     // a new PHP stream with the bytes, at its start; close it yourself
 $png->toStream();       // a new PSR-7 stream with the bytes
-$png->detach();         // the code's own stream, handed over; the output cannot be read afterwards
+$png->detach();         // the code's own stream, handed over; the output cannot be read afterward
 $png->toBase64();
 $png->toBase64Url();    // URL-safe, without padding
 $png->toDataUri();      // data:image/png;base64,...

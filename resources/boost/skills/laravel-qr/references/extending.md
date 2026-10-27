@@ -89,7 +89,7 @@ final readonly class PillModule implements Configurable, ModuleShape
 | `random($min, $max, $purpose)` | a number that is the same for this module every time |
 | `logo` | the region the code's logo clears, if it has one |
 
-Shapes are drawn clockwise (y grows downwards); a hole is drawn the other way round. `Path` and `RoundedRect` build
+Shapes are drawn clockwise (y grows downward); a hole is drawn the other way around. `Path` and `RoundedRect` build
 outlines:
 
 ```php
@@ -104,7 +104,8 @@ RoundedRect::circle($x, $y, $radius);
 ```
 
 `ExeQue\Qr\Geometry\Figures` has the figures the built-in shapes use: `squircle()`, `heart()`, `star()`, `diamond()`,
-`turnedSquare()`, `flower()`, `snowflake()`, `octagon()` and `hexagon()`.
+`turnedSquare()`, `flower()`, `snowflake()`, `sparkle()`, `cross()`, `clover()`, `blob()`, `scalloped()`, `octagon()` and
+`hexagon()` (lying, or standing with `standing: true`).
 
 ### Configurable
 
@@ -131,7 +132,7 @@ dark and light runs of 1:1:3:1:1 through the middle, so their geometry has rules
 
 - drawn in a box from -3.5 to 3.5, centered on `(0, 0)`: seven modules across, both ways;
 - the ring about one module wide, its hole about five modules across, drawn the opposite way round to the outline;
-- straight-ish sides; a point may reach half a module past the box, into the light border round the eye.
+- straight-ish sides; a point may reach half a module past the box, into the light border around the eye.
 
 **Inner eye** (`InnerEyeShape::path()`):
 
@@ -190,13 +191,39 @@ Qr::filters()->register('checkerboard', Checkerboard::class);
 Qr::url($url)->filter('checkerboard', opacity: 0.5);
 ```
 
-`ModuleStyle` has `withShape()`, `withPaint()`, `withRotate()`, `withSize()`, `withOffset()`, `withSkew()`,
+`ModuleStyle` has `withShape()`, `withPaint()`, `withRotation()`, `withSize()`, `withOffset()`, `withSkew()`,
 `withOpacity()` and `withSkip()`, and relative `rotateBy()`, `scaleBy()`, `offsetBy()` and `fadeBy()`. An eye filter
 gets an `EyeContext` (the corner, the symbol's size, a stable `random()`) and an `EyeStyle`, whose `outer` and `inner`
 parts change with `withOuter()` and `withInner()`.
 
 `name()` and `options()` must rebuild the filter: `new Checkerboard(...$filter->options())`. Use `$cell->random()` for
 anything random, never `rand()`, so a code looks the same every time.
+
+## Option rules
+
+When a [StyleRule](https://exeque.github.io/laravel-qr/docs/validation) takes a shape's or filter's options from input, it checks them by the class's rules.
+A class's constructor types give rules of their own (a float is numeric, an int an integer, a bool a boolean, a backed
+enum one of its values); a class that takes lists, or wants ranges, states its rules with `HasOptionRules`:
+
+```php
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+
+final class Checkerboard implements HasOptionRules, ModuleFilter, NamedFilter
+{
+    public static function optionRules(): array
+    {
+        return [
+            'opacity' => ['sometimes', 'numeric', 'between:0,1'],
+        ];
+    }
+
+    // ...
+}
+```
+
+`optionRules()` takes the place of the constructor's types, so it lists every option the class takes; one it leaves
+out is refused. What the constructor throws for an option, such as an `InvalidOptionException` for a value out of range, becomes an
+error on that option. To find rules some other way, bind your own `ResolvesOptionRules` in place of the package's.
 
 ## Gradients
 

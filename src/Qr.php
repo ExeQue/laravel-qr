@@ -48,6 +48,7 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
+use ExeQue\Qr\Validation\StyleRule;
 use ExeQue\Qr\Writers\Contracts\Output;
 use ExeQue\Qr\Writers\Contracts\Writer;
 use ExeQue\Qr\Writers\Metadata;
@@ -118,12 +119,20 @@ final class Qr
             // Fluent when() without a callback: the proxy it returns is beyond PHPStan's inference.
             // @phpstan-ignore argument.templateType
             ->when(isset($defaults['margin']))->margin((int) ($defaults['margin'] ?? 4))
-            ->when(isset($defaults['foreground']))->paint($defaults['foreground'] ?? null)
+            ->when(isset($defaults['paint']))->paint($defaults['paint'] ?? null)
             ->when(array_key_exists('background', $defaults))->background($defaults['background'] ?? null)
             ->when(isset($defaults['module']))->modules($defaults['module'] ?? null)
             ->when(isset($defaults['eye']))->eyes($defaults['eye'] ?? null);
 
         return isset($defaults['style']) ? $builder->style($defaults['style']) : $builder;
+    }
+
+    /**
+     * The application's rules for style input; see StyleRule::defaults().
+     */
+    public function rule(): StyleRule
+    {
+        return StyleRule::defaults();
     }
 
     public function url(string $url): PendingQr
@@ -225,19 +234,23 @@ final class Qr
     }
 
     /**
-     * A shape on its own as a small SVG: a module (or a whole eye preset) first, or an
-     * outer and/or inner eye by name. `Qr::icon(Module::Square)`, `Qr::icon(outer: 'square')`.
+     * A shape on its own as a small SVG: a module (or a whole eye preset) first, an eye preset by
+     * name, or an outer and/or inner eye by name. `Qr::icon(Module::Square)`, `Qr::icon(eye: 'heart')`,
+     * `Qr::icon(outer: 'square')`.
      */
     public function icon(
         ModuleShape|ProvidesQrModule|ProvidesQrEye|string|null $shape = null,
         OuterEyeShape|ProvidesQrOuterEye|string|null $outer = null,
         InnerEyeShape|ProvidesQrInnerEye|string|null $inner = null,
         bool $withOuter = true,
-        ?Corner $corner = null,
+        Corner|string|null $corner = null,
+        ProvidesQrEye|string|null $eye = null,
     ): Icon {
         $icons = $this->container->make(Icons::class);
+        $corner = is_string($corner) ? Corner::from($corner) : $corner;
 
         return match (true) {
+            $eye !== null => $icons->eye($eye, corner: $corner),
             $shape instanceof ProvidesQrEye && ! $shape instanceof ProvidesQrModule => $icons->eye($shape, corner: $corner),
             $shape !== null => $icons->module($shape),
             $outer !== null && $inner !== null => $icons->eye(outer: $outer, inner: $inner, corner: $corner),

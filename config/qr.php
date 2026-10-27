@@ -19,7 +19,7 @@ return [
         'error_correction' => ExeQue\Qr\Encoder\Enums\ErrorCorrection::Medium,
         'margin' => 4,
         'size' => 600,
-        'foreground' => '#000000',
+        'paint' => '#000000',
         'background' => '#ffffff',
         'module' => ExeQue\Qr\Shapes\Enums\Module::Square,
         'eye' => ExeQue\Qr\Shapes\Enums\Eye::Square,
@@ -66,6 +66,9 @@ return [
         'max_skew' => 20,
         'max_skip' => 0.25,
         'max_logo_share' => 0.6,
+        'outer_eye_scale' => [0.93, 1.0],
+        'inner_eye_scale' => [0.6, 1.15],
+        'eye_rotation_warning' => 10,
     ],
 
     /*
@@ -99,10 +102,11 @@ return [
     // else GD. GD needs no ImageMagick, but cannot draw SVG logos.
     'raster' => [
         'driver' => env('QR_RASTER_DRIVER', 'auto'),
+        // A resolution written into PNG, JPEG and WebP files, for print.
+        'dpi' => null,
     ],
 
     'png' => [
-        'dpi' => null,
         // 0-9: how hard PNGs are packed; higher is smaller and slower, the image the same.
         'compression_level' => 6,
     ],
@@ -136,9 +140,6 @@ return [
 
     'logos' => [
         'sanitizer' => ExeQue\Qr\Logos\Sanitizers\AutoSvgSanitizer::class,
-    ],
-
-    'logo' => [
         // A code with a logo gets error correction High, unless it sets its own.
         'auto_error_correction' => true,
     ],
@@ -151,7 +152,7 @@ return [
     | Qr::read() reads the code in an image with the decoder named here:
     | 'zxing' (zxing-cpp through Node: `npm install zxing-wasm`, plus
     | @resvg/resvg-wasm to read SVG - the most capable), 'native' (the
-    | package's own, in PHP, with Imagick - no Node needed), or 'stack', which
+    | package's own, in PHP, with Imagick or GD - no Node needed), or 'stack', which
     | tries the decoders listed in turn until one reads the code, moving past
     | any that is not installed. Your own decoders go under 'decoders' below.
     |
@@ -186,7 +187,7 @@ return [
 
     'monocle' => [
         'enabled' => (bool) env('QR_MONOCLE', true),
-        'slow_render_ms' => 50,
+        'slow_render_ms' => 100,
     ],
 
     /*

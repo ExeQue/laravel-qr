@@ -33,10 +33,11 @@ The pictures show the top-left eye close up, with the modules beside it.
 | `soft-round-corner` | `OuterEyes\Rounded` | `outer` [1.9, 1.9, 1.9, 3.5], `hole` [0.9, 0.9, 0.9, 2.5] | one round corner, three soft |
 | `squircle` | `OuterEyes\Squircle` | — | a square with soft, full sides |
 | `octagon` | `OuterEyes\Octagon` | `cut` 1.7, `holeCut` 1.3 | corners cut off |
-| `hexagon` | `OuterEyes\Hexagon` | — | a regular hexagon, flat top and bottom; its points reach into the light border round the eye |
+| `hexagon` | `OuterEyes\Hexagon` | `standing` false | a regular hexagon, flat top and bottom; its points reach into the light border around the eye |
+| `hexagon-standing` | `OuterEyes\Hexagon` | `standing` true | the same, flat sides left and right, points up and down |
 | `leaf` | `OuterEyes\Rounded` | `outer` [3, 0, 3, 0], `hole` [2, 0, 2, 0] | two opposite corners round |
 | `drop` | `OuterEyes\Rounded` | `outer` [3, 3, 3, 0], `hole` [2, 2, 2, 0] | three corners round, one pointed |
-| `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides round a soft hole |
+| `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides around a soft hole |
 | `dotted-ring` | `OuterEyes\DottedRing` | `diameter` 1.0 (0.8 to 1) | a dot on each of the ring's 24 modules |
 
 `OuterEyes\Rounded` takes one radius for every corner, or four: top-right, bottom-right, bottom-left, top-left. Its
@@ -62,7 +63,8 @@ Shown inside the square outer eye.
 | `star` | `InnerEyes\Star` | — |
 | `flower` | `InnerEyes\Flower` | — |
 | `diamond` | `InnerEyes\Diamond` | — |
-| `hexagon` | `InnerEyes\Hexagon` | — |
+| `hexagon` | `InnerEyes\Hexagon` | `standing` false: flat top and bottom |
+| `hexagon-standing` | `InnerEyes\Hexagon` | `standing` true: points up and down |
 | `octagon` | `InnerEyes\Octagon` | `cut` 0.88 |
 | `leaf` | `InnerEyes\Rounded` | `radius` [1.3, 0, 1.3, 0] |
 | `drop` | `InnerEyes\Rounded` | `radius` [1.3, 1.3, 1.3, 0] |
@@ -93,6 +95,7 @@ still measures about three modules.
 | `soft-round-corner` | `soft-round-corner` | `soft-round-corner` |
 | `squircle` | `squircle` | `squircle` |
 | `hexagon` | `hexagon` | `hexagon` |
+| `hexagon-standing` | `hexagon-standing` | `hexagon-standing` |
 | `octagon` | `octagon` | `octagon` |
 | `leaf` | `leaf` | `leaf` |
 | `drop` | `drop` | `drop` |
@@ -124,7 +127,7 @@ use ExeQue\Qr\Rendering\Enums\Corner;
 Qr::url($url)
     ->eyes(Eye::Rounded)
     ->eye(Corner::TopLeft, Eye::Heart, paint: '#be123c')
-    ->eye(Corner::BottomLeft, rotate: 90);
+    ->eye(Corner::BottomLeft, rotation: 90);
 ```
 
 The [`eye-tilt`](https://exeque.github.io/laravel-qr/docs/filters#eye-tilt), [`eye-size`](https://exeque.github.io/laravel-qr/docs/filters#eye-size) and [`eye-paint`](https://exeque.github.io/laravel-qr/docs/filters#eye-paint)

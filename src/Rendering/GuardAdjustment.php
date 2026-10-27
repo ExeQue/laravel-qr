@@ -12,7 +12,7 @@ use ExeQue\Qr\Rendering\Enums\Corner;
 final readonly class GuardAdjustment
 {
     /**
-     * @param string $guard Which guard: offset, scale, skip, margin, outer-eye-scale, inner-eye-scale, eye-rotation or contrast.
+     * @param string $guard Which guard: offset, scale, skew, skip, margin, outer-eye-scale, inner-eye-scale, eye-rotation, contrast or logo.
      * @param array{int, int}|null $cell The module's column and row, if it was one.
      * @param bool $warning True when nothing was changed, only reported.
      */

@@ -72,7 +72,8 @@ final class Hydrate
     }
 
     /**
-     * A shape from its class name or registered name, or `['class' => ..., 'options' => [...]]` with either.
+     * A shape from its class name or registered name, or `['class' => ..., 'options' => [...]]` with either;
+     * `shape` may stand for `class`, as style input names it.
      *
      * @template T of object
      *
@@ -84,7 +85,7 @@ final class Hydrate
     {
         [$class, $options] = match (true) {
             is_string($shape) => [$shape, []],
-            is_array($shape) => [$shape['class'] ?? null, (array) ($shape['options'] ?? [])],
+            is_array($shape) => [$shape['class'] ?? $shape['shape'] ?? null, (array) ($shape['options'] ?? [])],
             default => [null, []],
         };
 

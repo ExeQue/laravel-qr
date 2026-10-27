@@ -227,8 +227,15 @@ final readonly class StyleSerializer
             return $style;
         }
 
-        $source = $data['source'] ?? throw InvalidStyleException::logoWithoutSource();
-        $logo = $source instanceof Logo ? $source : (str_starts_with((string) $source, 'data:') ? Logo::fromDataUri((string) $source) : Logo::fromFile((string) $source));
+        // A file by its path, or the image itself: a data: URI, an SVG or image bytes.
+        $source = $data['source'] ?? null;
+        $logo = match (true) {
+            isset($data['file']) => Logo::fromFile((string) $data['file']),
+            $source instanceof Logo => $source,
+            is_string($source) && str_starts_with($source, 'data:') => Logo::fromDataUri($source),
+            is_string($source) => Logo::fromBytes($source),
+            default => throw InvalidStyleException::logoWithoutSource(),
+        };
 
         return $style->withLogo(new LogoStyle(
             $logo,

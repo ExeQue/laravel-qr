@@ -13,7 +13,7 @@ What every code starts from.
 | `error_correction` | `ErrorCorrection::Medium` | an enum case or `L`, `M`, `Q`, `H` |
 | `margin` | 4 | modules of quiet zone |
 | `size` | 600 | pixels, for PNG, JPEG and WebP without a size |
-| `foreground` | `#000000` | any color |
+| `paint` | `#000000` | any color or gradient |
 | `background` | `#ffffff` | any color, or `null` for transparent |
 | `module` | `Module::Square` | a module shape: name, enum case or class |
 | `eye` | `Eye::Square` | an eye preset |
@@ -53,15 +53,18 @@ See [Caching](https://exeque.github.io/laravel-qr/docs/caching).
 ## metadata
 
 Attribution written into every code's file: `title`, `author`, `description`, `copyright`, `url` and `keywords` (a
-list). A code's own `->metadata()` is merged over these. See [Output](https://exeque.github.io/laravel-qr/docs/output#attribution).
+list). The published config holds `author`, `copyright` and `url`; add any of the others. A code's own
+`->metadata()` is merged over these. See [Output](https://exeque.github.io/laravel-qr/docs/output#attribution).
 
-## svg and png
+## svg, png and raster
 
 | Key | Default | |
 |---|---|---|
 | `svg.precision` | 3 | decimals in path data |
 | `svg.xml_declaration` | `false` | start SVG files with `<?xml ...?>` |
-| `png.dpi` | `null` | a resolution written into PNG, JPEG and WebP files |
+| `raster.dpi` | `null` | a resolution written into PNG, JPEG and WebP files |
+| `png.compression_level` | 6 | 0 to 9: how hard PNGs are packed; higher is smaller and slower |
+| `raster.driver` | `auto` (`QR_RASTER_DRIVER`) | what draws PNG, JPEG and WebP: `imagick`, `gd`, or `auto` for Imagick when it is loaded |
 
 ## colors
 
@@ -74,12 +77,12 @@ instance or an array. See [Colors](https://exeque.github.io/laravel-qr/docs/colo
 |---|---|---|
 | `max_memory` | 2 MB (`QR_STREAM_MAX_MEMORY`) | bytes an output keeps in memory before moving to a temporary file |
 
-## logos and logo
+## logos
 
 | Key | Default | |
 |---|---|---|
 | `logos.sanitizer` | `AutoSvgSanitizer` | the class that sanitizes SVG logos: enshrined/svg-sanitize when installed, the package's own allowlist otherwise |
-| `logo.auto_error_correction` | `true` | raise codes with a logo to error correction `H` |
+| `logos.auto_error_correction` | `true` | raise codes with a logo to error correction `H` |
 
 ## reading
 
@@ -98,7 +101,7 @@ See [Reading codes](https://exeque.github.io/laravel-qr/docs/reading).
 | Key | Default | |
 |---|---|---|
 | `enabled` | `true` (`QR_MONOCLE`) | show codes in Monocle, when it is installed |
-| `slow_render_ms` | 50 | renders slower than this are flagged |
+| `slow_render_ms` | 100 | renders slower than this are flagged |
 
 ## Registries
 

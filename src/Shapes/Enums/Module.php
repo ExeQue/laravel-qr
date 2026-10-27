@@ -53,14 +53,17 @@ enum Module: string implements ProvidesQrModule
     case Stars = 'stars';
     case Snowflakes = 'snowflakes';
     case Hexagons = 'hexagons';
+    case HexagonsStanding = 'hexagons-standing';
     case Octagons = 'octagons';
     case Leaves = 'leaves';
     case Drops = 'drops';
     case Sparkles = 'sparkles';
     case Crosses = 'crosses';
     case Clovers = 'clovers';
-    case Pills = 'pills';
-    case Bricks = 'bricks';
+    case PillsVertical = 'pills-vertical';
+    case PillsHorizontal = 'pills-horizontal';
+    case BricksHorizontal = 'bricks-horizontal';
+    case BricksVertical = 'bricks-vertical';
     case Sketch = 'sketch';
     case LinesVertical = 'lines-vertical';
     case LinesHorizontal = 'lines-horizontal';
@@ -87,15 +90,15 @@ enum Module: string implements ProvidesQrModule
             self::Flowers => Flower::class,
             self::Stars => Star::class,
             self::Snowflakes => Snowflake::class,
-            self::Hexagons => Hexagon::class,
+            self::Hexagons, self::HexagonsStanding => Hexagon::class,
             self::Octagons => Octagon::class,
             self::Leaves => Leaf::class,
             self::Drops => Drop::class,
             self::Sparkles => Sparkle::class,
             self::Crosses => Cross::class,
             self::Clovers => Clover::class,
-            self::Pills => Pill::class,
-            self::Bricks => Brick::class,
+            self::PillsVertical, self::PillsHorizontal => Pill::class,
+            self::BricksHorizontal, self::BricksVertical => Brick::class,
             self::Sketch => Sketch::class,
             self::LinesVertical, self::LinesHorizontal => Lines::class,
             self::ConnectedDots => ConnectedDots::class,
@@ -120,6 +123,9 @@ enum Module: string implements ProvidesQrModule
             self::FlowingMedium => ['radius' => 0.35],
             self::FlowingStrong => ['radius' => 0.5],
             self::LinesHorizontal => ['vertical' => false],
+            self::BricksVertical => ['vertical' => true],
+            self::PillsHorizontal => ['vertical' => false],
+            self::HexagonsStanding => ['standing' => true],
             default => [],
         };
     }

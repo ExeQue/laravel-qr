@@ -17,7 +17,7 @@ read back from an uploaded image. Everything goes through the `ExeQue\Qr\Facades
    are given; never build `WIFI:`, `BEGIN:VCARD` or `mailto:` strings by hand.
 2. **Style it, if asked.** `->modules('dots-medium')`, `->eyes('rounded')`, `->paint('#1e1b4b')`,
    `->background(null)`, `->margin(2)`, `->filter('mixed-rotation', min: -15, max: 15)`,
-   `->logo($path, size: 0.2)`. A paint is a color, a gradient (`LinearGradient::make('#be123c', '#1e1b4b')`) or
+   `->logo(file: $path, size: 0.2)`. A paint is a color, a gradient (`LinearGradient::make('#be123c', '#1e1b4b')`) or
    paints stacked with `Layered::make($bottom)->layer($top, 0.5)`. Prefer a named style (`->style('brand')`) when the application has one; check
    `Qr::styles()->names()` or `config('qr.styles')`.
 3. **End with a format.** `->svg()`, `->png($size)`, `->jpeg($size)` or `->webp($size)`, then `->save($path, $disk)`,
@@ -96,7 +96,11 @@ Use a named style or color the application already has before writing a new one.
 - A logo can be sized with `size: 'auto'`: as large as the error correction allows. Raise the error correction
   (`->errorCorrection('H')`) for a larger logo.
 - Cache codes on hot pages with `->cache()`; a closure filter needs `name:` to be cacheable.
-- In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->content === $url)`.
+- In tests, call `Qr::fake()` and assert with `Qr::assertRendered(fn (PendingQr $qr) => $qr->text() === $url)`.
+- Validate a style from a form with `StyleRule` (`'style' => StyleRule::defaults()`, or
+  `...StyleRule::defaults()->for('style')`), and turn it into a style with `$request->qrStyle('style')`, which the
+  `ExeQue\Qr\Validation\InteractsWithQrStyle` trait on the form request or Livewire form gives; never pass
+  request input to `Style::fromArray()`.
 - Register shapes, filters and styles of the application in a service provider, or as plain values in
   `config/qr.php`; `php artisan qr:check` builds every one and lists problems.
 
@@ -114,6 +118,7 @@ Read the one that fits before going further than the steps above; each is the pa
 - `references/logos.md` - sources, sizes (`'auto'`), cleared shapes, plates
 - `references/scan-safety.md` - the guards and their limits
 - `references/blade.md` - the components
+- `references/validation.md` - `StyleRule` for styles from forms: fields, `Allow`, `PaintRule`, `scannable()`, `toStyle()`
 - `references/reading.md` - `Qr::read()`, decoders, `qr:install`
 - `references/caching.md`, `references/testing.md` - caching, and `Qr::fake()` with its assertions
 - `references/configuration.md` - every config key

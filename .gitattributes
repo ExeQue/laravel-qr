@@ -8,6 +8,7 @@
 /.github                export-ignore
 /.editorconfig          export-ignore
 /.lerd.yaml             export-ignore
+/public                 export-ignore
 /.php-version           export-ignore
 /tests                  export-ignore
 /phpunit.xml            export-ignore

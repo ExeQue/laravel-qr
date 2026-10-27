@@ -26,6 +26,8 @@ use ExeQue\Qr\Registries\OuterEyeRegistry;
 use ExeQue\Qr\Registries\PayloadRegistry;
 use ExeQue\Qr\Registries\StyleRegistry;
 use ExeQue\Qr\Registries\WriterRegistry;
+use ExeQue\Qr\Validation\Contracts\ResolvesOptionRules;
+use ExeQue\Qr\Validation\OptionRulesResolver;
 use ExeQue\Qr\View\Components\Code;
 use ExeQue\Qr\Writers\StreamFactory;
 use Illuminate\Contracts\Foundation\Application;
@@ -50,6 +52,7 @@ final class QrServiceProvider extends ServiceProvider
         $this->registries();
         $this->decoders();
         $this->monocle();
+        $this->validation();
     }
 
     /**
@@ -141,6 +144,14 @@ final class QrServiceProvider extends ServiceProvider
 
         // One per request, so codes are written once per request at most.
         $this->app->scoped(Pipeline::class);
+    }
+
+    /**
+     * The rules shape and filter options are validated by, for style input.
+     */
+    private function validation(): void
+    {
+        $this->app->singleton(ResolvesOptionRules::class, fn (): ResolvesOptionRules => new OptionRulesResolver());
     }
 
     public function boot(): void

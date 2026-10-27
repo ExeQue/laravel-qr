@@ -143,6 +143,7 @@ describe('refusals', function (): void {
         expect($options)->toThrow(InvalidWriterOptionException::class, $message);
     })->with([
         [fn () => new Options(size: 0), 'The size is at least 1, 0 given.'],
+        [fn () => new Options(size: 20000), 'An image is at most 16384 pixels wide, 20000 given.'],
         [fn () => new Options(dpi: 0), 'The dpi is at least 1, 0 given.'],
         [fn () => new Options(quality: 101), 'The quality is 1 to 100, 101 given.'],
     ]);
@@ -189,7 +190,7 @@ describe('drawing', function (): void {
 
     it('spreads a gradient in its own box across the logo plate', function (): void {
         $code = \ExeQue\Qr\Facades\Qr::make(RASTER_URL)->logo(
-            dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png',
+            file: dirname(__DIR__, 2).'/Fixtures/logos/ellipse.png',
             size: 0.2,
             plate: LinearGradient::make('#000000', '#ffffff')->angle(90)->box(GradientBox::Shape),
         );

@@ -15,6 +15,7 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Logos\LogoStyle;
 use ExeQue\Qr\Rendering\Enums\Corner;
 use ExeQue\Qr\Shapes\Contracts\Directional;
+use ExeQue\Qr\Shapes\Contracts\Symmetric;
 use ExeQue\Qr\Shapes\Enums\Eye;
 use ExeQue\Qr\Shapes\Enums\Module;
 use ExeQue\Qr\Support\Paints;
@@ -144,7 +145,7 @@ final readonly class Style implements Arrayable, JsonSerializable
     /**
      * Turns the top-right eye a quarter clockwise and the bottom-left one a
      * quarter back, on top of any turn they have, so a corner drawn top-left on
-     * the shape points outwards on every eye.
+     * the shape points outward on every eye.
      */
     public function mirrored(): self
     {
@@ -159,11 +160,12 @@ final readonly class Style implements Arrayable, JsonSerializable
     }
 
     /**
-     * A part turned as it sits on the corner, unless it turns itself (a directional part).
+     * A part turned as it sits on the corner, unless it turns itself (a directional part) or is its
+     * own mirror image (a symmetric one).
      */
     private static function turned(EyePartStyle $part, Corner $corner): EyePartStyle
     {
-        return $part->shape instanceof Directional && $part->shape->isDirectional() ? $part : $part->rotateBy($corner->turn());
+        return $part->shape instanceof Symmetric || ($part->shape instanceof Directional && $part->shape->isDirectional()) ? $part : $part->rotateBy($corner->turn());
     }
 
     public function withBackground(?Paint $background): self

@@ -23,6 +23,11 @@ final readonly class Logo
     private const array AVIF_BRANDS = ['avif', 'avis'];
 
     /**
+     * The most pixels a raster logo may have: plenty for any code, too few to exhaust memory.
+     */
+    public const int MAX_PIXELS = 16_777_216;
+
+    /**
      * @param string $hash Of the contents: what caching goes by.
      */
     private function __construct(
@@ -53,6 +58,8 @@ final readonly class Logo
             default => throw InvalidLogoException::unsupportedType(),
         };
 
+        self::checkPixels($bytes, $mimeType);
+
         // A GIF's first frame, and HEIF and AVIF, which browsers and GD read only in part, become PNG.
         [$bytes, $mimeType] = match ($mimeType) {
             'image/gif' => [self::firstFrame($bytes), 'image/png'],
@@ -68,6 +75,11 @@ final readonly class Logo
 
     public static function fromFile(string $path, ?SvgSanitizer $sanitizer = null): self
     {
+        // A stream wrapper (ftp://, http://, phar://...) would fetch from elsewhere or run code.
+        if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $path) === 1) {
+            throw InvalidLogoException::notLocal($path);
+        }
+
         $bytes = is_file($path) && is_readable($path) ? file_get_contents($path) : false;
 
         return self::fromBytes($bytes === false ? throw InvalidLogoException::missingFile($path) : $bytes, $sanitizer);
@@ -114,13 +126,92 @@ final readonly class Logo
     }
 
     /**
+     * Refuses an image with more pixels than a logo may have, from its header, before it is decoded.
+     */
+    private static function checkPixels(string $bytes, string $mimeType): void
+    {
+        $size = match ($mimeType) {
+            'image/heif', 'image/avif' => self::pinged($bytes),
+            default => getimagesizefromstring($bytes),
+        };
+
+        if ($size === false) {
+            throw InvalidLogoException::unreadable();
+        }
+
+        if ($size[0] * $size[1] > self::MAX_PIXELS) {
+            throw InvalidLogoException::tooLarge($size[0], $size[1], self::MAX_PIXELS);
+        }
+
+        // A GIF's header gives its canvas, which its frames may be larger than; and reading it decodes
+        // every frame, so they count together.
+        $frames = $mimeType === 'image/gif' ? self::frames($bytes) : [];
+        $pixels = array_sum(array_map(fn (array $frame): int => $frame[0] * $frame[1], $frames));
+
+        if ($pixels > self::MAX_PIXELS) {
+            throw InvalidLogoException::tooManyPixels($pixels, self::MAX_PIXELS);
+        }
+    }
+
+    /**
+     * The size of each of a GIF's frames, from ImageMagick reading their headers only; none without Imagick.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function frames(string $gif): array
+    {
+        if (! extension_loaded('imagick')) {
+            return []; // @codeCoverageIgnore
+        }
+
+        try {
+            $image = new Imagick();
+            $image->pingImageBlob($gif);
+        } catch (ImagickException) {
+            return [];
+        }
+
+        $sizes = [];
+
+        foreach ($image as $frame) {
+            $sizes[] = [$frame->getImageWidth(), $frame->getImageHeight()];
+        }
+
+        return $sizes;
+    }
+
+    /**
+     * A HEIF or AVIF image's size, from ImageMagick reading its header only.
+     *
+     * @return array{int, int}|false
+     */
+    private static function pinged(string $bytes): array|false
+    {
+        if (! extension_loaded('imagick')) {
+            return false; // @codeCoverageIgnore
+        }
+
+        try {
+            $image = new Imagick();
+            $image->pingImageBlob($bytes);
+
+            return [$image->getImageWidth(), $image->getImageHeight()];
+        } catch (ImagickException) {
+            return false;
+        }
+    }
+
+    /**
      * The size an SVG says it has: its viewBox, else its width and height, else a square.
      *
      * @return array{float, float}
      */
     private static function svgSize(string $svg): array
     {
-        if (preg_match('/<svg[^>]*\sviewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"/i', $svg, $match) === 1 && (float) $match[1] > 0 && (float) $match[2] > 0) {
+        // Numbers as SVG writes them: 10, -2.5, .5, 2e2.
+        $number = '-?[\d.]+(?:e[-+]?\d+)?';
+
+        if (preg_match("/<svg[^>]*\\sviewBox=\"\\s*{$number}[\\s,]+{$number}[\\s,]+({$number})[\\s,]+({$number})\\s*\"/i", $svg, $match) === 1 && (float) $match[1] > 0 && (float) $match[2] > 0) {
             return [(float) $match[1], (float) $match[2]];
         }
 
@@ -166,14 +257,18 @@ final readonly class Logo
             return (string) ob_get_clean();
         }
 
-        $image = new Imagick();
-        $image->readImageBlob($gif);
-        $image->setIteratorIndex(0);
+        try {
+            $image = new Imagick();
+            $image->readImageBlob($gif);
+            $image->setIteratorIndex(0);
 
-        $frame = $image->getImage();
-        $frame->setImageFormat('png');
-        $frame->setOption('png:exclude-chunks', 'date,time');
+            $frame = $image->getImage();
+            $frame->setImageFormat('png');
+            $frame->setOption('png:exclude-chunks', 'date,time');
 
-        return $frame->getImageBlob();
+            return $frame->getImageBlob();
+        } catch (ImagickException) {
+            throw InvalidLogoException::unreadable();
+        }
     }
 }

@@ -38,10 +38,13 @@ describe('pointing shapes', function (): void {
         expect(new Leaf(0.9, $point)->draw(pointCell())->toSvg(3))->toBe(RoundedRect::path(-0.45, -0.45, 0.9, 0.9, $radii)->toSvg(3));
     })->with([
         'top-left' => [Direction::TopLeft, [0.45, 0.0, 0.45, 0.0]],
-        'bottom-right' => [Direction::BottomRight, [0.45, 0.0, 0.45, 0.0]],
         'top-right' => [Direction::TopRight, [0.0, 0.45, 0.0, 0.45]],
-        'bottom-left' => [Direction::BottomLeft, [0.0, 0.45, 0.0, 0.45]],
     ]);
+
+    it('points a leaf only from a top corner, as the bottom ones draw the same leaves', function (Direction $point): void {
+        new Leaf(point: $point);
+    })->with([Direction::BottomRight, Direction::BottomLeft])
+        ->throws(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"point" must be one of top-left, top-right, random');
 
     it('picks a corner for each module from its seed, the same on every render', function (): void {
         $drop = new Drop(point: Direction::Random);

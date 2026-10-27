@@ -35,7 +35,7 @@ $color = Color::make($anyForm);              // a string, an array or a color
 
 Oklch::from($color);   // the same color in another space
 $color->toRgba();      // sRGB, brought into gamut
-$color->toHex();       // #be123c
+$color->toHex();       // #rrggbb
 $color->toCss();       // in its own notation
 $color->alpha();
 $color->withAlpha(0.5);
@@ -51,7 +51,7 @@ $brand = Hex::make('#be123c');
 
 $brand->lighten(20);   // 20 points lighter, in perceived lightness (OKLCH), up to white
 $brand->darken(20);    // 20 points darker, down to black
-$brand->shift(180);    // the hue turned 180 degrees round the OKLCH color wheel
+$brand->shift(180);    // the hue turned 180 degrees around the OKLCH color wheel
 $brand->invert();      // the opposite color in sRGB
 ```
 
@@ -77,10 +77,10 @@ or in a service provider:
 Qr::colors()->register('brand', '#be123c');
 ```
 
-`Qr::colors()` also tells what is there: `names()`, `has('brand')`, `get('brand')` and `all()`.
+Use them like CSS names, anywhere: `->paint('brand')`. A name keeps its color's alpha. In SVG output a name of your
+own is written as the color itself.
 
-and use them like CSS names, anywhere: `->paint('brand')`. A name keeps its color's alpha. In SVG output a name of
-your own is written as the color itself, since only your application knows it.
+`Qr::colors()` also tells what is there: `names()`, `has('brand')`, `get('brand')` and `all()`.
 
 ## currentColor
 

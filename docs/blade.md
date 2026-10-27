@@ -44,4 +44,4 @@ See [Shape icons](icons.md).
 
 Icons are filled in `currentColor` with no size of their own. They are hidden from screen readers unless given a
 `label`, which makes them `role="img"` with that label. `corner` shows an eye as it sits on that corner in a
-[mirrored](eyes.md#mirrored) style.
+[mirrored](eyes.md#turned-to-point-out) style.

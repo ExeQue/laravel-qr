@@ -11,11 +11,13 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
 use ExeQue\Qr\Support\Seed;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Turns each module by its own angle: anywhere in a range, or one of a few steps.
  */
-final class MixedRotation implements ModuleFilter, NamedFilter
+final class MixedRotation implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -38,7 +40,8 @@ final class MixedRotation implements ModuleFilter, NamedFilter
             throw InvalidFilterException::weightsDoNotMatch($this->name(), 0, null);
         }
 
-        $this->steps = $steps;
+        // Numbers from a form are strings; a list of them is not converted on the way in.
+        $this->steps = $steps === null ? null : array_map(floatval(...), $steps);
     }
 
     public function module(ModuleContext $cell, ModuleStyle $style): ModuleStyle
@@ -53,6 +56,17 @@ final class MixedRotation implements ModuleFilter, NamedFilter
             : Seed::pick($cell->seed, $this->steps, purpose: $purpose);
 
         return $style->rotateBy($degrees);
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'min' => Options::number(-180, 180),
+            'max' => Options::number(-180, 180),
+            'steps' => ['sometimes', 'nullable', 'list', 'min:1', 'max:16'],
+            'steps.*' => ['numeric', 'between:-360,360'],
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

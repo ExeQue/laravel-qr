@@ -102,7 +102,7 @@ final class EyesBuilder
     }
 
     /**
-     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outwards on each.
+     * Turns the top-right and bottom-left eyes so a corner drawn top-left points outward on each.
      */
     public function mirrored(): self
     {

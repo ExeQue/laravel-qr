@@ -99,10 +99,10 @@ final class Grid
                 $right = 5;
             }
 
-            $upwards = (($right + 1) & 2) === 0;
+            $upward = (($right + 1) & 2) === 0;
 
             for ($step = 0; $step < $this->size; $step++) {
-                $y = $upwards ? $this->size - 1 - $step : $step;
+                $y = $upward ? $this->size - 1 - $step : $step;
 
                 for ($x = $right; $x > $right - 2; $x--) {
                     $role = $this->roles[$y * $this->size + $x];
@@ -325,7 +325,7 @@ final class Grid
 
     /**
      * Both cells of each format bit, least significant first (ISO/IEC 18004:2015 figure 25):
-     * one copy round the top-left finder, the other split between the other two.
+     * one copy around the top-left finder, the other split between the other two.
      *
      * @return list<array{array{int, int}, array{int, int}}>
      */

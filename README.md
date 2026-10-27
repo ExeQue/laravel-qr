@@ -16,7 +16,7 @@
 
 Customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back.
 
-| 30 | 14 | 20 | 17 | 24 | 5 |
+| 33 | 15 | 21 | 18 | 24 | 5 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | module shapes | outer eyes | inner eyes | eye presets | filters | gradients |
 
@@ -40,8 +40,8 @@ Qr::url('https://example.com/e/ABCD1234')
 
 - **Content** - links, Wi-Fi logins, contact cards, email, text messages, places and calendar events, escaped the way
   phones read them; or any text, in any language.
-- **Shapes** - thirty module shapes, from squares and dots to flowing, organic and connected modules; fourteen outer
-  eyes, twenty inner eyes and seventeen presets.
+- **Shapes** - thirty-three module shapes, from squares and dots to flowing, organic and connected modules; fifteen outer
+  eyes, twenty-one inner eyes and eighteen presets.
 - **Color** - every CSS color space, your own color names, and linear, radial, conic, diamond and mesh gradients
   blended in OKLab.
 - **Filters** - turn, size, nudge, shade, recolor or reshape every module on its own, in waves or from the middle out.
@@ -50,6 +50,7 @@ Qr::url('https://example.com/e/ABCD1234')
 - **Output** - SVG, PNG, JPEG and WebP; saved, stored, downloaded, streamed or returned as a response; with
   attribution written into the file.
 - **Blade** - `<x-qr :content="$url" />`, and icons of every shape for style pickers.
+- **Validation** - `StyleRule` checks a style from a form, field by field, and turns it into a style.
 - **Reading** - `Qr::read()` reads codes from images, with the package's own decoder or zxing.
 - **Caching**, a **testing fake**, **events**, a **Monocle** lens, **artisan** commands, and a
   [Laravel Boost](docs/installation.md#laravel-boost) skill for AI agents.

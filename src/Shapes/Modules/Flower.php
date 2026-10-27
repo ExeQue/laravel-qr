@@ -12,7 +12,7 @@ use ExeQue\Qr\Shapes\Contracts\Configurable;
 use ExeQue\Qr\Shapes\Contracts\ModuleShape;
 
 /**
- * A flower: petal circles round a heart circle, as one outline.
+ * A flower: petal circles around a heart circle, as one outline.
  */
 final readonly class Flower implements Configurable, ModuleShape
 {
@@ -29,6 +29,9 @@ final readonly class Flower implements Configurable, ModuleShape
         public float $heart = 0.25,
         public int $petals = 6,
     ) {
+        self::within('petal', $petal, 0.05, 0.5);
+        self::within('reach', $reach, 0.0, 0.5);
+        self::within('heart', $heart, 0.0, 0.5);
         self::within('petals', $petals, 3, 12);
     }
 

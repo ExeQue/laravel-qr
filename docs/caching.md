@@ -1,7 +1,7 @@
 # Caching
 
-Drawing a code takes a few milliseconds; a page full of styled codes, or a large PNG, takes longer. Codes can be
-written once and served from the cache after that.
+Codes can be written once and served from the cache after that, which pays off for a page full of styled codes or
+large PNGs.
 
 ## Within a request
 

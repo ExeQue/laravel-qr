@@ -10,12 +10,14 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyePartStyle;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * A little of everything for each eye part: turned, sized and faded by an amount of its own.
  * The eyes stay where they are, as a scanner finds the code by them.
  */
-final class EyeJitter implements EyeFilter, NamedFilter
+final class EyeJitter implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -48,6 +50,16 @@ final class EyeJitter implements EyeFilter, NamedFilter
         };
 
         return $style->withOuter($jitter($style->outer, 'outer'))->withInner($jitter($style->inner, 'inner'));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'rotate' => Options::number(0, 45),
+            'size' => Options::number(0, 0.5),
+            'opacity' => Options::number(0, 1),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

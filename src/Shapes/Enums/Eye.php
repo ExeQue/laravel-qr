@@ -24,6 +24,7 @@ enum Eye: string implements ProvidesQrEye
     case SoftRoundCorner = 'soft-round-corner';
     case Squircle = 'squircle';
     case Hexagon = 'hexagon';
+    case HexagonStanding = 'hexagon-standing';
     case Octagon = 'octagon';
     case Leaf = 'leaf';
     case Drop = 'drop';
@@ -43,6 +44,7 @@ enum Eye: string implements ProvidesQrEye
             self::Heart, self::SoftRoundCorner => OuterEye::SoftRoundCorner,
             self::Squircle => OuterEye::Squircle,
             self::Hexagon => OuterEye::Hexagon,
+            self::HexagonStanding => OuterEye::HexagonStanding,
             self::Octagon => OuterEye::Octagon,
             self::Leaf => OuterEye::Leaf,
             self::Drop => OuterEye::Drop,
@@ -63,6 +65,7 @@ enum Eye: string implements ProvidesQrEye
             self::SoftRoundCorner => InnerEye::SoftRoundCorner,
             self::Squircle => InnerEye::Squircle,
             self::Hexagon => InnerEye::Hexagon,
+            self::HexagonStanding => InnerEye::HexagonStanding,
             self::Octagon => InnerEye::Octagon,
             self::Leaf => InnerEye::Leaf,
             self::Drop => InnerEye::Drop,

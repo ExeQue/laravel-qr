@@ -11,12 +11,14 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyePartStyle;
 use ExeQue\Qr\Rendering\EyeStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Each eye a little lighter or darker than its color, and its hue a little turned: one shade
  * per corner, for both its parts. Gradients are left as they are.
  */
-final class EyeShade implements EyeFilter, NamedFilter
+final class EyeShade implements EyeFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -55,6 +57,16 @@ final class EyeShade implements EyeFilter, NamedFilter
         };
 
         return $style->withOuter($shade($style->outer))->withInner($shade($style->inner));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'min' => Options::number(-100, 100),
+            'max' => Options::number(-100, 100),
+            'hue' => Options::number(0, 180),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

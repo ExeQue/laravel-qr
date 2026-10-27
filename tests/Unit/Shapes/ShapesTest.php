@@ -113,10 +113,12 @@ describe('every shape', function (): void {
     it('draws every outer eye in its 7x7 box, with a hole', function (OuterEye $eye): void {
         $path = $eye->qrOuterEye()->path();
 
-        // The hexagon's points reach into the separator; everything else keeps to the box.
+        // The hexagon's points reach into the separator, at the sides or standing at the top and bottom;
+        // everything else keeps to the box.
         $width = $eye === OuterEye::Hexagon ? round(7 / M_SQRT3, 3) : 3.5;
+        $height = $eye === OuterEye::HexagonStanding ? round(7 / M_SQRT3, 3) : 3.5;
 
-        expect(boundsOf($path))->toBe([-$width, -3.5, $width, 3.5])
+        expect(boundsOf($path))->toBe([-$width, -$height, $width, $height])
             // A ring and its hole; a ring of dots is a dot per module.
             ->and(substr_count($path->toSvg(), 'M'))->toBe($eye === OuterEye::DottedRing ? 24 : 2);
     })->with(OuterEye::cases());
@@ -179,6 +181,17 @@ describe('options', function (): void {
     })->with([
         [fn () => new Modules\Dot(1.5), 'Dot\'s "diameter" must be from 0.1 to 1, 1.5 given.'],
         [fn () => new Modules\Flowing(0.6), '"radius" must be from 0 to 0.5'],
+        [fn () => new Modules\Flower(petal: 5), '"petal" must be from 0.05 to 0.5'],
+        [fn () => new Modules\Flower(reach: 5), '"reach" must be from 0 to 0.5'],
+        [fn () => new Modules\Flower(heart: 5), '"heart" must be from 0 to 0.5'],
+        [fn () => new Modules\Star(outer: 2), '"outer" must be from 0.1 to 0.75'],
+        [fn () => new Modules\Star(inner: 0.6), '"inner" must be from 0.05 to 0.52'],
+        [fn () => new Modules\Snowflake(reach: 2), '"reach" must be from 0.1 to 0.75'],
+        [fn () => new Modules\Snowflake(width: 2), '"width" must be from 0.05 to 0.5'],
+        [fn () => new OuterEyes\Rounded(outer: [0.5]), '"outer" must be a number or a list of 4 numbers.'],
+        [fn () => new OuterEyes\Rounded(outer: 50), '"outer" must be from 0 to 3.5'],
+        [fn () => new InnerEyes\Rounded(radius: [1, 2]), '"radius" must be a number or a list of 4 numbers.'],
+        [fn () => new InnerEyes\Rounded(radius: ['a' => 1, 'b' => 1, 'c' => 1, 'd' => 1]), '"radius" must be a number or a list of 4 numbers.'],
         [fn () => new Modules\Rounded(side: 0), '"side"'],
         [fn () => new Modules\Rounded(radius: 1), '"radius"'],
         [fn () => new Modules\Squircle(2), '"side"'],

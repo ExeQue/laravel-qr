@@ -8,7 +8,7 @@ listening they cost nothing to speak of.
 | Event | When | Holds |
 |---|---|---|
 | `QrRendering` | a code is about to be drawn or served | `code`, `format` |
-| `QrRendered` | a code was drawn, or served without drawing | `code`, `format`, `rendered`, `milliseconds` (per phase: `encode`, `render`, `write`, `total`), `cached`, `version`, `errorCorrection`, `modules` |
+| `QrRendered` | a code was drawn, or served without drawing | `code`, `format`, `rendered`, `milliseconds` (per phase: `encode`, `render`, `write`, `total`), `cached`, `version`, `errorCorrection`, `modules`, `options` (the writer's options it was drawn with) |
 | `QrCacheHit` | the cache store had the code | `code`, `format`, `key` |
 | `QrCacheMissed` | the cache store did not | `code`, `format`, `key` |
 | `QrGuardApplied` | a [scan guard](scan-safety.md) changed or warned about something | `code`, `adjustment` |

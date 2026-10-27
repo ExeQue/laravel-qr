@@ -4,7 +4,7 @@ A logo sits in the middle of the code, on the modules it clears. The code's erro
 hides, so a code with a logo is raised to error correction `H` unless you set a level yourself.
 
 ```php
-Qr::url($url)->logo(storage_path('app/brand/logo.svg'), size: 0.22);
+Qr::url($url)->logo(file: storage_path('app/brand/logo.svg'), size: 0.22);
 ```
 
 | | |
@@ -15,7 +15,8 @@ Qr::url($url)->logo(storage_path('app/brand/logo.svg'), size: 0.22);
 ## Where the image comes from
 
 ```php
-->logo('/path/to/logo.png')                 // a file
+->logo(file: '/path/to/logo.png')           // a file, by its path
+->logo($request->file('logo'))              // an uploaded file, or any SplFileInfo
 ->logo($bytes)                               // PNG, JPEG, WebP, GIF (its first frame), HEIC, HEIF, AVIF or SVG bytes
 ->logo('<svg xmlns="http://www.w3.org/2000/svg">...</svg>')
 ->logo('data:image/png;base64,...')
@@ -49,22 +50,27 @@ class Team extends Model implements ProvidesQrLogo
 
 Logos are read from files, disks, bytes and data URIs only.
 
+A string is the image itself, never a path: a short string that is not an image (`'/path/logo.png'`, a URL) throws an
+`InvalidLogoException` that says how to give a file. A file is read only when given as a file, as `file:`, or as
+a stored style's logo `file` given to `Style::fromArray()`; give a user's logo as the uploaded file, and take style
+input through [StyleRule](validation.md), which never reads a logo's image from the input.
+
 ## Options
 
 | Option | Default | |
 |---|---|---|
 | `size` | 0.2 | the logo's width as a share of the code's, or `'auto'` |
-| `padding` | 1 | modules of clear space round it: no module comes nearer the logo than this |
+| `padding` | 1 | modules of clear space around it: no module comes nearer the logo than this |
 | `shape` | `square` | the cleared area: `square`, `rounded`, `circle`, or `alpha` (only under the logo's visible pixels) |
 | `plate` | none | a backing behind the logo and its padding: any color or gradient |
 | `plateRadius` | 0 | the plate's corner radius, in modules |
 | `position` | centered | the logo's top-left corner, in modules from the code's |
 
 ```php
-->logo($path, size: 0.25, padding: 1, shape: 'rounded', plate: '#ffffff', plateRadius: 1)
+->logo(file: $path, size: 0.25, padding: 1, shape: 'rounded', plate: '#ffffff', plateRadius: 1)
 
 ->logo(fn (LogoBuilder $logo) => $logo
-    ->from($path)
+    ->file($path)
     ->size(0.25)
     ->shape('circle')
     ->plate('#fde68a', radius: 2))
@@ -75,7 +81,7 @@ than the scan guards allow (`max_logo_share` of what the error correction level 
 of the code's width. Higher error correction gives a larger logo:
 
 ```php
-Qr::url($url)->errorCorrection('H')->logo($path, size: 'auto');
+Qr::url($url)->errorCorrection('H')->logo(file: $path, size: 'auto');
 ```
 
 The logo keeps its proportions inside its box. A logo, placed or centered, must stay clear of the finder, timing,
@@ -89,7 +95,7 @@ A logo may clear only part of what the error correction can restore; `qr.scan_sa
 much. A logo larger than that throws a `ScanSafetyException` that says how many modules it clears and how many it
 may, or only warns with `on_violation` set to `warn`. Larger codes, and error correction `H`, allow larger logos.
 
-`qr.logo.auto_error_correction` (on by default) raises codes with a logo to `H`; set it to `false`, or set a level
+`qr.logos.auto_error_correction` (on by default) raises codes with a logo to `H`; set it to `false`, or set a level
 on the code, to choose for yourself.
 
 ## SVG logos are sanitized

@@ -120,11 +120,14 @@ final readonly class Writer implements Fakeable, WriterContract
             throw InvalidWriterOptionException::unsupportedPaint($paint);
         }
 
-        // The gradient, as large as its box, kept only where the shapes are.
-        $layer = new Imagick();
-        $layer->newImage($canvas->getImageWidth(), $canvas->getImageHeight(), new ImagickPixel('transparent'));
+        // The gradient, as large as its box and carried on past it with its edge colors, as GD and
+        // browsers do, then kept only where the shapes are.
         [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, Boxes::on($paint, $scene, $shape));
-        $layer->compositeImage($this->sample($paint, (int) max(1, round($width)), (int) max(1, round($height))), Imagick::COMPOSITE_OVER, (int) round($x), (int) round($y));
+        $layer = $this->sample($paint, (int) max(1, round($width)), (int) max(1, round($height)));
+        $layer->setImageVirtualPixelMethod(Imagick::VIRTUALPIXELMETHOD_EDGE);
+        $layer->setImageArtifact('distort:viewport', sprintf('%dx%d+0+0', $canvas->getImageWidth(), $canvas->getImageHeight()));
+        $layer->distortImage(Imagick::DISTORTION_SCALEROTATETRANSLATE, [0, 0, 1, 0, round($x), round($y)], false);
+        $layer->setImagePage(0, 0, 0, 0);
 
         if ($paths !== null) {
             $layer->compositeImage($this->mask($canvas, $paths, $scale), Imagick::COMPOSITE_DSTIN, 0, 0);
@@ -148,13 +151,13 @@ final readonly class Writer implements Fakeable, WriterContract
             $this->fill($canvas, $style->plate, [$layer->area], 1.0, $scene, $layer->area, $scale);
         }
 
+        [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, $layer->box);
+
         $image = new Imagick();
         $image->setBackgroundColor(new ImagickPixel('transparent'));
-        // A density high enough that an SVG is drawn sharp at any size it is placed at.
-        $image->setResolution(300, 300);
-        $image->readImageBlob(self::readable($style->logo));
+        // An SVG is drawn at twice the size it is placed at, for sharp edges, whatever size it says it has.
+        $image->readImageBlob($style->logo->isSvg() ? self::sized(self::readable($style->logo), $style->logo, 2 * $width, 2 * $height) : self::readable($style->logo));
 
-        [$x, $y, $width, $height] = array_map(fn (float $value): float => $value * $scale, $layer->box);
         $fit = min($width / $image->getImageWidth(), $height / $image->getImageHeight());
         [$imageWidth, $imageHeight] = [(int) max(1, round($image->getImageWidth() * $fit)), (int) max(1, round($image->getImageHeight() * $fit))];
         $image->resizeImage($imageWidth, $imageHeight, Imagick::FILTER_LANCZOS, 1);
@@ -173,6 +176,23 @@ final readonly class Writer implements Fakeable, WriterContract
     /**
      * The logo's bytes, when ImageMagick can read them: raster images always, SVG with its SVG support.
      */
+    /**
+     * An SVG with its own width and height set to fit `$width` by `$height` pixels, its viewBox kept for
+     * its proportions: so ImageMagick draws it that size, whatever units or size it gave.
+     */
+    private static function sized(string $svg, Logo $logo, float $width, float $height): string
+    {
+        $fit = min($width / $logo->width, $height / $logo->height);
+        $size = sprintf(' width="%d" height="%d"', max(1, (int) round($logo->width * $fit)), max(1, (int) round($logo->height * $fit)));
+
+        return (string) preg_replace_callback('/<svg\b[^>]*>/i', function (array $tag) use ($logo, $size): string {
+            $root = (string) preg_replace('/\s(width|height)\s*=\s*("[^"]*"|\'[^\']*\')/i', '', $tag[0]);
+            $root = preg_match('/\sviewBox\s*=/i', $root) === 1 ? $root : (string) preg_replace('/^<svg\b/i', "<svg viewBox=\"0 0 {$logo->width} {$logo->height}\"", $root);
+
+            return (string) preg_replace('/^<svg\b/i', '<svg'.$size, $root);
+        }, $svg, 1);
+    }
+
     private static function readable(Logo $logo): string
     {
         return ! $logo->isSvg() || Imagick::queryFormats('SVG') !== [] ? $logo->contents : throw MissingExtensionException::svgLogos();

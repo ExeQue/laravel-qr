@@ -15,7 +15,7 @@ final class InvalidStyleException extends InvalidArgumentException implements Qr
 
     public static function logoWithoutSource(): self
     {
-        return new self('A stored logo has no source to read it from: give it a path or a data: URI as "source".');
+        return new self('The style has logo settings but no logo: give its image to toStyle() or qrStyle() as logo, or a stored style a path as "file" or a data: URI as "source".');
     }
 
     /**
@@ -34,6 +34,11 @@ final class InvalidStyleException extends InvalidArgumentException implements Qr
     public static function notPlain(string $method, mixed $value): self
     {
         return new self('A style in config keeps plain values only, to survive the config cache: '.get_debug_type($value)." given to {$method}(). Give a gradient as its array, and shapes and filters by their names.");
+    }
+
+    public static function notInput(string $part): self
+    {
+        return new self("The style's {$part} has no registered name, so it cannot be written as input.");
     }
 
     public static function noLayers(): self

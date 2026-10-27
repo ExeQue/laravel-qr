@@ -26,7 +26,6 @@ use ExeQue\Qr\Writers\Raster\Gd\Writer;
 use ExeQue\Qr\Writers\Raster\Imagick\Writer as ImagickWriter;
 use ExeQue\Qr\Writers\Raster\Options;
 use GdImage;
-use ValueError;
 
 covers(Writer::class, Coverage::class, Metadata::class, Driver::class, WriterRegistry::class, Bitmap::class, Knockout::class, Logo::class, MissingExtensionException::class);
 
@@ -53,7 +52,7 @@ describe('the driver', function (): void {
     });
 
     it('refuses a driver it does not know', function (): void {
-        expect(fn () => Driver::resolve('vips'))->toThrow(ValueError::class);
+        expect(fn () => Driver::resolve('vips'))->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, '"driver" must be one of auto, imagick, gd; "vips" given.');
     });
 });
 
@@ -125,14 +124,14 @@ describe('drawing', function (): void {
 describe('logos', function (): void {
     it('places raster logos on a plate, cut to their shape', function (string $file, string $shape): void {
         $png = Qr::make(GD_URL)->errorCorrection('H')
-            ->logo(gdLogo($file), size: 0.2, shape: $shape, plate: LinearGradient::make('#ffffff', '#fff1f2'))
+            ->logo(file: gdLogo($file), size: 0.2, shape: $shape, plate: LinearGradient::make('#ffffff', '#fff1f2'))
             ->png(400, driver: 'gd')->contents();
 
         expect(Qr::read($png, 'native')->text)->toBe(GD_URL);
     })->with([['ellipse.png', 'circle'], ['ellipse.png', 'square'], ['two-frames.gif', 'rounded']]);
 
     it('cannot draw an SVG logo', function (): void {
-        expect(fn () => Qr::make(GD_URL)->logo(gdLogo('badge.svg'))->png(300, driver: 'gd'))
+        expect(fn () => Qr::make(GD_URL)->logo(file: gdLogo('badge.svg'))->png(300, driver: 'gd'))
             ->toThrow(MissingExtensionException::class, 'GD cannot draw an SVG logo');
     });
 
@@ -140,7 +139,7 @@ describe('logos', function (): void {
         config()->set('qr.raster.driver', 'gd');
 
         $logo = Logo::fromFile(gdLogo('two-frames.gif'));
-        $knocked = Qr::make(GD_URL)->errorCorrection('H')->logo(gdLogo('ellipse.png'), size: 0.25, shape: 'alpha')->png(400)->contents();
+        $knocked = Qr::make(GD_URL)->errorCorrection('H')->logo(file: gdLogo('ellipse.png'), size: 0.25, shape: 'alpha')->png(400)->contents();
 
         expect($logo->mimeType)->toBe('image/png')
             ->and(Qr::read($knocked, 'native')->text)->toBe(GD_URL);
@@ -170,7 +169,7 @@ describe('reading', function (): void {
         $transparent = Qr::make(GD_URL)->background(null)->png(300)->contents();
 
         expect(Bitmap::fromImage($png, Driver::Gd)->width)->toBe(800)
-            ->and(Bitmap::fromImage($transparent, Driver::Gd)->grey[0])->toBe(255);
+            ->and(Bitmap::fromImage($transparent, Driver::Gd)->gray[0])->toBe(255);
 
         config()->set('qr.raster.driver', 'gd');
 

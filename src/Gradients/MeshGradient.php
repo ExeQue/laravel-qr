@@ -24,10 +24,12 @@ final class MeshGradient implements SerializableGradient
     public private(set) array $rows;
 
     /**
-     * @param list<list<ColorContract|string>> $rows At least two rows of at least two colors, all as long.
+     * @param array<array-key, array<array-key, ColorContract|string>> $rows At least two rows of at least two colors, all as long.
      */
     public function __construct(array $rows)
     {
+        // Rows and colors by position, whatever keys they came with.
+        $rows = array_values(array_map(array_values(...), $rows));
         $width = count($rows[0] ?? []);
 
         if (count($rows) < 2 || $width < 2 || array_any($rows, fn (array $row): bool => count($row) !== $width)) {

@@ -42,6 +42,7 @@ use ExeQue\Qr\Shapes\Modules\Square;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
+use SplFileInfo;
 
 covers(
     QrManager::class,
@@ -59,6 +60,8 @@ covers(
     InvalidLogoException::class,
     ScanSafety::class,
     \ExeQue\Qr\Rendering\EyeStyle::class,
+    \ExeQue\Qr\Exceptions\InvalidOptionException::class,
+    \ExeQue\Qr\Writers\Raster\Enums\Driver::class,
 );
 
 pest()->group('builder');
@@ -91,7 +94,7 @@ describe('making codes', function (): void {
     ])->group('scan');
 
     it('starts from the config\'s defaults', function (): void {
-        config()->set('qr.defaults', ['margin' => 2, 'foreground' => '#1c1917', 'background' => null, 'error_correction' => 'Q', 'module' => 'square', 'eye' => Eye::Square]);
+        config()->set('qr.defaults', ['margin' => 2, 'paint' => '#1c1917', 'background' => null, 'error_correction' => 'Q', 'module' => 'square', 'eye' => Eye::Square]);
         Qr::styles()->register('wide', ['margin' => 6]);
 
         $code = Qr::make(BUILDER_URL);
@@ -131,6 +134,22 @@ describe('making codes', function (): void {
             ->and(Qr::make(BUILDER_URL)->margin(0)->scanSafety(ScanSafety::off())->scene()->margin)->toBe(0)
             ->and(ScanSafety::fromConfig(['on_violation' => \ExeQue\Qr\Rendering\Enums\Violation::Warn])->onViolation)->toBe(\ExeQue\Qr\Rendering\Enums\Violation::Warn);
     });
+});
+
+describe('named settings', function (): void {
+    it('takes error correction in either case', function (): void {
+        expect(Qr::make(BUILDER_URL)->errorCorrection('q')->matrix()->errorCorrection)->toBe(ErrorCorrection::Quartile);
+    });
+
+    it('says which values a named setting takes', function (callable $build, string $message): void {
+        expect($build)->toThrow(\ExeQue\Qr\Exceptions\InvalidOptionException::class, $message);
+    })->with([
+        [fn () => Qr::make(BUILDER_URL)->errorCorrection('x'), '"level" must be one of L, M, Q, H; "x" given.'],
+        [fn () => Qr::make(BUILDER_URL)->mask(9), '"mask" must be one of 0, 1, 2, 3, 4, 5, 6, 7; "9" given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(file: logoFixture(), shape: 'oval'), '"shape" must be one of square, rounded, circle, alpha; "oval" given.'],
+        [fn () => Qr::make(BUILDER_URL)->logo(fn (LogoBuilder $logo) => $logo->file(logoFixture())->shape('oval')), '"shape" must be one of'],
+        [fn () => Qr::make(BUILDER_URL)->png(driver: 'foo'), '"driver" must be one of auto, imagick, gd; "foo" given.'],
+    ]);
 });
 
 describe('styling', function (): void {
@@ -202,7 +221,7 @@ describe('styling', function (): void {
                 ->bottomLeft(fn (EyeBuilder $eye): EyeBuilder => $eye->whole('square'))
                 ->mirrored())
             ->background(fn (BackgroundBuilder $background): BackgroundBuilder => $background->paint('#fff7ed'))
-            ->eye(Corner::BottomLeft, rotate: 10, paint: '#be123c', outer: 'square', inner: 'square', eye: Eye::Square)
+            ->eye(Corner::BottomLeft, rotation: 10, paint: '#be123c', outer: 'square', inner: 'square', eye: Eye::Square)
             ->eye(Corner::TopLeft, fn (EyeBuilder $eye): EyeBuilder => $eye->rotate(-3));
 
         $style = $code->toStyle();
@@ -281,7 +300,7 @@ describe('logos', function (): void {
             ->and($code->matrix()->errorCorrection)->toBe(ErrorCorrection::High)
             ->and($code->svg())->toDecodeAs(BUILDER_URL);
     })->with([
-        'path' => [fn () => logoFixture()],
+        'file' => [fn () => new SplFileInfo(logoFixture())],
         'data uri' => [fn () => Logo::fromFile(logoFixture())->toDataUri()],
         'svg' => [fn () => (string) file_get_contents(logoFixture())],
         'logo' => [fn () => Logo::fromFile(logoFixture())],
@@ -310,16 +329,16 @@ describe('logos', function (): void {
     });
 
     it('keeps the error correction it was given, logo or not', function (): void {
-        config()->set('qr.logo.auto_error_correction', false);
+        config()->set('qr.logos.auto_error_correction', false);
 
-        expect(Qr::make(BUILDER_URL)->errorCorrection('Q')->logo(logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Quartile)
-            ->and(Qr::make(BUILDER_URL)->logo(logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Medium);
+        expect(Qr::make(BUILDER_URL)->errorCorrection('Q')->logo(file: logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Quartile)
+            ->and(Qr::make(BUILDER_URL)->logo(file: logoFixture())->matrix()->errorCorrection)->toBe(ErrorCorrection::Medium);
     });
 
     it('refuses a logo it cannot read', function (callable $build, string $message): void {
         expect($build)->toThrow(InvalidLogoException::class, $message);
     })->with([
-        [fn () => new LogoBuilder()->toLogoStyle(), 'The logo has no image: call from() first.'],
+        [fn () => new LogoBuilder()->toLogoStyle(), 'The logo has no image: give it one, or call from() or file() first.'],
         [fn () => new LogoBuilder()->from(null), 'A logo cannot be read from null'],
     ]);
 })->group('logos');
@@ -339,7 +358,7 @@ describe('output', function (): void {
 
     it('passes writer options on, over the config\'s', function (): void {
         config()->set('qr.svg.precision', 1);
-        config()->set('qr.png.dpi', 300);
+        config()->set('qr.raster.dpi', 300);
         config()->set('qr.defaults.size', 240);
 
         $image = new Imagick();

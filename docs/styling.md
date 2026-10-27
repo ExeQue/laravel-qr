@@ -58,17 +58,21 @@ One corner, or each corner in turn:
 use ExeQue\Qr\Rendering\Enums\Corner;
 
 ->eye(Corner::TopLeft, Eye::Dot, paint: '#be123c')
-->eye(Corner::TopRight, outer: 'soft', inner: 'heart', rotate: 90)
+->eye(Corner::TopRight, outer: 'soft', inner: 'heart', rotation: 90)
 
 ->eyes(fn (EyesBuilder $eyes) => $eyes
     ->outer('rounded')
     ->inner('soft')
     ->paint('#be123c')
     ->topLeft(fn (EyeBuilder $eye) => $eye->innerPaint('#1e1b4b'))
-    ->each(fn (EyeBuilder $eye) => $eye->rotate(0)))
+    ->each(fn (EyeBuilder $eye) => $eye->rotate(0))
+    ->corner(Corner::BottomLeft, fn (EyeBuilder $eye) => $eye->outer('circle'))
+    ->mirrored())
 ```
 
-`EyeBuilder` has `whole()`, `outer()`, `inner()`, `rotate()`, `paint()`, `outerPaint()` and `innerPaint()`.
+`EyesBuilder` has `outer()`, `inner()`, `paint()`, `topLeft()`, `topRight()`, `bottomLeft()`, `each()`, `corner()` and
+`mirrored()`; `EyeBuilder` has `whole()`, `outer()`, `inner()`, `rotate()`, `paint()`, `outerPaint()` and
+`innerPaint()`.
 
 ## Paint and background
 
@@ -87,7 +91,7 @@ use ExeQue\Qr\Rendering\Enums\Corner;
 
 ## Margin
 
-The quiet zone round the code, in modules. Scanners need some; the [scan guards](scan-safety.md) keep at least two.
+The quiet zone around the code, in modules. Scanners need some; the [scan guards](scan-safety.md) keep at least two.
 
 ```php
 ->margin(2)
@@ -100,7 +104,7 @@ sits in the middle.
 
 ```php
 ->filter('mixed-rotation', min: -15, max: 15)
-->logo(storage_path('app/logo.svg'), size: 0.22)
+->logo(file: storage_path('app/logo.svg'), size: 0.22)
 ```
 
 ## Reusing a style
@@ -151,7 +155,7 @@ What it takes, as config must survive the cache:
 - as arguments, text, numbers, booleans, arrays, enum cases and color classes (`Hex::make(...)`, `Oklch::make(...)`);
 - shapes, filters and gradients by their names or arrays: `modules('dots-medium', diameter: 0.7)`,
   `filter('mixed-rotation', min: -10, max: 10)`, `paint(['kind' => 'linear', 'angle' => 135, 'stops' => [...]])`;
-- a logo by its path or data URI.
+- a logo by its path (`logo(file: ...)`) or data URI.
 
 Gradient and shape objects, closures, and builder closures such as `eyes(fn (EyesBuilder $eyes) => ...)` cannot be
 cached, and `Style::make()` refuses them at once with what to give instead. A style that needs them belongs in a
@@ -202,7 +206,7 @@ A style can be written down as plain data, for a database column or a settings f
 ```php
 $data = Qr::url($url)->modules('flowing-soft')->paint('#be123c')->toArray();   // only what differs from the defaults
 
-$style = Qr::styles()->hydrate($data);
+$style = Qr::styles()->hydrate($data);   // or Style::fromArray($data), the same
 Qr::url($url)->style($style)->svg();
 ```
 

@@ -17,6 +17,11 @@ final readonly class Options
      * @param int $compressionLevel 0-9, for PNG: how hard zlib packs it; higher is smaller and slower,
      *                              and the image is the same.
      */
+    /**
+     * The widest image drawn, in pixels: large enough for print, small enough to keep memory in hand.
+     */
+    public const int MAX_SIZE = 16384;
+
     public function __construct(
         public int $size = 600,
         public ImageFormat $format = ImageFormat::Png,
@@ -27,6 +32,10 @@ final readonly class Options
     ) {
         if ($size < 1) {
             throw InvalidWriterOptionException::notPositive('size', $size);
+        }
+
+        if ($size > self::MAX_SIZE) {
+            throw InvalidWriterOptionException::tooLarge($size, self::MAX_SIZE);
         }
 
         if ($dpi !== null && $dpi < 1) {

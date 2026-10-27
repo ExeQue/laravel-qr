@@ -64,9 +64,29 @@ final class InvalidLogoException extends InvalidArgumentException implements QrE
         return new self("A logo cannot be read from {$type}: give a Logo, a path, a data: URI, an SVG, image bytes, or a disk and a path.");
     }
 
+    public static function tooLarge(int $width, int $height, int $max): self
+    {
+        return new self("A logo may have at most {$max} pixels; this one is {$width} by {$height}.");
+    }
+
+    public static function tooManyPixels(int $pixels, int $max): self
+    {
+        return new self("A logo may have at most {$max} pixels in all its frames; this one has {$pixels}.");
+    }
+
+    public static function notAnImage(string $source): self
+    {
+        return new self("\"{$source}\" is not an image: give a file by path with file: or Logo::fromFile(), an uploaded file, a data: URI, an SVG or image bytes.");
+    }
+
+    public static function notLocal(string $path): self
+    {
+        return new self("A logo is read from a local file, not from \"{$path}\": logos are never fetched from elsewhere.");
+    }
+
     public static function noSource(): self
     {
-        return new self('The logo has no image: call from() first.');
+        return new self('The logo has no image: give it one, or call from() or file() first.');
     }
 
 }

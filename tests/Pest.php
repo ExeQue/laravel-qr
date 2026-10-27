@@ -166,3 +166,22 @@ function expectScansAsBaselineSays(string $kind, BackedEnum $shape, bool $mirror
         }
     }
 }
+
+/**
+ * An animated GIF of small frames that together hold more pixels than a logo may have.
+ */
+function manyFrames(): string
+{
+    $gif = new \Imagick();
+
+    for ($frame = 0; $frame < 18; $frame++) {
+        $image = new \Imagick();
+        $image->newImage(1000, 1000, $frame % 2 === 0 ? 'red' : 'blue');
+        $image->setImageFormat('gif');
+        $gif->addImage($image);
+    }
+
+    $gif->setFormat('gif');
+
+    return $gif->getImagesBlob();
+}

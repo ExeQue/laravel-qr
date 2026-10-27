@@ -14,11 +14,14 @@ use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
 use ExeQue\Qr\Support\Normalizer;
 use ExeQue\Qr\Support\Seed;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\PaintRule;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Paints each module a color of its own from a list, optionally weighted: confetti codes.
  */
-final class Palette implements ModuleFilter, NamedFilter
+final class Palette implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -36,6 +39,9 @@ final class Palette implements ModuleFilter, NamedFilter
         private ?array $weights = null,
         private int $seed = 0,
     ) {
+        // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        $this->weights = $weights === null ? null : array_map(floatval(...), $weights);
+
         if ($colors === [] || ($weights !== null && count($weights) !== count($colors))) {
             throw InvalidFilterException::weightsDoNotMatch($this->name(), count($colors), $weights === null ? null : count($weights));
         }
@@ -50,6 +56,17 @@ final class Palette implements ModuleFilter, NamedFilter
         }
 
         return $style->withPaint(Seed::pick($cell->seed, $this->colors, $this->weights, "{$this->name()}:{$this->seed}"));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'colors' => ['required', 'list', 'min:1', 'max:16'],
+            'colors.*' => [PaintRule::colors()],
+            'weights' => ['sometimes', 'nullable', 'list', 'max:16'],
+            'weights.*' => ['numeric', 'min:0'],
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

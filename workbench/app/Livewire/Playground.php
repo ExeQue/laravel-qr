@@ -8,6 +8,7 @@ use BackedEnum;
 use ExeQue\Qr\Builders\EyeBuilder;
 use ExeQue\Qr\Builders\EyesBuilder;
 use ExeQue\Qr\Builders\PendingQr;
+use ExeQue\Qr\Builders\Rendered;
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Encoder\Enums\Role;
 use ExeQue\Qr\Exceptions\QrExceptionInterface;
@@ -34,6 +35,7 @@ use Livewire\WithFileUploads;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 use TypeError;
 use ValueError;
@@ -265,7 +267,7 @@ class Playground extends Component
             'eyeFilters' => array_map(fn (array $filter): bool => is_subclass_of((string) Qr::filters()->classOf($filter['name']), EyeFilter::class), $this->filters),
             'roles' => array_map(fn (Role $role): string => $role->value, Role::cases()),
             'properties' => array_map(fn (Property $property): string => $property->value, Property::cases()),
-            'logos' => array_map(basename(...), glob(dirname(__DIR__, 2).'/resources/logos/*') ?: []),
+            'logos' => self::logos(),
             'php' => null,
             'warning' => null,
         ];
@@ -300,12 +302,7 @@ class Playground extends Component
      */
     private function draw(PendingQr $code, int $started): array
     {
-        $output = match ($this->format) {
-            'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
-            'jpeg' => $code->jpeg($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            'webp' => $code->webp($this->size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
-            default => $code->png($this->size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
-        };
+        $output = $this->output($code, $this->format);
         $scene = $code->scene();
 
         return [
@@ -319,13 +316,36 @@ class Playground extends Component
         ];
     }
 
+    /**
+     * The code on screen as a file, in any format, with this format's settings.
+     */
+    public function download(string $format): StreamedResponse
+    {
+        $format = in_array($format, ['svg', 'png', 'jpeg', 'webp'], true) ? $format : 'svg';
+
+        return $this->output($this->code(), $format)->download("qr-code.{$format}");
+    }
+
+    private function output(PendingQr $code, string $format): Rendered
+    {
+        // The size comes from the browser: kept to what the size field offers.
+        $size = max(64, min(4096, $this->size));
+
+        return match ($format) {
+            'svg' => $code->svg(currentColor: $this->currentColor, compact: $this->compact, precision: $this->precision),
+            'jpeg' => $code->jpeg($size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            'webp' => $code->webp($size, dpi: $this->dpi, quality: $this->quality, driver: $this->driver),
+            default => $code->png($size, dpi: $this->dpi, driver: $this->driver, compressionLevel: $this->compressionLevel),
+        };
+    }
+
     private function code(): PendingQr
     {
         $code = Qr::make($this->content)
             ->withoutCache()
             ->errorCorrection($this->errorCorrection)
             ->minVersion(max(1, min(40, $this->minVersion)))
-            ->margin($this->margin)
+            ->margin(max(0, min(40, $this->margin)))
             ->modules($this->module, ...$this->typed('modules', $this->module, $this->moduleOptions))
             ->paint($this->paintOf($this->paint))
             ->background($this->transparent ? null : $this->paintOf($this->background));
@@ -346,13 +366,18 @@ class Playground extends Component
             $code = $code->filter($this->filter($filter));
         }
 
+        // Only an uploaded image or one of the logos listed: the value comes from the browser.
+        $logo = match (true) {
+            $this->logo === self::UPLOADED && $this->upload !== null => Logo::fromBytes($this->upload->get()),
+            in_array($this->logo, self::logos(), true) => Logo::fromFile(dirname(__DIR__, 2).'/resources/logos/'.$this->logo),
+            default => null,
+        };
+
         return $code
             ->when($this->mirrored)->mirrored()
             ->scanSafety($this->safety())
-            ->when($this->logo !== '')->logo(
-                $this->logo === self::UPLOADED && $this->upload !== null
-                    ? Logo::fromBytes($this->upload->get())
-                    : dirname(__DIR__, 2)."/resources/logos/{$this->logo}",
+            ->when($logo !== null)->logo(
+                $logo ?? '',
                 size: $this->logoAuto ? 'auto' : $this->logoSize,
                 padding: $this->logoPadding,
                 shape: $this->logoShape,
@@ -568,5 +593,15 @@ class Playground extends Component
         } catch (QrExceptionInterface $exception) {
             return 'does not scan: '.$exception->getMessage();
         }
+    }
+
+    /**
+     * The logos to choose from, by file name.
+     *
+     * @return list<string>
+     */
+    private static function logos(): array
+    {
+        return array_map(basename(...), glob(dirname(__DIR__, 2).'/resources/logos/*') ?: []);
     }
 }

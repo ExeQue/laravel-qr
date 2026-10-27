@@ -11,7 +11,7 @@ use ImagickException;
 use ImagickPixel;
 
 /**
- * An image as grey levels, and as dark and light pixels.
+ * An image as gray levels, and as dark and light pixels.
  *
  * @internal
  */
@@ -24,12 +24,12 @@ final readonly class Bitmap
     private const int MAX_PIXELS = 50_000_000;
 
     /**
-     * @param list<int> $grey 0 (black) to 255 (white), row by row.
+     * @param list<int> $gray 0 (black) to 255 (white), row by row.
      */
     public function __construct(
         public int $width,
         public int $height,
-        public array $grey,
+        public array $gray,
     ) {
     }
 
@@ -47,8 +47,14 @@ final readonly class Bitmap
         try {
             $image = new Imagick();
             $image->pingImageBlob($bytes);
+            $pixels = 0;
 
-            if ($image->getImageWidth() * $image->getImageHeight() > self::MAX_PIXELS) {
+            // Reading decodes every frame of an animation, so they count together.
+            foreach ($image as $frame) {
+                $pixels += $frame->getImageWidth() * $frame->getImageHeight();
+            }
+
+            if ($pixels > self::MAX_PIXELS) {
                 throw UnreadableCodeException::unreadableImage();
             }
 
@@ -63,13 +69,13 @@ final readonly class Bitmap
             }
 
             [$width, $height] = [$image->getImageWidth(), $image->getImageHeight()];
-            $grey = $image->exportImagePixels(0, 0, $width, $height, 'I', Imagick::PIXEL_CHAR);
+            $gray = $image->exportImagePixels(0, 0, $width, $height, 'I', Imagick::PIXEL_CHAR);
             $image->clear();
         } catch (ImagickException) {
             throw UnreadableCodeException::unreadableImage();
         }
 
-        return new self($width, $height, $grey);
+        return new self($width, $height, $gray);
     }
 
     /**
@@ -100,16 +106,16 @@ final readonly class Bitmap
         }
 
         [$width, $height] = [imagesx($flat), imagesy($flat)];
-        $grey = [];
+        $gray = [];
 
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
                 $color = imagecolorat($flat, $x, $y);
-                $grey[] = (int) round(0.2126 * (($color >> 16) & 0xFF) + 0.7152 * (($color >> 8) & 0xFF) + 0.0722 * ($color & 0xFF));
+                $gray[] = (int) round(0.2126 * (($color >> 16) & 0xFF) + 0.7152 * (($color >> 8) & 0xFF) + 0.0722 * ($color & 0xFF));
             }
         }
 
-        return new self($width, $height, $grey);
+        return new self($width, $height, $gray);
     }
 
     /**
@@ -125,7 +131,7 @@ final readonly class Bitmap
 
     /**
      * Dark where darker than a threshold for the whole image, picked by Otsu's method: the one
-     * that separates the grey levels into the two most distinct groups.
+     * that separates the gray levels into the two most distinct groups.
      *
      * @return list<bool>
      */
@@ -133,11 +139,11 @@ final readonly class Bitmap
     {
         $histogram = array_fill(0, 256, 0);
 
-        foreach ($this->grey as $level) {
+        foreach ($this->gray as $level) {
             $histogram[$level]++;
         }
 
-        $total = count($this->grey);
+        $total = count($this->gray);
         $sum = 0;
 
         foreach ($histogram as $level => $count) {
@@ -163,7 +169,7 @@ final readonly class Bitmap
             }
         }
 
-        return array_map(fn (int $level): bool => $level <= $threshold, $this->grey);
+        return array_map(fn (int $level): bool => $level <= $threshold, $this->gray);
     }
 
     /**
@@ -183,7 +189,7 @@ final readonly class Bitmap
             $row = 0;
 
             for ($x = 0; $x < $width; $x++) {
-                $row += $this->grey[$y * $width + $x];
+                $row += $this->gray[$y * $width + $x];
                 $sums[($y + 1) * ($width + 1) + $x + 1] = $sums[$y * ($width + 1) + $x + 1] + $row;
             }
         }
@@ -200,7 +206,7 @@ final readonly class Bitmap
                     - $sums[$bottom * ($width + 1) + $left] + $sums[$top * ($width + 1) + $left];
                 $mean = $sum / (($bottom - $top) * ($right - $left));
 
-                $dark[] = $this->grey[$y * $width + $x] < $mean - 8;
+                $dark[] = $this->gray[$y * $width + $x] < $mean - 8;
             }
         }
 

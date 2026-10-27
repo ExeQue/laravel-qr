@@ -44,7 +44,7 @@ final readonly class ModuleStyle
         return clone($this, ['paint' => $paint]);
     }
 
-    public function withRotate(float $degrees): self
+    public function withRotation(float $degrees): self
     {
         return clone($this, ['rotation' => $degrees]);
     }
@@ -79,7 +79,7 @@ final readonly class ModuleStyle
      */
     public function rotateBy(float $degrees): self
     {
-        return $this->withRotate($this->rotation + $degrees);
+        return $this->withRotation($this->rotation + $degrees);
     }
 
     /**

@@ -148,7 +148,7 @@ describe('reading back', function (): void {
         $stored['logo']['source'] = $logo->toDataUri();
 
         expect(Style::fromArray($stored)->toArray())->toBe($style->toArray())
-            ->and(Style::fromArray(['logo' => ['source' => dirname(__DIR__, 2).'/Fixtures/logos/badge.svg']])->logo?->logo->hash)->toBe($logo->hash)
+            ->and(Style::fromArray(['logo' => ['file' => dirname(__DIR__, 2).'/Fixtures/logos/badge.svg']])->logo?->logo->hash)->toBe($logo->hash)
             ->and(Style::fromArray(['logo' => ['source' => $logo]])->logo?->logo)->toBe($logo);
     });
 
@@ -173,7 +173,7 @@ describe('reading back', function (): void {
             ->withMargin(3)
             ->withPaint(new Hex('#1c1917'))
             ->withBackground(new Hex('#fff7ed'))
-            ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotate(5))
+            ->withModules(Style::default()->modules->withPaint(new Hex('#1c1917'))->withOpacity(0.9)->withRotation(5))
             ->withEye(Corner::TopRight, $eye->withOuter($eye->outer->withPaint(new Hex('#be123c'))->withSize(0.95))->withInner($eye->inner->withOpacity(0.8)))
             ->withFilters(new MixedOpacity(min: 0.85), new EyeTilt());
 
@@ -187,7 +187,7 @@ describe('reading back', function (): void {
 describe('invalid input', function (): void {
     it('refuses a logo it cannot read back', function (): void {
         Style::fromArray(['logo' => ['hash' => 'abc', 'size' => 0.2]]);
-    })->throws(InvalidStyleException::class, 'A stored logo has no source to read it from');
+    })->throws(InvalidStyleException::class, 'The style has logo settings but no logo');
 
     it('builds no class from a stored name that is not a shape', function (): void {
         \Tests\Fixtures\ConstructionSpy::$built = 0;

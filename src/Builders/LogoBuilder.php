@@ -6,6 +6,7 @@ namespace ExeQue\Qr\Builders;
 
 use ExeQue\Qr\Contracts\Paint;
 use ExeQue\Qr\Exceptions\InvalidLogoException;
+use ExeQue\Qr\Exceptions\InvalidOptionException;
 use ExeQue\Qr\Logos\Contracts\ProvidesQrLogo;
 use ExeQue\Qr\Logos\Enums\LogoShape;
 use ExeQue\Qr\Logos\Logo;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use SplFileInfo;
 
 /**
  * A logo and where and how it sits. Each call returns a changed copy.
@@ -34,17 +36,20 @@ final class LogoBuilder
     private array $settings = [];
 
     /**
-     * The image: a Logo or something providing one, a file path, a data: URI, an
-     * SVG or raw image bytes - or a disk (by name or instance) and a path on it.
+     * The image: a Logo or something providing one, a file (an uploaded one too), a data: URI, an
+     * SVG or raw image bytes - or a disk (by name or instance) and a path on it. A string is the image
+     * itself, never a path: a file is given as a file, or by path through file().
      */
-    public function from(Logo|ProvidesQrLogo|Filesystem|string|null $source, ?string $path = null): self
+    public function from(Logo|ProvidesQrLogo|SplFileInfo|Filesystem|string|null $source, ?string $path = null): self
     {
         $logo = match (true) {
             $path !== null => Logo::fromBytes((string) self::disk($source)->get($path)),
             $source instanceof Logo => $source,
             $source instanceof ProvidesQrLogo => $source->qrLogo(),
+            $source instanceof SplFileInfo => Logo::fromFile($source->getPathname()),
             is_string($source) && str_starts_with($source, 'data:') => Logo::fromDataUri($source),
-            is_string($source) && strlen($source) < 4096 && ! str_contains($source, '<') && is_file($source) => Logo::fromFile($source),
+            // A short line of text is no image; most likely a path or URL meant as one.
+            is_string($source) && strlen($source) < 4096 && preg_match('/[<\x00-\x08\x0E-\x1F\x7F-\xFF]/', $source) !== 1 => throw InvalidLogoException::notAnImage($source),
             is_string($source) => Logo::fromBytes($source),
             default => throw InvalidLogoException::unreadableSource(get_debug_type($source)),
         };
@@ -71,7 +76,7 @@ final class LogoBuilder
 
     public function shape(LogoShape|string $shape): self
     {
-        return $this->with(shape: $shape instanceof LogoShape ? $shape : LogoShape::from($shape));
+        return $this->with(shape: $shape instanceof LogoShape ? $shape : self::logoShape($shape));
     }
 
     /**
@@ -95,10 +100,25 @@ final class LogoBuilder
     /**
      * Settings by name, as `->logo($source, size: 0.2)` takes them.
      */
+    /**
+     * The image from a file on this server, by its path.
+     */
+    public function file(string $path): self
+    {
+        return clone($this, ['logo' => Logo::fromFile($path)]);
+    }
+
     public function with(mixed ...$settings): self
     {
+        if (isset($settings['file'])) {
+            $builder = $this->file((string) $settings['file']);
+            unset($settings['file']);
+
+            return $builder->with(...$settings);
+        }
+
         if (isset($settings['shape']) && is_string($settings['shape'])) {
-            $settings['shape'] = LogoShape::from($settings['shape']);
+            $settings['shape'] = self::logoShape($settings['shape']);
         }
 
         if (($settings['size'] ?? null) === 'auto') {
@@ -117,8 +137,14 @@ final class LogoBuilder
         return new LogoStyle($this->logo ?? throw InvalidLogoException::noSource(), ...$this->settings);
     }
 
-    private static function disk(Logo|ProvidesQrLogo|Filesystem|string|null $disk): Filesystem
+    private static function disk(Logo|ProvidesQrLogo|SplFileInfo|Filesystem|string|null $disk): Filesystem
     {
         return $disk instanceof Filesystem ? $disk : Storage::disk(is_string($disk) ? $disk : null);
+    }
+
+    private static function logoShape(LogoShape|string $shape): LogoShape
+    {
+        return $shape instanceof LogoShape ? $shape : (LogoShape::tryFrom($shape)
+            ?? throw InvalidOptionException::notOneOf(LogoShape::class, 'shape', array_column(LogoShape::cases(), 'value'), $shape));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Writers;
 
+use DOMDocument;
 use ExeQue\Qr\Encoder\Encoder;
 use ExeQue\Qr\Rendering\Renderer;
 use ExeQue\Qr\Rendering\Style;
@@ -65,6 +66,14 @@ describe('svg', function (): void {
 });
 
 describe('values', function (): void {
+    it('leaves out the control characters XML cannot hold', function (): void {
+        $scene = new Renderer()->render(new Encoder()->encode('hi'), Style::default());
+        $svg = new SvgWriter(new SvgOptions(metadata: Metadata::make(title: "A\x01B", description: "C\x1Fd\te")))->write($scene)->contents();
+
+        expect(new DOMDocument()->loadXML($svg))->toBeTrue()
+            ->and($svg)->toContain('<title>AB</title>');
+    });
+
     it('writes nothing without metadata', function (): void {
         $scene = new Renderer()->render(new Encoder()->encode('hi'), Style::default());
 

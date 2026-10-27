@@ -9,11 +9,13 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Nudges each module its own way, up to `$max` modules on each axis.
  */
-final class MixedOffset implements ModuleFilter, NamedFilter
+final class MixedOffset implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -35,6 +37,14 @@ final class MixedOffset implements ModuleFilter, NamedFilter
             $cell->random(-$this->max, $this->max, "{$purpose}:x"),
             $cell->random(-$this->max, $this->max, "{$purpose}:y"),
         );
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'max' => Options::number(0, 1),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

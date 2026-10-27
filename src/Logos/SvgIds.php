@@ -74,8 +74,8 @@ final class SvgIds
     }
 
     /**
-     * Each rule's selectors put under the logo's root and its ids prefixed; a sheet with at-rules
-     * or escapes is dropped, as it cannot be scoped safely.
+     * Each rule's selectors put under the logo's root and its ids prefixed; a sheet with at-rules,
+     * escapes, comments or quoted strings is dropped, as it cannot be scoped safely.
      *
      * @param list<string> $ids
      */
@@ -83,7 +83,19 @@ final class SvgIds
     {
         $css = $style->textContent;
 
-        if (str_contains($css, '@') || str_contains($css, '\\') || substr_count($css, '{') !== substr_count($css, '}')) {
+        // A style sheet is text only; with elements in it, it cannot be checked as it reads.
+        foreach ($style->childNodes as $child) {
+            if ($child instanceof DOMElement) {
+                $style->parentNode?->removeChild($style);
+
+                return;
+            }
+        }
+
+        // Comments and quoted strings could hide braces from the rules matched below.
+        // A selector that starts with a sibling combinator would reach past the logo once scoped, and a
+        // rule nested in another would leave the outer one unscoped.
+        if (preg_match('/[@\\\\"\']|\/\*|(^|[{},])\s*[~+]|\{[^}]*\{/', $css) === 1 || substr_count($css, '{') !== substr_count($css, '}')) {
             $style->parentNode?->removeChild($style);
 
             return;

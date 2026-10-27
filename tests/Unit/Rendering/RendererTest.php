@@ -125,7 +125,7 @@ describe('eyes', function (): void {
     it('styles each eye part on its own', function (): void {
         $eye = EyeStyle::of(new SquareOuter(), new SquareInner())
             ->withOuter(new EyePartStyle(new SquareOuter(), rotation: 4))
-            ->withInner(new EyePartStyle(new SquareInner())->withSize(0.8)->withRotate(-7)->withOpacity(0.5)->withShape(new SquareInner()));
+            ->withInner(new EyePartStyle(new SquareInner())->withSize(0.8)->withRotation(-7)->withOpacity(0.5)->withShape(new SquareInner()));
 
         expect($eye->outer->transform()->toString())->toBe('rotate(4)')
             ->and($eye->inner->transform()->toString())->toBe('scale(0.8) rotate(-7)')
@@ -136,7 +136,7 @@ describe('eyes', function (): void {
 
 describe('modules', function (): void {
     it('applies a module style\'s size, skew, rotation and offset about the cell', function (): void {
-        $module = Style::default()->modules->withSize(0.5, 0.25)->withSkew(10, 5)->withRotate(30)->withOffset(0.1, -0.1);
+        $module = Style::default()->modules->withSize(0.5, 0.25)->withSkew(10, 5)->withRotation(30)->withOffset(0.1, -0.1);
 
         expect($module->transform()->toString())->toBe('scale(0.5 0.25) skew(10 5) rotate(30) translate(0.1 -0.1)');
     });

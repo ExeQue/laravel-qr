@@ -12,11 +12,13 @@ use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Support\Normalizer;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\PaintRule;
 
 /**
  * Paints each module the color a gradient has at its middle, across the symbol.
  */
-final class GradientFill implements ModuleFilter, NamedFilter
+final class GradientFill implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -37,6 +39,13 @@ final class GradientFill implements ModuleFilter, NamedFilter
         }
 
         return $style->withPaint($this->gradient->colorAt($cell->x / $cell->size, $cell->y / $cell->size));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'gradient' => ['required', PaintRule::gradients()],
+        ];
     }
 
     public function name(): string

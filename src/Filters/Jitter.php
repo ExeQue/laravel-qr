@@ -9,11 +9,13 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Rotation, size and offset mixed at once, for a hand-placed look.
  */
-final class Jitter implements ModuleFilter, NamedFilter
+final class Jitter implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -45,6 +47,16 @@ final class Jitter implements ModuleFilter, NamedFilter
                 $cell->random(-$this->offset, $this->offset, "{$purpose}:x"),
                 $cell->random(-$this->offset, $this->offset, "{$purpose}:y"),
             );
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'rotate' => Options::number(0, 45),
+            'size' => Options::number(0, 0.5),
+            'offset' => Options::number(0, 0.5),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

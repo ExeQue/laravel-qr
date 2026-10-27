@@ -16,11 +16,15 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Support\Hydrate;
 use ExeQue\Qr\Support\Normalizer;
 use ExeQue\Qr\Support\Seed;
+use ExeQue\Qr\Validation\Allow;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
+use ExeQue\Qr\Validation\Rules\ShapeEntry;
 
 /**
  * Draws each module with a shape of its own from a list, optionally weighted.
  */
-final class MixedShape implements ModuleFilter, NamedFilter
+final class MixedShape implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -39,6 +43,9 @@ final class MixedShape implements ModuleFilter, NamedFilter
         private ?array $weights = null,
         private int $seed = 0,
     ) {
+        // As floats whatever they came as (form strings, whole numbers from JSON), so equal filters are equal.
+        $this->weights = $weights === null ? null : array_map(floatval(...), $weights);
+
         if ($shapes === [] || ($weights !== null && count($weights) !== count($shapes))) {
             throw InvalidFilterException::weightsDoNotMatch($this->name(), count($shapes), $weights === null ? null : count($weights));
         }
@@ -57,6 +64,17 @@ final class MixedShape implements ModuleFilter, NamedFilter
         }
 
         return $style->withShape(Seed::pick($cell->seed, $this->shapes, $this->weights, "{$this->name()}:{$this->seed}"));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'shapes' => ['required', 'list', 'min:1', 'max:8'],
+            'shapes.*' => [new ShapeEntry('module', Allow::all())],
+            'weights' => ['sometimes', 'nullable', 'list', 'max:8'],
+            'weights.*' => ['numeric', 'min:0'],
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string

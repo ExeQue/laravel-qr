@@ -11,13 +11,15 @@ use ExeQue\Qr\Shapes\Concerns\HasOptions;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
 use ExeQue\Qr\Shapes\Contracts\Directional;
 use ExeQue\Qr\Shapes\Contracts\OuterEyeShape;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Numbers;
 
 /**
  * A ring with rounded corners, outside and in. A radius is one for every corner, or four:
  * top-right, bottom-right, bottom-left, top-left. A single round corner (round-corner) points out
  * on every eye in a mirrored style.
  */
-final readonly class Rounded implements Configurable, Directional, OuterEyeShape
+final readonly class Rounded implements Configurable, Directional, OuterEyeShape, HasOptionRules
 {
     use HasOptions;
 
@@ -25,10 +27,25 @@ final readonly class Rounded implements Configurable, Directional, OuterEyeShape
      * @param float|array{float, float, float, float} $outer The outline's radius, up to 3.5.
      * @param float|array{float, float, float, float} $hole The hole's radius, up to 2.5.
      */
-    public function __construct(
-        public float|array $outer = 1.9,
-        public float|array $hole = 0.9,
-    ) {
+    /**
+     * @var float|array{float, float, float, float}
+     */
+    public float|array $outer;
+
+    /**
+     * @var float|array{float, float, float, float}
+     */
+    public float|array $hole;
+
+    /**
+     * @param float|array{float, float, float, float} $outer The outline's radius, up to 3.5.
+     * @param float|array{float, float, float, float} $hole The hole's radius, up to 2.5.
+     */
+    public function __construct(float|array $outer = 1.9, float|array $hole = 0.9)
+    {
+        // Numbers from a form are strings; a list of them is not converted on the way in.
+        $this->outer = $outer = self::corners('outer', $outer, 0.0, 3.5);
+        $this->hole = $hole = self::corners('hole', $hole, 0.0, 2.5);
         $outers = is_array($outer) ? $outer : [$outer, $outer, $outer, $outer];
         $holes = is_array($hole) ? $hole : [$hole, $hole, $hole, $hole];
 
@@ -41,6 +58,14 @@ final readonly class Rounded implements Configurable, Directional, OuterEyeShape
                 throw InvalidOptionException::outOfRange(self::class, 'hole', $least, 2.5, $holes[$corner]);
             }
         }
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'outer' => ['sometimes', new Numbers(0, 3.5, 4)],
+            'hole' => ['sometimes', new Numbers(0, 2.5, 4)],
+        ];
     }
 
     public function path(): Path

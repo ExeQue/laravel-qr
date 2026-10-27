@@ -13,7 +13,7 @@ All gradients are in `ExeQue\Qr\Gradients`.
 ## Linear
 
 ```php
-LinearGradient::make('#be123c', '#1e1b4b')->angle(135);        // degrees as in CSS: 0 runs upwards, 90 to the right, 180 by default
+LinearGradient::make('#be123c', '#1e1b4b')->angle(135);        // degrees as in CSS: 0 runs upward, 90 to the right, 180 by default
 LinearGradient::make('#be123c', '#1e1b4b')->between(0, 0, 1, 1);  // from and to, in the box (0 to 1)
 ```
 
@@ -68,7 +68,7 @@ Two stops at the same position make a hard edge.
 
 ## Blending
 
-Colors blend in OKLab by default, which keeps the middle of a gradient from going grey or muddy. Any of the CSS
+Colors blend in OKLab by default, which keeps the middle of a gradient from going gray or muddy. Any of the CSS
 spaces can be chosen:
 
 ```php
@@ -76,7 +76,7 @@ use ExeQue\Qr\Gradients\Enums\ColorSpace;
 use ExeQue\Qr\Gradients\Enums\HueInterpolation;
 
 ->in(ColorSpace::Srgb)                                  // as older CSS blends
-->in(ColorSpace::Oklch, HueInterpolation::Longer)       // round the long way of the color wheel
+->in(ColorSpace::Oklch, HueInterpolation::Longer)       // around the long way of the color wheel
 ```
 
 Spaces: `oklab`, `oklch`, `srgb`, `srgb-linear`, `lch`, `hsl`. Hue interpolation applies to the polar ones (`oklch`,
@@ -109,8 +109,6 @@ Per-module sampling gives a mosaic look, and keeps each module a single color in
 ## Gradients in each eye
 
 ```php
-use ExeQue\Qr\Rendering\Enums\Corner;
-
 Qr::url($url)->eyes(fn (EyesBuilder $eyes) => $eyes
     ->paint(RadialGradient::make('#be123c', '#1e1b4b')->box(GradientBox::Shape)));
 ```

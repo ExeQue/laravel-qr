@@ -202,7 +202,7 @@ describe('errors', function (): void {
     it('says which names it has when one is unknown', function (): void {
         Qr::outerEyes()->forget('soft');
         Qr::outerEyes()->get('triangle');
-    })->throws(RegistryException::class, 'No outer eye is registered as "triangle"; registered are: square, soft-square, rounded, circle, round-corner, soft-round-corner, squircle, octagon, hexagon, leaf, drop, scalloped, dotted-ring.');
+    })->throws(RegistryException::class, 'No outer eye is registered as "triangle"; registered are: square, soft-square, rounded, circle, round-corner, soft-round-corner, squircle, octagon, hexagon, hexagon-standing, leaf, drop, scalloped, dotted-ring.');
 
     it('says when it has none', function (): void {
         foreach (Qr::outerEyes()->names() as $name) {

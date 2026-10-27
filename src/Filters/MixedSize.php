@@ -9,11 +9,13 @@ use ExeQue\Qr\Filters\Contracts\ModuleFilter;
 use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Rendering\ModuleContext;
 use ExeQue\Qr\Rendering\ModuleStyle;
+use ExeQue\Qr\Validation\Contracts\HasOptionRules;
+use ExeQue\Qr\Validation\Rules\Options;
 
 /**
  * Scales each module by its own factor in a range.
  */
-final class MixedSize implements ModuleFilter, NamedFilter
+final class MixedSize implements ModuleFilter, NamedFilter, HasOptionRules
 {
     use Scoped;
 
@@ -36,6 +38,15 @@ final class MixedSize implements ModuleFilter, NamedFilter
         $purpose = "{$this->name()}:{$this->seed}";
 
         return $style->scaleBy($cell->random($this->min, $this->max, $purpose));
+    }
+
+    public static function optionRules(): array
+    {
+        return [
+            'min' => Options::number(0, 2),
+            'max' => Options::number(0, 2),
+            'seed' => Options::integer(),
+        ];
     }
 
     public function name(): string
