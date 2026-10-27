@@ -42,6 +42,27 @@ broken ones.
 Classes are built through the container, so their constructors can ask for services, and options are passed by name.
 An option a class does not take throws an `InvalidOptionException` that lists the ones it does.
 
+## Labels
+
+Every registry names its entries for people, in the application's language, for a picker or a select:
+
+```php
+Qr::modules()->label('dots-medium');   // "Medium dots", "Mellemstore prikker" in Danish
+Qr::filters()->labels();               // ['mixed-rotation' => 'Mixed rotation', ...]
+```
+
+The built-in shapes, presets, filters, gradients, kinds of content, formats and readers have labels in Bulgarian,
+Catalan, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Icelandic,
+Irish, Italian, Latvian, Lithuanian, Maltese, Norwegian Bokmål, Polish, Portuguese, Romanian, Serbian, Slovak,
+Slovenian, Spanish, Swedish and Ukrainian, under `qr::labels.{registry}.{name}`: `modules`, `outer_eyes`,
+`inner_eyes`, `eyes`, `filters`, `gradients`, `payloads`, `writers` or `decoders`. An entry without a label is named
+by its name in words: `my-pill` is "My Pill". Give your own entries labels, or change the built-in ones, by publishing
+the translations (`php artisan vendor:publish --tag=qr-translations`) or adding lines in a service provider:
+
+```php
+app('translator')->addLines(['labels.modules.pill' => 'Pill'], 'en', 'qr');
+```
+
 ## Module shapes
 
 A module shape draws one dark module about its middle, `(0, 0)`, in modules. It should stay within -0.5 to 0.5 and

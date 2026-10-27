@@ -245,5 +245,5 @@ Until set, `StyleRule::defaults()` is `StyleRule::everything()`.
 
 ## Messages
 
-The messages are in `lang/en/validation.php` under `qr::validation`; publish them with
-`php artisan vendor:publish --tag=qr-translations` to change or translate them.
+The messages are under `qr::validation`, in the [languages the package comes in](https://exeque.github.io/laravel-qr/docs/extending#labels); publish them
+with `php artisan vendor:publish --tag=qr-translations` to change them or add a language.

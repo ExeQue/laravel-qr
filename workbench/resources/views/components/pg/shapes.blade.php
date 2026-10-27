@@ -1,5 +1,5 @@
 @props(['kind', 'names', 'model', 'blank' => null])
-{{-- Shapes to pick from by their icons; the name shows on hover and under the grid. --}}
+{{-- Shapes to pick from by their icons, by name => label; the label shows on hover. --}}
 <div class="shapes" role="radiogroup">
     @if ($blank !== null)
         <label class="shape" title="{{ $blank }}">
@@ -7,8 +7,8 @@
             <span class="shape-blank">{{ $blank }}</span>
         </label>
     @endif
-    @foreach ($names as $name)
-        <label class="shape" title="{{ $name }}" wire:key="{{ $model }}-{{ $name }}">
+    @foreach ($names as $name => $label)
+        <label class="shape" title="{{ $label }}" wire:key="{{ $model }}-{{ $name }}">
             <input type="radio" value="{{ $name }}" wire:model.live="{{ $model }}">
             @switch ($kind)
                 @case ('module')

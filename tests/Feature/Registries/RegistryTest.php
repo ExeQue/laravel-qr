@@ -198,6 +198,23 @@ describe('building', function (): void {
 
 });
 
+describe('labels', function (): void {
+    it('labels in the application\'s language, and an entry without a label by its name in words', function (): void {
+        Qr::modules()->register('my-pill', SquareModule::class);
+        app()->setLocale('da');
+
+        expect(Qr::modules()->label('dots-medium'))->not->toBe('Medium dots')
+            ->and(Qr::modules()->label('my-pill'))->toBe('My Pill')
+            ->and(Qr::modules()->labels())->toHaveKey('my-pill', 'My Pill')->toHaveCount(count(Qr::modules()->names()));
+
+        app()->setLocale('en');
+        app('translator')->addLines(['labels.modules.my-pill' => 'Pill, mine'], 'en', 'qr');
+
+        expect(Qr::modules()->label('dots-medium'))->toBe('Medium dots')
+            ->and(Qr::modules()->label('my-pill'))->toBe('Pill, mine');
+    });
+});
+
 describe('errors', function (): void {
     it('says which names it has when one is unknown', function (): void {
         Qr::outerEyes()->forget('soft');
