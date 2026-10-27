@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegáns',
         'bubbles' => 'Buborékok',
         'organic' => 'Organikus',
+        'garland' => 'Füzér',
+        'baubles' => 'Karácsonyi gömbök',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Kereszt',
         'pill' => 'Kapszula',
         'blob' => 'Folt',
+        'christmas-tree' => 'Karácsonyfa',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Szikra',
         'scalloped' => 'Hullámos',
         'organic' => 'Organikus',
+        'christmas-tree' => 'Karácsonyfa',
     ],
 
     'filters' => [

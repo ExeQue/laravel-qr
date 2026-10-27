@@ -37,6 +37,8 @@ return [
         'classy' => 'Classy',
         'bubbles' => 'Bubbles',
         'organic' => 'Organic',
+        'garland' => 'Garland',
+        'baubles' => 'Baubles',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Cross',
         'pill' => 'Pill',
         'blob' => 'Blob',
+        'christmas-tree' => 'Christmas tree',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Sparkle',
         'scalloped' => 'Scalloped',
         'organic' => 'Organic',
+        'christmas-tree' => 'Christmas tree',
     ],
 
     'filters' => [

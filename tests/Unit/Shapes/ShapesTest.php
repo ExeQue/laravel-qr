@@ -32,6 +32,9 @@ covers(
     Modules\Sketch::class,
     Modules\Lines::class,
     Modules\ConnectedDots::class,
+    Modules\Garland::class,
+    Modules\Baubles::class,
+    InnerEyes\ChristmasTree::class,
     Modules\Classy::class,
     Modules\Bubbles::class,
     Modules\Organic::class,
@@ -222,6 +225,9 @@ describe('options', function (): void {
         [fn () => new Modules\Sketch(0.5), '"wobble"'],
         [fn () => new Modules\Lines(width: 0.1), '"width"'],
         [fn () => new Modules\ConnectedDots(bridge: 0.9), '"bridge"'],
+        [fn () => new Modules\Garland(bead: 1), '"bead"'],
+        [fn () => new Modules\Garland(droop: 0.5), '"droop"'],
+        [fn () => new Modules\Baubles(diameter: 0.95), '"diameter"'],
         [fn () => new Modules\Classy(1), '"radius"'],
         [fn () => new Modules\Bubbles(0.6, 0.5), '"largest"'],
         [fn () => new Modules\Organic(0.4, 0.3), '"most"'],
@@ -308,6 +314,26 @@ describe('module details', function (): void {
         expect(boundsOf($dots->draw(cell())))->toBe([-0.36, -0.36, 0.36, 0.36])
             ->and(boundsOf($dots->draw(cell(['1,0', '0,1']))))->toBe([-0.36, -0.36, 1.0, 1.0])
             ->and(boundsOf($dots->draw(cell(['-1,0', '0,-1']))))->toBe([-0.36, -0.36, 0.36, 0.36]);
+    });
+
+    it('strings garland beads to the right and below, the bead between hanging below along a row, and hangs a bauble on its own', function (): void {
+        $garland = new Modules\Garland();
+        $kinds = fn (\ExeQue\Qr\Geometry\Path $path): int => substr_count($path->toSvg(), 'M');
+
+        expect($garland->draw(cell()))->toEqual(Modules\Baubles::bauble(0.8))
+            ->and($kinds($garland->draw(cell(['-1,0']))))->toBe(1)
+            ->and(boundsOf($garland->draw(cell(['1,0', '0,1']))))->toBe([-0.33, -0.33, 1.0, 1.0])
+            ->and(boundsOf($garland->draw(cell(['1,0']))))->toBe([-0.33, -0.33, 1.0, 0.33])
+            ->and($garland->draw(cell(['1,0'], column: 4)))->toEqual($garland->draw(cell(['1,0'], column: 5)))
+            ->and(boundsOf(new Modules\Garland(bead: 0.4, droop: 0.2)->draw(cell(['1,0']))))->toBe([-0.2, -0.2, 1.0, 0.312])
+            ->and(boundsOf(new Modules\Garland(bead: 0.4, droop: 0.2)->draw(cell(['0,1']))))->toBe([-0.2, -0.2, 0.2, 1.0]);
+    });
+
+    it('draws a bauble with its cap on top, and a fir standing upright on every corner', function (): void {
+        expect(boundsOf(new Modules\Baubles()->draw(cell())))->toBe([-0.4, -0.42, 0.4, 0.5])
+            ->and(boundsOf(new Modules\Baubles(diameter: 0.6)->draw(cell())))->toBe([-0.3, -0.22, 0.3, 0.5])
+            ->and(new InnerEyes\ChristmasTree())->toBeInstanceOf(\ExeQue\Qr\Shapes\Contracts\Symmetric::class)
+            ->and(boundsOf(new InnerEyes\ChristmasTree()->path()))->toBe([-1.9, -1.8, 1.9, 1.8]);
     });
 
     it('rounds the outer top-left and bottom-right corners of classy modules', function (): void {

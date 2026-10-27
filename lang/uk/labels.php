@@ -37,6 +37,8 @@ return [
         'classy' => 'Елегантний',
         'bubbles' => 'Бульбашки',
         'organic' => 'Органічний',
+        'garland' => 'Гірлянда',
+        'baubles' => 'Ялинкові кульки',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Хрестик',
         'pill' => 'Капсула',
         'blob' => 'Пляма',
+        'christmas-tree' => 'Ялинка',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Іскра',
         'scalloped' => 'Фестончастий',
         'organic' => 'Органічний',
+        'christmas-tree' => 'Ялинка',
     ],
 
     'filters' => [

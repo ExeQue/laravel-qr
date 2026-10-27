@@ -16,7 +16,7 @@
 
 Customizable, scannable, beautiful QR codes for Laravel, and a reader to scan them back.
 
-| 33 | 15 | 21 | 18 | 28 | 5 |
+| 35 | 15 | 22 | 19 | 28 | 5 |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | module shapes | outer eyes | inner eyes | eye presets | filters | gradients |
 
@@ -40,8 +40,8 @@ Qr::url('https://example.com/e/ABCD1234')
 
 - **Content** - links, Wi-Fi logins, contact cards, email, text messages, places and calendar events, escaped the way
   phones read them; or any text, in any language.
-- **Shapes** - thirty-three module shapes, from squares and dots to flowing, organic and connected modules; fifteen outer
-  eyes, twenty-one inner eyes and eighteen presets.
+- **Shapes** - thirty-five module shapes, from squares and dots to flowing, organic, connected and Christmas
+  modules; fifteen outer eyes, twenty-two inner eyes and nineteen presets.
 - **Color** - every CSS color space, your own color names, and linear, radial, conic, diamond and mesh gradients
   blended in OKLab.
 - **Filters** - turn, size, nudge, shade, recolor or reshape every module on its own, in waves or from the middle out.

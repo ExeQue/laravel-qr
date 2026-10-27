@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegants',
         'bubbles' => 'Burbuļi',
         'organic' => 'Organisks',
+        'garland' => 'Vītne',
+        'baubles' => 'Ziemassvētku bumbiņas',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Krusts',
         'pill' => 'Tablete',
         'blob' => 'Plankums',
+        'christmas-tree' => 'Ziemassvētku eglīte',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Dzirkstele',
         'scalloped' => 'Viļņots',
         'organic' => 'Organisks',
+        'christmas-tree' => 'Ziemassvētku eglīte',
     ],
 
     'filters' => [

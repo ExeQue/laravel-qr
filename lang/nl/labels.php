@@ -37,6 +37,8 @@ return [
         'classy' => 'Stijlvol',
         'bubbles' => 'Bubbels',
         'organic' => 'Organisch',
+        'garland' => 'Slinger',
+        'baubles' => 'Kerstballen',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Kruis',
         'pill' => 'Pil',
         'blob' => 'Klodder',
+        'christmas-tree' => 'Kerstboom',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Glinstering',
         'scalloped' => 'Geschulpt',
         'organic' => 'Organisch',
+        'christmas-tree' => 'Kerstboom',
     ],
 
     'filters' => [

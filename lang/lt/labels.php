@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegantiškas',
         'bubbles' => 'Burbulai',
         'organic' => 'Organiškas',
+        'garland' => 'Girlianda',
+        'baubles' => 'Kalėdiniai žaisliukai',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Kryžius',
         'pill' => 'Piliulė',
         'blob' => 'Dėmė',
+        'christmas-tree' => 'Kalėdų eglutė',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Žybsnis',
         'scalloped' => 'Banguotas',
         'organic' => 'Organiškas',
+        'christmas-tree' => 'Kalėdų eglutė',
     ],
 
     'filters' => [

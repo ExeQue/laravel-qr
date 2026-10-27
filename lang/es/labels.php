@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegante',
         'bubbles' => 'Burbujas',
         'organic' => 'Orgánico',
+        'garland' => 'Guirnalda',
+        'baubles' => 'Bolas de Navidad',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Cruz',
         'pill' => 'Píldora',
         'blob' => 'Mancha',
+        'christmas-tree' => 'Árbol de Navidad',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Destello',
         'scalloped' => 'Festoneado',
         'organic' => 'Orgánico',
+        'christmas-tree' => 'Árbol de Navidad',
     ],
 
     'filters' => [

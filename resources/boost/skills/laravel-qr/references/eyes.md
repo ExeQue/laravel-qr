@@ -73,6 +73,7 @@ Shown inside the square outer eye.
 | `cross` | `InnerEyes\Cross` | — a plus with broad bars |
 | `pill` | `InnerEyes\Pill` | `vertical` true: standing up, or lying down |
 | `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
+| `christmas-tree` | `InnerEyes\ChristmasTree` | — a fir of three tiers on a trunk, upright on every corner |
 
 The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
 still measures about three modules.
@@ -102,6 +103,7 @@ still measures about three modules.
 | `sparkle` | `soft` | `sparkle` |
 | `scalloped` | `scalloped` | `circle` |
 | `organic` | `soft` | `blob` |
+| `christmas-tree` | `soft` | `christmas-tree` |
 
 `Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
 
@@ -111,7 +113,9 @@ Eye parts whose corners differ - `round-corner`, `soft-round-corner`, `drop`, `l
 your own with uneven corners - turn by themselves on each corner, so their distinct corner points out of the code on
 all three eyes: the top-right a quarter clockwise, the bottom-left a quarter back.
 
-`mirrored()` turns every other eye part the same way, for shapes of your own that should point out too:
+`mirrored()` turns every other eye part the same way, for shapes of your own that should point out too. Parts that
+look the same turned, and the `christmas-tree`, which should stand upright, implement `Shapes\Contracts\Symmetric`
+and are left as they are:
 
 ```php
 Qr::url($url)->eyes('my-arrow')->mirrored();

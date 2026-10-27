@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegantno',
         'bubbles' => 'Mjehurići',
         'organic' => 'Organsko',
+        'garland' => 'Girlanda',
+        'baubles' => 'Božićne kuglice',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Križ',
         'pill' => 'Kapsula',
         'blob' => 'Mrlja',
+        'christmas-tree' => 'Božićno drvce',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Iskrica',
         'scalloped' => 'Valoviti rub',
         'organic' => 'Organsko',
+        'christmas-tree' => 'Božićno drvce',
     ],
 
     'filters' => [

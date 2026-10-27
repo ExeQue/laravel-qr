@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegant',
         'bubbles' => 'Bule',
         'organic' => 'Organic',
+        'garland' => 'Ghirlandă',
+        'baubles' => 'Globuri de Crăciun',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Cruce',
         'pill' => 'Capsulă',
         'blob' => 'Pată',
+        'christmas-tree' => 'Brad de Crăciun',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Sclipire',
         'scalloped' => 'Festonat',
         'organic' => 'Organic',
+        'christmas-tree' => 'Brad de Crăciun',
     ],
 
     'filters' => [

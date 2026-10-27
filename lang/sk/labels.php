@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegantné',
         'bubbles' => 'Bubliny',
         'organic' => 'Organické',
+        'garland' => 'Girlanda',
+        'baubles' => 'Vianočné gule',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Krížik',
         'pill' => 'Kapsula',
         'blob' => 'Škvrna',
+        'christmas-tree' => 'Vianočný stromček',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Iskra',
         'scalloped' => 'Vlnitý okraj',
         'organic' => 'Organické',
+        'christmas-tree' => 'Vianočný stromček',
     ],
 
     'filters' => [

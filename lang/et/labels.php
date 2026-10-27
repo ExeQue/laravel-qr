@@ -37,6 +37,8 @@ return [
         'classy' => 'Elegantne',
         'bubbles' => 'Mullid',
         'organic' => 'Orgaaniline',
+        'garland' => 'Vanik',
+        'baubles' => 'Jõulukuulid',
     ],
 
     'outer_eyes' => [
@@ -79,6 +81,7 @@ return [
         'cross' => 'Rist',
         'pill' => 'Kapsel',
         'blob' => 'Plekk',
+        'christmas-tree' => 'Jõulupuu',
     ],
 
     'eyes' => [
@@ -100,6 +103,7 @@ return [
         'sparkle' => 'Säde',
         'scalloped' => 'Lainjas',
         'organic' => 'Orgaaniline',
+        'christmas-tree' => 'Jõulupuu',
     ],
 
     'filters' => [
