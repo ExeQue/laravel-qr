@@ -132,7 +132,7 @@
             @endforeach
             <div class="row">
                 <select wire:model="addFilter">
-                    @foreach ($filterNames as $name)<option value="{{ $name }}">{{ $name }}</option>@endforeach
+                    @foreach ($filterNames as $name => $label)<option value="{{ $name }}">{{ $label }}</option>@endforeach
                 </select>
                 <button type="button" wire:click="addSelectedFilter">Add filter</button>
             </div>

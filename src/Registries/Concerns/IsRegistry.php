@@ -10,6 +10,8 @@ use ExeQue\Qr\Exceptions\RegistryException;
 use ExeQue\Qr\Factory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Support\Str;
 
 /**
  * Named parts for referring to them by a stable string, in code, config and stored styles.
@@ -119,6 +121,34 @@ trait IsRegistry
     public function names(): array
     {
         return array_keys($this->entries());
+    }
+
+    /**
+     * A name for people, in the application's language: `qr::labels.{registry}.{name}`, which an
+     * application can add to or change for its own entries, or the name itself in words.
+     */
+    public function label(string $name): string
+    {
+        $key = "qr::labels.{$this->configKey()}.{$name}";
+        $label = $this->container->make(Translator::class)->get($key);
+
+        return is_string($label) && $label !== $key ? $label : Str::headline($name);
+    }
+
+    /**
+     * Every name with its label, for a select.
+     *
+     * @return array<string, string>
+     */
+    public function labels(): array
+    {
+        $labels = [];
+
+        foreach ($this->names() as $name) {
+            $labels[$name] = $this->label($name);
+        }
+
+        return $labels;
     }
 
     /**
