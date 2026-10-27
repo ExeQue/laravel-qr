@@ -236,6 +236,8 @@ final readonly class Logo
         try {
             $image = new Imagick();
             $image->readImageBlob($bytes);
+            // Without the dates it was read on, the same image gives the same bytes, and so the same hash.
+            $image->stripImage();
             $image->setImageFormat('png');
             $image->setOption('png:exclude-chunks', 'date,time');
 
@@ -263,6 +265,9 @@ final readonly class Logo
             $image->setIteratorIndex(0);
 
             $frame = $image->getImage();
+            // ImageMagick 6 writes the dates a frame was read on despite png:exclude-chunks; without them
+            // the same GIF gives the same bytes, and so the same hash.
+            $frame->stripImage();
             $frame->setImageFormat('png');
             $frame->setOption('png:exclude-chunks', 'date,time');
 
