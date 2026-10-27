@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'det inre ögat är vridet :degrees grader från ett kvarts varv',
     'logo_clears' => 'täcker :cleared dataceller, fler än de :budget som tillåts',
     'contrast' => 'bara :ratio:1 mot bakgrunden',
+    'inverted' => 'ljusare än bakgrunden, vilket inte alla läsare kan skanna',
 ];

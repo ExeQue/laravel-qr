@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Het veld :attribute schaalt de buitenogen te ver om te scannen: :detail.',
         'inner-eye-scale' => 'Het veld :attribute schaalt de binnenogen te ver om te scannen: :detail.',
         'eye-rotation' => 'Het veld :attribute draait de ogen zo ver dat de code mogelijk niet scant: :detail.',
+        'inverted' => 'Het veld :attribute maakt de code :detail.',
     ],
 ];

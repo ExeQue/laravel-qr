@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'det indre øyet er dreid :degrees grader bort fra en kvart omdreining',
     'logo_clears' => 'dekker :cleared dataceller, flere enn de :budget det kan',
     'contrast' => 'bare :ratio:1 mot bakgrunnen',
+    'inverted' => 'lysere enn bakgrunnen, noe ikke alle lesere kan skanne',
 ];

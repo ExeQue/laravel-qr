@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'vidinė akis pasukta :degrees laipsnių nuo ketvirčio apsisukimo',
     'logo_clears' => 'uždengia :cleared duomenų langelius, daugiau nei leistini :budget',
     'contrast' => 'tik :ratio:1 fono atžvilgiu',
+    'inverted' => 'šviesesnį už foną, o tokio kodo ne kiekvienas skaitytuvas gali nuskaityti',
 ];

@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Pole :attribute mění velikost vnějších očí tak, že kód nelze naskenovat: :detail.',
         'inner-eye-scale' => 'Pole :attribute mění velikost vnitřních očí tak, že kód nelze naskenovat: :detail.',
         'eye-rotation' => 'Pole :attribute otáčí oči tak moc, že kód nemusí jít naskenovat: :detail.',
+        'inverted' => 'Pole :attribute dělá kód :detail.',
     ],
 ];

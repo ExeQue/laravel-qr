@@ -403,6 +403,7 @@ describe('scannable', function (): void {
         expect(array_keys(styleErrors($style, $rule)))->toBe([$field]);
     })->with([
         'contrast, background' => [['background' => '#111111'], 'style.background'],
+        'inverted, background' => [['background' => '#111111', 'modules' => ['paint' => '#ffffff']], 'style.background'],
         'contrast, modules' => [['modules' => ['paint' => '#eeeeee']], 'style.modules.paint'],
         'contrast, eyes' => [['eyes' => ['paint' => '#eeeeee']], 'style.eyes.paint'],
         'contrast, filters' => [['filters' => [['name' => 'eye-paint', 'options' => ['paint' => '#eeeeee']]]], 'style'],

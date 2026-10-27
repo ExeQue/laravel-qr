@@ -51,11 +51,12 @@ final readonly class Icons
     private const int SAMPLE = 5;
 
     /**
-     * The built-in filters drawn stronger than their defaults, so what they do shows at icon size.
+     * The built-in filters drawn stronger than their defaults, so what they do shows at icon size;
+     * for those that need options, options to show them with.
      *
      * @var array<string, array<string, mixed>>
      */
-    private const array FILTER_OPTIONS = [
+    public const array FILTER_OPTIONS = [
         'mixed-rotation' => ['min' => -35, 'max' => 35],
         'mixed-size' => ['min' => 0.4, 'max' => 1.2],
         'mixed-offset' => ['max' => 0.22],

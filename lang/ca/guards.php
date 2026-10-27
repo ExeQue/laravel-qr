@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'ull interior girat :degrees graus respecte d\'un quart de volta',
     'logo_clears' => 'tapa :cleared cel·les de dades, més de les :budget permeses',
     'contrast' => 'només :ratio:1 respecte al fons',
+    'inverted' => 'més clar que el fons, cosa que no tots els lectors poden escanejar',
 ];

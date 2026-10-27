@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Laukas :attribute per daug pakeičia išorinių akių dydį, todėl kodo nepavyks nuskaityti: :detail.',
         'inner-eye-scale' => 'Laukas :attribute per daug pakeičia vidinių akių dydį, todėl kodo nepavyks nuskaityti: :detail.',
         'eye-rotation' => 'Laukas :attribute pasuka akis taip stipriai, kad kodo gali nepavykti nuskaityti: :detail.',
+        'inverted' => 'Laukas :attribute padaro kodą :detail.',
     ],
 ];

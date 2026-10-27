@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'l-għajn ta\' ġewwa mdawra :degrees grad \'il bogħod minn kwart ta\' dawra',
     'logo_clears' => 'jgħatti :cleared ċellula tad-data, aktar mill-:budget permessi',
     'contrast' => 'biss :ratio:1 kontra l-isfond',
+    'inverted' => 'iċar mill-isfond tiegħu, ħaġa li mhux kull qarrej jista\' jiskenja',
 ];

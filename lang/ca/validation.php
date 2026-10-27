@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'El camp :attribute canvia la mida dels ulls exteriors més enllà del que es pot escanejar: :detail.',
         'inner-eye-scale' => 'El camp :attribute canvia la mida dels ulls interiors més enllà del que es pot escanejar: :detail.',
         'eye-rotation' => 'El camp :attribute gira tant els ulls que potser el codi no es pot escanejar: :detail.',
+        'inverted' => 'El camp :attribute fa el codi :detail.',
     ],
 ];

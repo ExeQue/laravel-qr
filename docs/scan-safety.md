@@ -17,6 +17,7 @@ see it.
 | `eye_rotation_warning` | 10 | warns about an eye turned this many degrees or more off a quarter turn |
 | `min_contrast` | 3.0 | the least WCAG contrast of any drawn color against the background |
 | `max_logo_share` | 0.6 | the share of what the error correction can restore that a logo may clear |
+| `inverted` | `'warn'` | warns about a code lighter than its background, which not every reader scans; `'throw'` refuses it |
 
 Most guards clamp what they hold. Too little contrast and too large a logo throw a `ScanSafetyException` that says
 what is wrong, or only warn:
@@ -41,6 +42,26 @@ foreach ($scene->adjustments as $adjustment) {
 ```
 
 Each one is also dispatched as a `QrGuardApplied` event, and shown by the [Monocle lens](events.md#monocle).
+`message()` says what it did in the application's language; `detail` is always English, for logs.
+
+## Asking without drawing
+
+`scanSafetyReport()` runs the guards without drawing the code, and tells how it stands: on each save of a settings
+form, say. Guards set to throw are reported as refusing rather than throwing.
+
+```php
+use ExeQue\Qr\Rendering\Enums\Severity;
+
+$report = Qr::url($url)->style($settings)->scanSafetyReport();
+
+$report->severity();    // Severity::Fine, Adjusted, Warning or Refused, the worst of it
+$report->isFine();      // nothing to say
+$report->messages();    // ['inverted' => 'lighter than its background, which not every reader scans'], translated
+$report->adjustments;   // every GuardAdjustment, with severityOf($adjustment) for each
+```
+
+`Adjusted` means the guards changed the code to keep it scannable; `Warning`, that it is drawn as asked but may not
+scan everywhere; `Refused`, that drawing it would throw.
 
 ## Changing the limits
 

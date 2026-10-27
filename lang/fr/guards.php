@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'œil intérieur décalé de :degrees degrés par rapport à un quart de tour',
     'logo_clears' => 'masque :cleared cellules de données, au-delà des :budget autorisées',
     'contrast' => 'seulement :ratio:1 par rapport au fond',
+    'inverted' => 'plus clair que son fond, ce que tous les lecteurs ne savent pas lire',
 ];

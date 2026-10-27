@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'ochiul interior rotit cu :degrees grade față de un sfert de rotație',
     'logo_clears' => 'acoperă :cleared celule de date, mai mult decât cele :budget permise',
     'contrast' => 'doar :ratio:1 față de fundal',
+    'inverted' => 'mai deschis decât fundalul, ceea ce nu orice cititor poate scana',
 ];

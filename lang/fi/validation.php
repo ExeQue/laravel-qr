@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Kenttä :attribute muuttaa ulompien silmien kokoa enemmän kuin skannaus sallii: :detail.',
         'inner-eye-scale' => 'Kenttä :attribute muuttaa sisempien silmien kokoa enemmän kuin skannaus sallii: :detail.',
         'eye-rotation' => 'Kenttä :attribute kääntää silmiä niin paljon, ettei koodi välttämättä skannaudu: :detail.',
+        'inverted' => 'Kenttä :attribute tekee koodista :detail.',
     ],
 ];

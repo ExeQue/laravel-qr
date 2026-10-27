@@ -152,12 +152,13 @@ final class Guard
      */
     public function contrast(array $items, ?Paint $background): void
     {
-        if ($this->safety->minContrast === null) {
+        if ($this->safety->minContrast === null && $this->safety->inverted === null) {
             return;
         }
 
         $grounds = $background === null ? [new Hex('#ffffff')] : Paints::colors($background);
         $worst = INF;
+        $inverted = false;
         $checked = [];
 
         foreach ($items as $item) {
@@ -173,11 +174,14 @@ final class Guard
             foreach (Paints::colors($item->paint) as $color) {
                 foreach ($grounds as $ground) {
                     $worst = min($worst, Contrast::ratio($color, $ground, $item->opacity));
+                    $inverted = $inverted || Contrast::lighter($color, $ground, $item->opacity);
                 }
             }
         }
 
-        if ($worst >= $this->safety->minContrast) {
+        $this->inverted($inverted);
+
+        if ($this->safety->minContrast === null || $worst >= $this->safety->minContrast) {
             return;
         }
 
@@ -186,6 +190,22 @@ final class Guard
         }
 
         $this->adjustments[] = new GuardAdjustment('contrast', 'contrast', ['ratio' => Number::format($worst, 2)], warning: true);
+    }
+
+    /**
+     * A code lighter than its background: warned about, or refused when told to.
+     */
+    private function inverted(bool $inverted): void
+    {
+        if (! $inverted || $this->safety->inverted === null) {
+            return;
+        }
+
+        if ($this->safety->inverted === Violation::Throw) {
+            throw ScanSafetyException::inverted();
+        }
+
+        $this->adjustments[] = new GuardAdjustment('inverted', 'inverted', warning: true);
     }
 
     /**

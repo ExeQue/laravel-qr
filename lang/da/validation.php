@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Feltet :attribute ændrer de ydre øjnes størrelse mere, end koden kan scannes med: :detail.',
         'inner-eye-scale' => 'Feltet :attribute ændrer de indre øjnes størrelse mere, end koden kan scannes med: :detail.',
         'eye-rotation' => 'Feltet :attribute drejer øjnene så meget, at koden måske ikke kan scannes: :detail.',
+        'inverted' => 'Feltet :attribute gør koden :detail.',
     ],
 ];

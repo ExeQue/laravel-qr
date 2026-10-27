@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'súil inmheánach casta :degrees céim ó cheathrú casadh',
     'logo_clears' => 'clúdaíonn sé :cleared cill sonraí, níos mó ná an :budget atá ceadaithe',
     'contrast' => 'níl ach :ratio:1 i gcoinne an chúlra',
+    'inverted' => 'níos gile ná a chúlra, rud nach féidir le gach léitheoir a scanadh',
 ];

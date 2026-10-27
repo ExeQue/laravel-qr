@@ -181,6 +181,32 @@ describe('contrast', function (): void {
             ->and($scene->adjustments[0]->detail)->toBe('only 1.92:1 against the background');
     });
 
+    it('warns about a code lighter than its background, refuses it when told to, or lets it be', function (): void {
+        $inverted = Style::default()->withPaint(new Hex('#ffffff'))->withBackground(new Hex('#111111'));
+        $scene = guarded($inverted);
+
+        expect(guards($scene))->toBe(['inverted'])
+            ->and($scene->adjustments[0]->warning)->toBeTrue()
+            ->and($scene->adjustments[0]->detail)->toBe('lighter than its background, which not every reader scans')
+            ->and(guarded($inverted, safety: new ScanSafety(inverted: null))->adjustments)->toBe([])
+            // Against the white assumed behind a transparent code, a light code is too faint, not lighter.
+            ->and(guarded(Style::default()->withPaint(new Hex('#ffffff'))->withBackground(null), safety: new ScanSafety(minContrast: null))->adjustments)->toBe([])
+            ->and(fn () => guarded($inverted, safety: new ScanSafety(inverted: Violation::Throw)))->toThrow(ScanSafetyException::class, 'lighter than its background')
+            ->and(ScanSafety::fromConfig(['inverted' => 'throw'])->inverted)->toBe(Violation::Throw)
+            ->and(ScanSafety::fromConfig(['inverted' => null])->inverted)->toBeNull()
+            ->and(ScanSafety::fromConfig([])->inverted)->toBe(Violation::Warn)
+            ->and(ScanSafety::off()->inverted)->toBeNull()
+            ->and(new ScanSafety(inverted: Violation::Throw)->warningOnly()->inverted)->toBe(Violation::Warn)
+            ->and(new ScanSafety(inverted: null)->warningOnly()->inverted)->toBeNull();
+    });
+
+    it('tells a lighter code from a darker one, translucency counted', function (): void {
+        expect(Contrast::lighter(new Hex('#ffffff'), new Hex('#000000')))->toBeTrue()
+            ->and(Contrast::lighter(new Hex('#000000'), new Hex('#ffffff')))->toBeFalse()
+            ->and(Contrast::lighter(new Hex('#ffffff'), new Hex('#00000000')))->toBeFalse()
+            ->and(Contrast::lighter(new Hex('#ffffff'), new Hex('#000000'), 0.0))->toBeFalse();
+    });
+
     it('cannot judge currentColor, and lets it be', function (): void {
         expect(guarded(Style::default()->withPaint(new Named('currentColor')))->adjustments)->toBe([]);
     });

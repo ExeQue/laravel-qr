@@ -11,6 +11,7 @@ use ExeQue\Qr\Console\CheckCommand;
 use ExeQue\Qr\Console\ClearCommand;
 use ExeQue\Qr\Console\IconsCommand;
 use ExeQue\Qr\Console\InstallCommand;
+use ExeQue\Qr\Console\ManifestCommand;
 use ExeQue\Qr\Decoding\StackDecoder;
 use ExeQue\Qr\Decoding\ZxingDecoder;
 use ExeQue\Qr\Logos\Contracts\SvgSanitizer;
@@ -179,7 +180,8 @@ final class QrServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/../config/qr.php' => config_path('qr.php')], 'qr-config');
             $this->publishes([__DIR__.'/../lang' => $this->app->langPath('vendor/qr')], 'qr-translations');
-            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class]);
+            $this->publishes([__DIR__.'/../resources/js/laravel-qr.js' => resource_path('js/vendor/laravel-qr.js')], 'qr-js');
+            $this->commands([CheckCommand::class, ClearCommand::class, IconsCommand::class, InstallCommand::class, ManifestCommand::class]);
         }
     }
 }

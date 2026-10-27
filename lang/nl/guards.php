@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'binnenoog :degrees graden gedraaid ten opzichte van een kwartslag',
     'logo_clears' => 'bedekt :cleared datacellen, meer dan de toegestane :budget',
     'contrast' => 'slechts :ratio:1 tegen de achtergrond',
+    'inverted' => 'lichter dan de achtergrond, wat niet elke lezer kan scannen',
 ];

@@ -8,7 +8,6 @@ use Closure;
 use ExeQue\Qr\Encoder\Encoder;
 use ExeQue\Qr\Encoder\Enums\ErrorCorrection;
 use ExeQue\Qr\Logos\Logo;
-use ExeQue\Qr\Rendering\Enums\Violation;
 use ExeQue\Qr\Rendering\GuardAdjustment;
 use ExeQue\Qr\Rendering\Renderer;
 use ExeQue\Qr\Rendering\ScanSafety;
@@ -45,7 +44,7 @@ final readonly class Scannable implements ValidationRule
         }
 
         $safety = $this->safety ?? ScanSafety::fromConfig((array) config('qr.scan_safety', []));
-        $safety = new ScanSafety(...[...get_object_vars($safety), 'onViolation' => Violation::Warn]);
+        $safety = $safety->warningOnly();
 
         try {
             // A stand-in logo: the guards weigh only how much of the code it clears.
@@ -85,7 +84,7 @@ final readonly class Scannable implements ValidationRule
     private function field(GuardAdjustment $adjustment, array $input): ?string
     {
         return match ($adjustment->guard) {
-            'contrast' => match (true) {
+            'contrast', 'inverted' => match (true) {
                 array_key_exists('background', $input) => 'background',
                 isset($input['modules']['paint']) => 'modules.paint',
                 isset($input['eyes']['paint']) => 'eyes.paint',

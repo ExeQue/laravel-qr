@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Das Feld :attribute skaliert die äußeren Augen über das Scannbare hinaus: :detail.',
         'inner-eye-scale' => 'Das Feld :attribute skaliert die inneren Augen über das Scannbare hinaus: :detail.',
         'eye-rotation' => 'Das Feld :attribute dreht die Augen so weit, dass der Code eventuell nicht scannbar ist: :detail.',
+        'inverted' => 'Das Feld :attribute macht den Code :detail.',
     ],
 ];

@@ -19,6 +19,7 @@ use ExeQue\Qr\Filters\Contracts\NamedFilter;
 use ExeQue\Qr\Filters\Contracts\ProvidesQrFilter;
 use ExeQue\Qr\Icons\Icon;
 use ExeQue\Qr\Icons\Icons;
+use ExeQue\Qr\Manifest\Manifest;
 use ExeQue\Qr\Payloads\Contracts\Payload;
 use ExeQue\Qr\Payloads\Contracts\ProvidesQrContent;
 use ExeQue\Qr\Payloads\Email;
@@ -233,6 +234,17 @@ final class Qr
     public function flush(): void
     {
         $this->container->make(Pipeline::class)->flush();
+    }
+
+    /**
+     * The registered parts, their labels in the application's language or `$locale`, unit paths and
+     * the scan guards' limits, as plain data for a browser. See `Manifest`.
+     *
+     * @return array<string, mixed>
+     */
+    public function manifest(?string $locale = null): array
+    {
+        return $this->container->make(Manifest::class)->toArray($locale);
     }
 
     /**

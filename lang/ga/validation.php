@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Athraíonn an réimse :attribute méid na súl seachtrach thar an méid is féidir a scanadh: :detail.',
         'inner-eye-scale' => 'Athraíonn an réimse :attribute méid na súl inmheánach thar an méid is féidir a scanadh: :detail.',
         'eye-rotation' => 'Casann an réimse :attribute na súile chomh mór sin go mb\'fhéidir nach scanfar iad: :detail.',
+        'inverted' => 'Déanann an réimse :attribute an cód :detail.',
     ],
 ];

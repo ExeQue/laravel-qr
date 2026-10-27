@@ -16,14 +16,15 @@
 - [Scan safety](scan-safety.md) - The guards that keep styled codes readable
 - [Blade](blade.md) - Components for codes and shape icons
 - [Validating input](validation.md) - Styles from forms, checked and turned into styles
-- [Shape icons](icons.md) - Shapes on their own, for pickers and settings screens
+- [Shape icons](icons.md) - Shapes and filters on their own, for pickers and settings screens
+- [In the browser](browser.md) - The manifest of parts, and instant checks of colors
 - [Reading codes](reading.md) - Reading the code in an image
 - [Caching](caching.md) - Writing each code once
 - [Extending](extending.md) - Your own shapes, filters, gradients, content, formats and readers
 - [Testing](testing.md) - `Qr::fake()` and its assertions
 - [Events](events.md) - What the package tells as it works
 - [Monocle](monocle.md) - The codes each request rendered, in the Monocle profiler
-- [Artisan commands](commands.md) - `qr:check`, `qr:clear`, `qr:icons` and `qr:install`
+- [Artisan commands](commands.md) - `qr:check`, `qr:clear`, `qr:icons`, `qr:install` and `qr:manifest`
 - [Configuration](configuration.md) - Every option in `config/qr.php`
 
 ## Where things are

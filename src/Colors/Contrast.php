@@ -26,6 +26,18 @@ final class Contrast
     }
 
     /**
+     * Whether the color shows lighter than the background: a light code on a dark ground, which
+     * not every reader scans. Translucent colors count as `ratio()` counts them.
+     */
+    public static function lighter(ColorContract $color, ColorContract $background, float $opacity = 1.0): bool
+    {
+        $ground = self::over(self::channels($background), $background->alpha(), [1.0, 1.0, 1.0]);
+        $shown = self::over(self::channels($color), $color->alpha() * $opacity, $ground);
+
+        return self::luminance($shown) > self::luminance($ground);
+    }
+
+    /**
      * @return array{float, float, float}
      */
     private static function channels(ColorContract $color): array

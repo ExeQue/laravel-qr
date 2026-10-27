@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Il campo :attribute ridimensiona gli occhi esterni oltre il limite leggibile: :detail.',
         'inner-eye-scale' => 'Il campo :attribute ridimensiona gli occhi interni oltre il limite leggibile: :detail.',
         'eye-rotation' => 'Il campo :attribute ruota gli occhi così tanto che potrebbero non essere leggibili: :detail.',
+        'inverted' => 'Il campo :attribute rende il codice :detail.',
     ],
 ];
