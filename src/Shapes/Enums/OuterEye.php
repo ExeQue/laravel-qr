@@ -8,6 +8,7 @@ use ExeQue\Qr\Factory;
 use ExeQue\Qr\Shapes\Contracts\OuterEyeShape;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
 use ExeQue\Qr\Shapes\OuterEyes\DottedRing;
+use ExeQue\Qr\Shapes\OuterEyes\Ghost;
 use ExeQue\Qr\Shapes\OuterEyes\Hexagon;
 use ExeQue\Qr\Shapes\OuterEyes\Octagon;
 use ExeQue\Qr\Shapes\OuterEyes\Rounded;
@@ -35,6 +36,7 @@ enum OuterEye: string implements ProvidesQrOuterEye
     case Drop = 'drop';
     case Scalloped = 'scalloped';
     case DottedRing = 'dotted-ring';
+    case Ghost = 'ghost';
 
     /**
      * The shape's class, for building it with options.
@@ -50,6 +52,7 @@ enum OuterEye: string implements ProvidesQrOuterEye
             self::Hexagon, self::HexagonStanding => Hexagon::class,
             self::Scalloped => Scalloped::class,
             self::DottedRing => DottedRing::class,
+            self::Ghost => Ghost::class,
             default => Rounded::class,
         };
     }

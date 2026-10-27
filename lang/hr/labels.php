@@ -39,6 +39,7 @@ return [
         'organic' => 'Organsko',
         'garland' => 'Girlanda',
         'baubles' => 'Božićne kuglice',
+        'ghosts' => 'Duhovi',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Kap',
         'scalloped' => 'Valoviti rub',
         'dotted-ring' => 'Točkasti prsten',
+        'ghost' => 'Duh',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Kapsula',
         'blob' => 'Mrlja',
         'christmas-tree' => 'Božićno drvce',
+        'ghost' => 'Duh',
+        'pumpkin' => 'Bundeva',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Valoviti rub',
         'organic' => 'Organsko',
         'christmas-tree' => 'Božićno drvce',
+        'ghost' => 'Duh',
+        'pumpkin' => 'Bundeva',
     ],
 
     'filters' => [

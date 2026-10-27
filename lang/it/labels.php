@@ -39,6 +39,7 @@ return [
         'organic' => 'Organico',
         'garland' => 'Ghirlanda',
         'baubles' => 'Palline di Natale',
+        'ghosts' => 'Fantasmi',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Goccia',
         'scalloped' => 'Smerlato',
         'dotted-ring' => 'Anello punteggiato',
+        'ghost' => 'Fantasma',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pillola',
         'blob' => 'Macchia',
         'christmas-tree' => 'Albero di Natale',
+        'ghost' => 'Fantasma',
+        'pumpkin' => 'Zucca',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Smerlato',
         'organic' => 'Organico',
         'christmas-tree' => 'Albero di Natale',
+        'ghost' => 'Fantasma',
+        'pumpkin' => 'Zucca',
     ],
 
     'filters' => [

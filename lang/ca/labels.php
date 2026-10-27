@@ -39,6 +39,7 @@ return [
         'organic' => 'Orgànic',
         'garland' => 'Garlanda',
         'baubles' => 'Boles de Nadal',
+        'ghosts' => 'Fantasmes',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Gota',
         'scalloped' => 'Festonejat',
         'dotted-ring' => 'Anell puntejat',
+        'ghost' => 'Fantasma',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Píndola',
         'blob' => 'Taca',
         'christmas-tree' => 'Arbre de Nadal',
+        'ghost' => 'Fantasma',
+        'pumpkin' => 'Carbassa',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Festonejat',
         'organic' => 'Orgànic',
         'christmas-tree' => 'Arbre de Nadal',
+        'ghost' => 'Fantasma',
+        'pumpkin' => 'Carbassa',
     ],
 
     'filters' => [

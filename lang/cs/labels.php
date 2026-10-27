@@ -39,6 +39,7 @@ return [
         'organic' => 'Organické',
         'garland' => 'Girlanda',
         'baubles' => 'Vánoční baňky',
+        'ghosts' => 'Duchové',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Kapka',
         'scalloped' => 'Vroubkované',
         'dotted-ring' => 'Tečkovaný kruh',
+        'ghost' => 'Duch',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pilulka',
         'blob' => 'Skvrna',
         'christmas-tree' => 'Vánoční stromek',
+        'ghost' => 'Duch',
+        'pumpkin' => 'Dýně',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Vroubkované',
         'organic' => 'Organické',
         'christmas-tree' => 'Vánoční stromek',
+        'ghost' => 'Duch',
+        'pumpkin' => 'Dýně',
     ],
 
     'filters' => [

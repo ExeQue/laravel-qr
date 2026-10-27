@@ -43,6 +43,39 @@ final class Figures
     }
 
     /**
+     * A ghost, its head round and its hem in four scallops, one point at the middle, filling a box `$width` by
+     * `$height`.
+     */
+    public static function ghost(float $x, float $y, float $width, float $height): Path
+    {
+        // In a 1x1 box about the middle: the head over the top, down the right side, the hem back
+        // along the bottom in arcs that rise between its five points, and up the left side.
+        $path = Path::make()->arc(0, 0, 0.45, 180, 360)->lineTo(0.45, 0.5);
+
+        foreach ([0.3375, 0.1125, -0.1125, -0.3375] as $middle) {
+            $path = $path->arc($middle, 0.5, 0.1125, 0, -180);
+        }
+
+        return $path->close()->transform(Transform::identity()->scale($width, $height)->translate($x, $y));
+    }
+
+    /**
+     * A pumpkin of three lobes, the middle one tallest, under a short stem, filling a box `$width` by `$height`.
+     */
+    public static function pumpkin(float $x, float $y, float $width, float $height): Path
+    {
+        $lobe = fn (float $middle, float $across, float $tall): Path => RoundedRect::circle(0, 0, 0.5)
+            ->transform(Transform::identity()->scale($across, $tall)->translate($middle, 0.5 - $tall / 2));
+
+        return Path::merge([
+            $lobe(-0.22, 0.56, 0.74),
+            $lobe(0.22, 0.56, 0.74),
+            $lobe(0.0, 0.5, 0.84),
+            RoundedRect::path(-0.06, -0.5, 0.12, 0.2, 0.03),
+        ])->transform(Transform::identity()->scale($width, $height)->translate($x, $y));
+    }
+
+    /**
      * A fir tree of three tiers on a short trunk, its tip up, filling a box `$width` by `$height`.
      */
     public static function christmasTree(float $x, float $y, float $width, float $height): Path

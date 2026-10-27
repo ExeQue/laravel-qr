@@ -39,6 +39,7 @@ return [
         'organic' => 'Orgaaninen',
         'garland' => 'Köynnös',
         'baubles' => 'Joulupallot',
+        'ghosts' => 'Haamut',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Pisara',
         'scalloped' => 'Aaltoreuna',
         'dotted-ring' => 'Pisterengas',
+        'ghost' => 'Haamu',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Kapseli',
         'blob' => 'Läiskä',
         'christmas-tree' => 'Joulukuusi',
+        'ghost' => 'Haamu',
+        'pumpkin' => 'Kurpitsa',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Aaltoreuna',
         'organic' => 'Orgaaninen',
         'christmas-tree' => 'Joulukuusi',
+        'ghost' => 'Haamu',
+        'pumpkin' => 'Kurpitsa',
     ],
 
     'filters' => [

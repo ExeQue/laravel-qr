@@ -39,6 +39,7 @@ return [
         'organic' => 'Organisks',
         'garland' => 'Vītne',
         'baubles' => 'Ziemassvētku bumbiņas',
+        'ghosts' => 'Spoki',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Lāse',
         'scalloped' => 'Viļņots',
         'dotted-ring' => 'Punktots gredzens',
+        'ghost' => 'Spoks',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Tablete',
         'blob' => 'Plankums',
         'christmas-tree' => 'Ziemassvētku eglīte',
+        'ghost' => 'Spoks',
+        'pumpkin' => 'Ķirbis',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Viļņots',
         'organic' => 'Organisks',
         'christmas-tree' => 'Ziemassvētku eglīte',
+        'ghost' => 'Spoks',
+        'pumpkin' => 'Ķirbis',
     ],
 
     'filters' => [

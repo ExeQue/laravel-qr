@@ -39,6 +39,7 @@ return [
         'organic' => 'Organiku',
         'garland' => 'Girlanda',
         'baubles' => 'Boċċi tal-Milied',
+        'ghosts' => 'Fatati',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Qatra',
         'scalloped' => 'Ondulat',
         'dotted-ring' => 'Ċirku bit-tikek',
+        'ghost' => 'Fatat',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pillola',
         'blob' => 'Tebgħa',
         'christmas-tree' => 'Siġra tal-Milied',
+        'ghost' => 'Fatat',
+        'pumpkin' => 'Qargħa',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Ondulat',
         'organic' => 'Organiku',
         'christmas-tree' => 'Siġra tal-Milied',
+        'ghost' => 'Fatat',
+        'pumpkin' => 'Qargħa',
     ],
 
     'filters' => [

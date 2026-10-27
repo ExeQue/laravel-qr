@@ -39,6 +39,7 @@ return [
         'organic' => 'Orgaaniline',
         'garland' => 'Vanik',
         'baubles' => 'Jõulukuulid',
+        'ghosts' => 'Kummitused',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Tilk',
         'scalloped' => 'Lainjas',
         'dotted-ring' => 'Täpiline rõngas',
+        'ghost' => 'Kummitus',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Kapsel',
         'blob' => 'Plekk',
         'christmas-tree' => 'Jõulupuu',
+        'ghost' => 'Kummitus',
+        'pumpkin' => 'Kõrvits',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Lainjas',
         'organic' => 'Orgaaniline',
         'christmas-tree' => 'Jõulupuu',
+        'ghost' => 'Kummitus',
+        'pumpkin' => 'Kõrvits',
     ],
 
     'filters' => [

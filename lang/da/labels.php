@@ -39,6 +39,7 @@ return [
         'organic' => 'Organisk',
         'garland' => 'Guirlande',
         'baubles' => 'Julekugler',
+        'ghosts' => 'Spøgelser',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Dråbe',
         'scalloped' => 'Bølget',
         'dotted-ring' => 'Prikket ring',
+        'ghost' => 'Spøgelse',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pille',
         'blob' => 'Klat',
         'christmas-tree' => 'Juletræ',
+        'ghost' => 'Spøgelse',
+        'pumpkin' => 'Græskar',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Bølget',
         'organic' => 'Organisk',
         'christmas-tree' => 'Juletræ',
+        'ghost' => 'Spøgelse',
+        'pumpkin' => 'Græskar',
     ],
 
     'filters' => [

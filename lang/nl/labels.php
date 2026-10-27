@@ -39,6 +39,7 @@ return [
         'organic' => 'Organisch',
         'garland' => 'Slinger',
         'baubles' => 'Kerstballen',
+        'ghosts' => 'Spoken',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Druppel',
         'scalloped' => 'Geschulpt',
         'dotted-ring' => 'Gestippelde ring',
+        'ghost' => 'Spook',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pil',
         'blob' => 'Klodder',
         'christmas-tree' => 'Kerstboom',
+        'ghost' => 'Spook',
+        'pumpkin' => 'Pompoen',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Geschulpt',
         'organic' => 'Organisch',
         'christmas-tree' => 'Kerstboom',
+        'ghost' => 'Spook',
+        'pumpkin' => 'Pompoen',
     ],
 
     'filters' => [

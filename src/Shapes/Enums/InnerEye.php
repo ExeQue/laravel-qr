@@ -13,10 +13,12 @@ use ExeQue\Qr\Shapes\InnerEyes\Clover;
 use ExeQue\Qr\Shapes\InnerEyes\Cross;
 use ExeQue\Qr\Shapes\InnerEyes\Diamond;
 use ExeQue\Qr\Shapes\InnerEyes\Flower;
+use ExeQue\Qr\Shapes\InnerEyes\Ghost;
 use ExeQue\Qr\Shapes\InnerEyes\Heart;
 use ExeQue\Qr\Shapes\InnerEyes\Hexagon;
 use ExeQue\Qr\Shapes\InnerEyes\Octagon;
 use ExeQue\Qr\Shapes\InnerEyes\Pill;
+use ExeQue\Qr\Shapes\InnerEyes\Pumpkin;
 use ExeQue\Qr\Shapes\InnerEyes\Rounded;
 use ExeQue\Qr\Shapes\InnerEyes\Sparkle;
 use ExeQue\Qr\Shapes\InnerEyes\Square;
@@ -50,6 +52,8 @@ enum InnerEye: string implements ProvidesQrInnerEye
     case Pill = 'pill';
     case Blob = 'blob';
     case ChristmasTree = 'christmas-tree';
+    case Ghost = 'ghost';
+    case Pumpkin = 'pumpkin';
 
     /**
      * The shape's class, for building it with options.
@@ -73,6 +77,8 @@ enum InnerEye: string implements ProvidesQrInnerEye
             self::Pill => Pill::class,
             self::Blob => Blob::class,
             self::ChristmasTree => ChristmasTree::class,
+            self::Ghost => Ghost::class,
+            self::Pumpkin => Pumpkin::class,
             default => Rounded::class,
         };
     }
