@@ -38,8 +38,14 @@
         {
             "name": "eye-tilt",
             "options": {
-                "outer": 4,
-                "inner": -7,
+                "outer": [
+                    -6,
+                    6
+                ],
+                "inner": [
+                    -10,
+                    10
+                ],
                 "seed": 0
             }
         }

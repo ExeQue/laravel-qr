@@ -98,7 +98,7 @@ describe('test conventions', function (): void {
             'ExeQue\\Qr\\Validation\\StyleInput',
             'ExeQue\\Qr\\Writers\\Boxes',
             'ExeQue\\Qr\\Writers\\Raster\\Coverage',
-            'ExeQue\\Qr\\Writers\\Raster\\Gd\\Metadata',
+            'ExeQue\\Qr\\Writers\\Raster\\Metadata',
         ];
 
         // Elsewhere only these are.

@@ -28,8 +28,8 @@ final class EyeTilt implements EyeFilter, NamedFilter, HasOptionRules
      * @param float|array{float, float} $inner Degrees, or a range to pick from per corner.
      */
     public function __construct(
-        private float|array $outer = 4,
-        private float|array $inner = -7,
+        private float|array $outer = [-6, 6],
+        private float|array $inner = [-10, 10],
         private int $seed = 0,
     ) {
         // Numbers from a form are strings; a range of them is not converted on the way in.

@@ -1,11 +1,11 @@
 canvas 37, margin 4, background #ffffff
 
-outer-eye top-left Square rotate(4) translate(7.5 7.5) #000000
-inner-eye top-left Square rotate(-7) translate(7.5 7.5) #000000
-outer-eye top-right Square rotate(4) translate(29.5 7.5) #000000
-inner-eye top-right Square rotate(-7) translate(29.5 7.5) #000000
-outer-eye bottom-left Square rotate(4) translate(7.5 29.5) #000000
-inner-eye bottom-left Square rotate(-7) translate(7.5 29.5) #000000
+outer-eye top-left Square rotate(5.516) translate(7.5 7.5) #000000
+inner-eye top-left Square rotate(6.433) translate(7.5 7.5) #000000
+outer-eye top-right Square rotate(0.009) translate(29.5 7.5) #000000
+inner-eye top-right Square rotate(-2.612) translate(29.5 7.5) #000000
+outer-eye bottom-left Square rotate(-2.695) translate(7.5 29.5) #000000
+inner-eye bottom-left Square rotate(-7.582) translate(7.5 29.5) #000000
 module 8,0 format Square translate(12.5 4.5) #000000
 module 9,0 data Square translate(13.5 4.5) #000000
 module 13,0 data Square translate(17.5 4.5) #000000

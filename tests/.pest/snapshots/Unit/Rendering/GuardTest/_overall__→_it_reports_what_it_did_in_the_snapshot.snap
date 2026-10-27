@@ -6,11 +6,11 @@ warning eye-rotation top-right: outer eye turned 20 degrees off a quarter turn
 warning eye-rotation bottom-left: outer eye turned 20 degrees off a quarter turn
 
 outer-eye top-left Square rotate(20) translate(5.5 5.5) #000000
-inner-eye top-left Square rotate(-7) translate(5.5 5.5) #000000
+inner-eye top-left Square rotate(6.433) translate(5.5 5.5) #000000
 outer-eye top-right Square rotate(20) translate(27.5 5.5) #000000
-inner-eye top-right Square rotate(-7) translate(27.5 5.5) #000000
+inner-eye top-right Square rotate(-2.612) translate(27.5 5.5) #000000
 outer-eye bottom-left Square rotate(20) translate(5.5 27.5) #000000
-inner-eye bottom-left Square rotate(-7) translate(5.5 27.5) #000000
+inner-eye bottom-left Square rotate(-7.582) translate(5.5 27.5) #000000
 module 8,0 format Square translate(10.5 2.5) #000000
 module 9,0 data Square translate(11.5 2.5) #000000
 module 11,0 data Square translate(13.5 2.5) #000000

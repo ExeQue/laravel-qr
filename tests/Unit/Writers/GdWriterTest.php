@@ -21,9 +21,9 @@ use ExeQue\Qr\Writers\Metadata as Attribution;
 use ExeQue\Qr\Writers\Raster\Coverage;
 use ExeQue\Qr\Writers\Raster\Enums\Driver;
 use ExeQue\Qr\Writers\Raster\Enums\ImageFormat;
-use ExeQue\Qr\Writers\Raster\Gd\Metadata;
 use ExeQue\Qr\Writers\Raster\Gd\Writer;
 use ExeQue\Qr\Writers\Raster\Imagick\Writer as ImagickWriter;
+use ExeQue\Qr\Writers\Raster\Metadata;
 use ExeQue\Qr\Writers\Raster\Options;
 use GdImage;
 

@@ -143,8 +143,8 @@ Size or opacity changing from the middle outward. `Radial(property: 'size', inne
 
 ![eye-tilt](images/filters/eye-tilt.png)
 
-Tilts the outer and inner eyes. `EyeTilt(outer: 4, inner: -7, seed: 0)`, in degrees, or a range such as `[-5, 5]` to
-pick from per corner.
+Tilts the outer and inner eyes. `EyeTilt(outer: [-6, 6], inner: [-10, 10], seed: 0)`: a range to pick from per corner,
+so each eye leans its own way, or a number of degrees for all three alike.
 
 ### eye-size
 
@@ -198,8 +198,8 @@ degrees either way about each axis, and on the screen.
 
 ![eye-rotation-3d](images/filters/eye-rotation-3d.png)
 
-Turns each eye in depth as one, seen straight on. `EyeRotation3d(x: 15, y: 0, z: 0, seed: 0)`, in degrees, or a range
-such as `[-15, 15]` to pick from per corner.
+Turns each eye in depth as one, seen straight on. `EyeRotation3d(x: [-15, 15], y: [-15, 15], z: 0, seed: 0)`: a range to
+pick from per corner, so each eye turns its own way, or a number of degrees for all three alike.
 
 ### eye-twist
 
@@ -227,8 +227,8 @@ darkens. Gradients are left as they are.
 
 ![eye-stretch](images/filters/eye-stretch.png)
 
-The eyes wider than tall, or taller than wide. `EyeStretch(width: 1.12, height: 0.9, outer: true, inner: true)`, as
-shares of the shape's own size.
+The eyes wider than tall, or taller than wide. `EyeStretch(width: 1.12, height: 0.9, outer: true, inner: true, seed:
+0)`, as shares of the shape's own size, or a range such as `[0.9, 1.15]` to pick from per corner.
 
 ### eye-flip
 
