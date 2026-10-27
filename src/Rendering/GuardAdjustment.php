@@ -17,7 +17,7 @@ final readonly class GuardAdjustment
     public string $detail;
 
     /**
-     * @param string $guard Which guard: offset, scale, skew, tilt, skip, margin, outer-eye-scale, inner-eye-scale, eye-rotation, contrast or logo.
+     * @param string $guard Which guard: offset, scale, skew, tilt, skip, margin, outer-eye-scale, inner-eye-scale, eye-rotation, contrast, inverted or logo.
      * @param string $reason What it did, as a line under `qr::guards`.
      * @param array<string, string|int> $parameters The line's placeholders.
      * @param array{int, int}|null $cell The module's column and row, if it was one.

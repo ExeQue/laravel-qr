@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'a belső szem :degrees fokkal tér el a negyed fordulattól',
     'logo_clears' => ':cleared adatcellát takar ki, többet a megengedett :budget cellánál',
     'contrast' => 'csak :ratio:1 a háttérhez képest',
+    'inverted' => 'világosabb a hátterénél, amit nem minden olvasó tud beolvasni',
 ];

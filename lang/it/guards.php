@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'occhio interno ruotato di :degrees gradi rispetto a un quarto di giro',
     'logo_clears' => 'copre :cleared celle di dati, più delle :budget consentite',
     'contrast' => 'solo :ratio:1 rispetto allo sfondo',
+    'inverted' => 'più chiaro del suo sfondo, cosa che non tutti i lettori riescono a scansionare',
 ];

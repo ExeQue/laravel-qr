@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'inner eye turned :degrees degrees off a quarter turn',
     'logo_clears' => 'clears :cleared data cells, more than the :budget it may',
     'contrast' => 'only :ratio:1 against the background',
+    'inverted' => 'lighter than its background, which not every reader scans',
 ];

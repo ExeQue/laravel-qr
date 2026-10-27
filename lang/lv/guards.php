@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'iekšējā acs pagriezta par :degrees grādiem attiecībā pret ceturtdaļapgriezienu',
     'logo_clears' => 'aizsedz :cleared datu šūnas, vairāk nekā atļautās :budget',
     'contrast' => 'tikai :ratio:1 pret fonu',
+    'inverted' => 'gaišāku par fonu, un ne katrs lasītājs to spēj noskenēt',
 ];

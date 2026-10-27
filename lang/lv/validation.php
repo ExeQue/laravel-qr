@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Lauks :attribute pārāk maina ārējo acu izmēru, tāpēc kodu nevarēs noskenēt: :detail.',
         'inner-eye-scale' => 'Lauks :attribute pārāk maina iekšējo acu izmēru, tāpēc kodu nevarēs noskenēt: :detail.',
         'eye-rotation' => 'Lauks :attribute pagriež acis tik tālu, ka kodu var neizdoties noskenēt: :detail.',
+        'inverted' => 'Lauks :attribute padara kodu :detail.',
     ],
 ];

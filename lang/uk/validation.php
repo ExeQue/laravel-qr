@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Поле :attribute змінює розмір зовнішніх очей понад межу сканування: :detail.',
         'inner-eye-scale' => 'Поле :attribute змінює розмір внутрішніх очей понад межу сканування: :detail.',
         'eye-rotation' => 'Поле :attribute повертає очі так сильно, що сканування може не вдатися: :detail.',
+        'inverted' => 'Поле :attribute робить код :detail.',
     ],
 ];

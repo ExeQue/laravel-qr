@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'oko wewnętrzne obrócone o :degrees stopni względem ćwierć obrotu',
     'logo_clears' => 'zasłania :cleared komórek danych, więcej niż dozwolone :budget',
     'contrast' => 'tylko :ratio:1 względem tła',
+    'inverted' => 'jaśniejszy od tła, czego nie każdy czytnik potrafi zeskanować',
 ];

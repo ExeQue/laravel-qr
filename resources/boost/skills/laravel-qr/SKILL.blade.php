@@ -116,9 +116,10 @@ Read the one that fits before going further than the steps above; each is the pa
 - `references/colors.md`, `references/gradients.md` - color notations and names, gradients and layered paints
 - `references/filters.md` - every filter, its options and scope
 - `references/logos.md` - sources, sizes (`'auto'`), cleared shapes, plates
-- `references/scan-safety.md` - the guards and their limits
+- `references/scan-safety.md` - the guards and their limits, and `scanSafetyReport()` to ask without drawing
 - `references/blade.md` - the components
 - `references/validation.md` - `StyleRule` for styles from forms: fields, `Allow`, `PaintRule`, `scannable()`, `toStyle()`
+- `references/browser.md` - `Qr::manifest()`, `qr:manifest`, and the JS module's `scannability()` and labels
 - `references/reading.md` - `Qr::read()`, decoders, `qr:install`
 - `references/caching.md`, `references/testing.md` - caching, and `Qr::fake()` with its assertions
 - `references/configuration.md` - every config key

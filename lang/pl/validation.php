@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Pole :attribute zmienia rozmiar oczu zewnętrznych zbyt mocno, aby kod dało się zeskanować: :detail.',
         'inner-eye-scale' => 'Pole :attribute zmienia rozmiar oczu wewnętrznych zbyt mocno, aby kod dało się zeskanować: :detail.',
         'eye-rotation' => 'Pole :attribute obraca oczy tak mocno, że kodu może nie dać się zeskanować: :detail.',
+        'inverted' => 'Pole :attribute sprawia, że kod jest :detail.',
     ],
 ];

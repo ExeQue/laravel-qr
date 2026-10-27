@@ -39,6 +39,16 @@ php artisan qr:icons --path=resources/svg/qr
 php artisan qr:icons --built-in --path=resources/svg/qr
 ```
 
-Writes an SVG icon for every shape your application registers, into `modules/`, `outer-eyes/`, `inner-eyes/` and
-`eyes/` under the path (`resources/svg/qr` by default). With `--built-in`, the package's own shapes instead, which
-also ship ready-made. See [Shape icons](icons.md).
+Writes an SVG icon for every shape and filter your application registers, into `modules/`, `outer-eyes/`,
+`inner-eyes/`, `eyes/` and `filters/` under the path (`resources/svg/qr` by default). With `--built-in`, the package's
+own instead, which also ship ready-made. See [Shape icons](icons.md).
+
+## qr:manifest
+
+```bash
+php artisan qr:manifest --path=resources/js/qr-manifest.json
+php artisan qr:manifest --locale=da
+```
+
+Writes the [manifest](browser.md#the-manifest) of registered parts, labels and scan guard limits as JSON, to the file
+or the console, with labels in the application's language or `--locale`.

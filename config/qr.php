@@ -52,6 +52,7 @@ return [
     |
     | Limits that keep a styled code scannable, applied after the filters. Too
     | little contrast or too large a logo throws, or only warns with 'warn'.
+    | A code lighter than its background warns, or throws with 'throw'.
     | Null turns a limit off.
     |
     */
@@ -69,6 +70,7 @@ return [
         'outer_eye_scale' => [0.93, 1.0],
         'inner_eye_scale' => [0.6, 1.15],
         'eye_rotation_warning' => 10,
+        'inverted' => 'warn',
     ],
 
     /*

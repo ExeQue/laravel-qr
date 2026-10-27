@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Il-qasam :attribute ibiddel id-daqs tal-għajnejn ta\' barra wisq biex il-kodiċi jiġi skenjat: :detail.',
         'inner-eye-scale' => 'Il-qasam :attribute ibiddel id-daqs tal-għajnejn ta\' ġewwa wisq biex il-kodiċi jiġi skenjat: :detail.',
         'eye-rotation' => 'Il-qasam :attribute idawwar l-għajnejn tant li l-kodiċi jista\' ma jiġix skenjat: :detail.',
+        'inverted' => 'Il-qasam :attribute jagħmel il-kodiċi :detail.',
     ],
 ];

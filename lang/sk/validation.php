@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Položka :attribute mení veľkosť vonkajších očí nad rámec skenovateľnosti: :detail.',
         'inner-eye-scale' => 'Položka :attribute mení veľkosť vnútorných očí nad rámec skenovateľnosti: :detail.',
         'eye-rotation' => 'Položka :attribute otáča oči tak veľmi, že skenovanie nemusí fungovať: :detail.',
+        'inverted' => 'Položka :attribute robí kód :detail.',
     ],
 ];

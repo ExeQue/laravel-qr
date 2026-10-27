@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'vnitřní oko je pootočeno o :degrees stupňů mimo čtvrt otáčky',
     'logo_clears' => 'zakrývá :cleared datových buněk, víc než povolených :budget',
     'contrast' => 'jen :ratio:1 vůči pozadí',
+    'inverted' => 'světlejší než pozadí, což ne každá čtečka naskenuje',
 ];

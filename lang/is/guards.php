@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'innra auga snúið :degrees gráður frá fjórðungssnúningi',
     'logo_clears' => 'hylur :cleared gagnareiti, fleiri en þá :budget sem leyfðir eru',
     'contrast' => 'aðeins :ratio:1 á móti bakgrunninum',
+    'inverted' => 'ljósari en bakgrunninn, sem ekki allir lesarar geta skannað',
 ];

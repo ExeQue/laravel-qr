@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'The :attribute field sizes the outer eyes beyond what scans: :detail.',
         'inner-eye-scale' => 'The :attribute field sizes the inner eyes beyond what scans: :detail.',
         'eye-rotation' => 'The :attribute field turns the eyes so far they may not scan: :detail.',
+        'inverted' => 'The :attribute field makes the code :detail.',
     ],
 ];

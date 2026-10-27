@@ -73,6 +73,7 @@ export default defineConfig({
           { text: 'Logos', link: '/docs/logos' },
           { text: 'Scan safety', link: '/docs/scan-safety' },
           { text: 'Shape icons', link: '/docs/icons' },
+          { text: 'In the browser', link: '/docs/browser' },
         ],
       },
       {

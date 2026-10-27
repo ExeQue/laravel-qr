@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'sisemine silm on veerandpöördest :degrees kraadi võrra kõrvale pööratud',
     'logo_clears' => 'katab :cleared andmerakku, rohkem kui lubatud :budget',
     'contrast' => 'tausta suhtes ainult :ratio:1',
+    'inverted' => 'taustast heledam, mida kõik lugejad skannida ei suuda',
 ];

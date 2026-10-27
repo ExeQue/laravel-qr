@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Väli :attribute muudab välimiste silmade suurust rohkem, kui skannimine lubab: :detail.',
         'inner-eye-scale' => 'Väli :attribute muudab sisemiste silmade suurust rohkem, kui skannimine lubab: :detail.',
         'eye-rotation' => 'Väli :attribute pöörab silmi nii palju, et koodi ei pruugi saada skannida: :detail.',
+        'inverted' => 'Väli :attribute muudab koodi nii, et see on :detail.',
     ],
 ];

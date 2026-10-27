@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'El campo :attribute cambia el tamaño de los ojos exteriores más allá de lo escaneable: :detail.',
         'inner-eye-scale' => 'El campo :attribute cambia el tamaño de los ojos interiores más allá de lo escaneable: :detail.',
         'eye-rotation' => 'El campo :attribute gira tanto los ojos que el código podría no escanearse: :detail.',
+        'inverted' => 'El campo :attribute hace que el código sea :detail.',
     ],
 ];

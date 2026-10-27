@@ -53,6 +53,8 @@ Qr::url('https://example.com/e/ABCD1234')
 - **Validation** - `StyleRule` checks a style from a form, field by field, and turns it into a style.
 - **Translated** - labels for every shape, preset, filter, gradient, kind of content and format, and the validation messages, in 29
   languages.
+- **In the browser** - a manifest of every part with its label, and a small module that checks colors as the scan
+  guards do.
 - **Reading** - `Qr::read()` reads codes from images, with the package's own decoder or zxing.
 - **Caching**, a **testing fake**, **events**, a **Monocle** lens, **artisan** commands, and a
   [Laravel Boost](docs/installation.md#laravel-boost) skill for AI agents.

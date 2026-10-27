@@ -21,6 +21,7 @@ use ExeQue\Qr\Payloads\Contracts\ProvidesQrContent;
 use ExeQue\Qr\Rendering\Enums\Corner;
 use ExeQue\Qr\Rendering\Renderer;
 use ExeQue\Qr\Rendering\ScanSafety;
+use ExeQue\Qr\Rendering\ScanSafetyReport;
 use ExeQue\Qr\Rendering\Scene;
 use ExeQue\Qr\Rendering\Style;
 use ExeQue\Qr\Shapes\Contracts\Configurable;
@@ -255,6 +256,18 @@ final class PendingQr implements Arrayable, Htmlable, Stringable
     public function sceneOf(Matrix $matrix): Scene
     {
         return $this->factory->make(Renderer::class)->render($matrix, $this->style, $this->scanSafety ?? $this->configuredSafety());
+    }
+
+    /**
+     * What the scan guards make of the code, without drawing it: every adjustment and warning,
+     * how bad each is, and what they say. Guards set to throw are reported as refusing instead.
+     */
+    public function scanSafetyReport(): ScanSafetyReport
+    {
+        $safety = $this->scanSafety ?? $this->configuredSafety();
+        $scene = $this->factory->make(Renderer::class)->render($this->matrix(), $this->style, $safety->warningOnly());
+
+        return new ScanSafetyReport($scene->adjustments, $safety);
     }
 
     /**

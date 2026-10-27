@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Reiturinn :attribute breytir stærð ytri augna meira en skönnun leyfir: :detail.',
         'inner-eye-scale' => 'Reiturinn :attribute breytir stærð innri augna meira en skönnun leyfir: :detail.',
         'eye-rotation' => 'Reiturinn :attribute snýr augunum svo mikið að kóðinn skannast hugsanlega ekki: :detail.',
+        'inverted' => 'Reiturinn :attribute gerir kóðann :detail.',
     ],
 ];

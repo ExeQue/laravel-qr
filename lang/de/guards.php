@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'inneres Auge um :degrees Grad gegenüber einer Vierteldrehung verdreht',
     'logo_clears' => 'verdeckt :cleared Datenzellen, mehr als die erlaubten :budget',
     'contrast' => 'nur :ratio:1 gegenüber dem Hintergrund',
+    'inverted' => 'heller als seinen Hintergrund, was nicht jeder Scanner lesen kann',
 ];

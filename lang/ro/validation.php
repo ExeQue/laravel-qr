@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'Câmpul :attribute dimensionează ochii exteriori peste limita de scanare: :detail.',
         'inner-eye-scale' => 'Câmpul :attribute dimensionează ochii interiori peste limita de scanare: :detail.',
         'eye-rotation' => 'Câmpul :attribute rotește ochii atât de mult încât scanarea poate eșua: :detail.',
+        'inverted' => 'Câmpul :attribute face codul :detail.',
     ],
 ];

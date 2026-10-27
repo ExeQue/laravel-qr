@@ -62,5 +62,6 @@ return [
         'outer-eye-scale' => 'A(z) :attribute mező a beolvashatóság határán túl méretezi a külső szemeket: :detail.',
         'inner-eye-scale' => 'A(z) :attribute mező a beolvashatóság határán túl méretezi a belső szemeket: :detail.',
         'eye-rotation' => 'A(z) :attribute mező annyira elforgatja a szemeket, hogy a kód esetleg nem olvasható be: :detail.',
+        'inverted' => 'A(z) :attribute mező miatt a kód :detail.',
     ],
 ];

@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'sisempi silmä on kääntynyt :degrees astetta neljänneskierroksesta',
     'logo_clears' => 'peittää :cleared datasolua, enemmän kuin sallitut :budget',
     'contrast' => 'vain :ratio:1 taustaa vasten',
+    'inverted' => 'taustaansa vaaleamman, mitä kaikki lukijat eivät pysty skannaamaan',
 ];

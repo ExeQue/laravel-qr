@@ -26,6 +26,8 @@ final readonly class ScanSafety
      * @param array{float, float}|null $outerEyeScale How much an outer eye may shrink or grow; it must stay about 7 modules wide.
      * @param array{float, float}|null $innerEyeScale How much an inner eye may shrink or grow.
      * @param float|null $eyeRotationWarning Degrees off a quarter turn from which a turned eye is warned about.
+     * @param Violation|null $inverted What a code lighter than its background does - a light code on a dark ground,
+     *                                 which not every reader scans: warn, throw, or nothing when null.
      */
     public function __construct(
         public ?float $minContrast = 3.0,
@@ -40,6 +42,7 @@ final readonly class ScanSafety
         public ?array $outerEyeScale = [0.93, 1.0],
         public ?array $innerEyeScale = [0.6, 1.15],
         public ?float $eyeRotationWarning = 10.0,
+        public ?Violation $inverted = Violation::Warn,
     ) {
     }
 
@@ -53,6 +56,7 @@ final readonly class ScanSafety
         $default = new self();
         $value = fn (string $key, mixed $fallback): mixed => array_key_exists($key, $config) ? $config[$key] : $fallback;
         $violation = $value('on_violation', $default->onViolation);
+        $inverted = $value('inverted', $default->inverted);
 
         return new self(
             minContrast: $value('min_contrast', $default->minContrast),
@@ -67,7 +71,20 @@ final readonly class ScanSafety
             outerEyeScale: $value('outer_eye_scale', $default->outerEyeScale),
             innerEyeScale: $value('inner_eye_scale', $default->innerEyeScale),
             eyeRotationWarning: $value('eye_rotation_warning', $default->eyeRotationWarning),
+            inverted: $inverted === null || $inverted instanceof Violation ? $inverted : Violation::from((string) $inverted),
         );
+    }
+
+    /**
+     * The same guards, warning where they would throw: to hear everything they have to say.
+     */
+    public function warningOnly(): self
+    {
+        return new self(...[
+            ...get_object_vars($this),
+            'onViolation' => Violation::Warn,
+            'inverted' => $this->inverted === null ? null : Violation::Warn,
+        ]);
     }
 
     /**
@@ -88,6 +105,7 @@ final readonly class ScanSafety
             outerEyeScale: null,
             innerEyeScale: null,
             eyeRotationWarning: null,
+            inverted: null,
         );
     }
 }

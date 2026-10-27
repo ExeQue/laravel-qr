@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'unutarnje oko zakrenuto je :degrees stupnjeva od četvrtine okreta',
     'logo_clears' => 'prekriva :cleared podatkovnih ćelija, više od dopuštenih :budget',
     'contrast' => 'samo :ratio:1 u odnosu na pozadinu',
+    'inverted' => 'svjetlijim od pozadine, što ne može skenirati svaki čitač',
 ];

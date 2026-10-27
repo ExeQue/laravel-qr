@@ -14,4 +14,5 @@ return [
     'inner_turned' => 'olho interior rodado :degrees graus em relação a um quarto de volta',
     'logo_clears' => 'tapa :cleared células de dados, mais do que as :budget permitidas',
     'contrast' => 'apenas :ratio:1 em relação ao fundo',
+    'inverted' => 'mais claro do que o fundo, algo que nem todos os leitores conseguem ler',
 ];
