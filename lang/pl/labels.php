@@ -39,6 +39,7 @@ return [
         'organic' => 'Organiczny',
         'garland' => 'Girlanda',
         'baubles' => 'Bombki',
+        'ghosts' => 'Duszki',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Kropla',
         'scalloped' => 'Falisty',
         'dotted-ring' => 'Kropkowany pierścień',
+        'ghost' => 'Duszek',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Pigułka',
         'blob' => 'Plama',
         'christmas-tree' => 'Choinka',
+        'ghost' => 'Duszek',
+        'pumpkin' => 'Dynia',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Falisty',
         'organic' => 'Organiczny',
         'christmas-tree' => 'Choinka',
+        'ghost' => 'Duszek',
+        'pumpkin' => 'Dynia',
     ],
 
     'filters' => [

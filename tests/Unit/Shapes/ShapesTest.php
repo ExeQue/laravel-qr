@@ -35,6 +35,10 @@ covers(
     Modules\Garland::class,
     Modules\Baubles::class,
     InnerEyes\ChristmasTree::class,
+    InnerEyes\Ghost::class,
+    InnerEyes\Pumpkin::class,
+    OuterEyes\Ghost::class,
+    Modules\Ghost::class,
     Modules\Classy::class,
     Modules\Bubbles::class,
     Modules\Organic::class,
@@ -228,6 +232,7 @@ describe('options', function (): void {
         [fn () => new Modules\Garland(bead: 1), '"bead"'],
         [fn () => new Modules\Garland(droop: 0.5), '"droop"'],
         [fn () => new Modules\Baubles(diameter: 0.95), '"diameter"'],
+        [fn () => new Modules\Ghost(size: 1.2), '"size"'],
         [fn () => new Modules\Classy(1), '"radius"'],
         [fn () => new Modules\Bubbles(0.6, 0.5), '"largest"'],
         [fn () => new Modules\Organic(0.4, 0.3), '"most"'],
@@ -334,6 +339,22 @@ describe('module details', function (): void {
             ->and(boundsOf(new Modules\Baubles(diameter: 0.6)->draw(cell())))->toBe([-0.3, -0.22, 0.3, 0.5])
             ->and(new InnerEyes\ChristmasTree())->toBeInstanceOf(\ExeQue\Qr\Shapes\Contracts\Symmetric::class)
             ->and(boundsOf(new InnerEyes\ChristmasTree()->path()))->toBe([-1.9, -1.8, 1.9, 1.8]);
+    });
+
+    it('draws ghosts and pumpkins upright, a ghost ring a module wide with a point down the middle', function (): void {
+        $ring = new OuterEyes\Ghost();
+        $middle = fn (\ExeQue\Qr\Geometry\Path $path): array => array_values(array_filter(array_map(
+            fn (array $command): ?array => $command[0] !== 'Z' && abs((float) $command[count($command) - 2]) < 1e-9 ? [(float) $command[count($command) - 1]] : null,
+            $path->commands(),
+        )));
+
+        expect(boundsOf(new Modules\Ghost()->draw(cell())))->toBe([-0.414, -0.414, 0.414, 0.46])
+            ->and(boundsOf(new Modules\Ghost(size: 0.6)->draw(cell())))->toBe([-0.27, -0.27, 0.27, 0.3])
+            ->and(boundsOf($ring->path()))->toBe([-3.5, -3.5, 3.5, 3.5])
+            ->and($middle($ring->path()))->toContain([3.5], [2.5])
+            ->and(boundsOf(new InnerEyes\Ghost()->path()))->toBe([-1.508, -1.498, 1.508, 1.495])
+            ->and(boundsOf(new InnerEyes\Pumpkin()->path()))->toBe([-1.525, -1.85, 1.525, 1.45])
+            ->and([new InnerEyes\Ghost(), new InnerEyes\Pumpkin(), $ring])->each->toBeInstanceOf(\ExeQue\Qr\Shapes\Contracts\Symmetric::class);
     });
 
     it('rounds the outer top-left and bottom-right corners of classy modules', function (): void {

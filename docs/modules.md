@@ -68,6 +68,8 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `crosses` | `clovers` | `pills-vertical` | `bricks-horizontal` |
 | ![pills-horizontal](images/modules/pills-horizontal.png) | ![bricks-vertical](images/modules/bricks-vertical.png) | ![hexagons-standing](images/modules/hexagons-standing.png) | ![sketch](images/modules/sketch.png) |
 | `pills-horizontal` | `bricks-vertical` | `hexagons-standing` | `sketch` |
+| ![baubles](images/modules/baubles.png) | ![ghosts](images/modules/ghosts.png) | | |
+| `baubles` | `ghosts` | | |
 
 | Name | Class | Options |
 |---|---|---|
@@ -91,6 +93,8 @@ Flowing modules never join the eyes, and stop short of the area a logo clears.
 | `bricks-horizontal` | `Modules\Brick` | `height` 0.76 (0.3 to 1), `vertical` false: rows read as courses of bricks |
 | `bricks-vertical` | `Modules\Brick` | the same, `vertical` true: columns read as courses |
 | `sketch` | `Modules\Sketch` | `wobble` 0.06 (0 to 0.1): a square drawn by hand, each its own way |
+| `baubles` | `Modules\Baubles` | `diameter` 0.8 (0.5 to 0.86): a Christmas bauble with a cap |
+| `ghosts` | `Modules\Ghost` | `size` 0.92 (0.6 to 1): a little ghost, its head round and its hem in scallops |
 
 `point` picks the pointed corner: a drop takes `top-left`, `top-right`, `bottom-right` or `bottom-left`, a leaf
 `top-left` or `top-right` (each pointing at the corner across from it too); either takes `random` for a corner picked

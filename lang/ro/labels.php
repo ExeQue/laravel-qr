@@ -39,6 +39,7 @@ return [
         'organic' => 'Organic',
         'garland' => 'Ghirlandă',
         'baubles' => 'Globuri de Crăciun',
+        'ghosts' => 'Fantome',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Picătură',
         'scalloped' => 'Festonat',
         'dotted-ring' => 'Inel punctat',
+        'ghost' => 'Fantomă',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Capsulă',
         'blob' => 'Pată',
         'christmas-tree' => 'Brad de Crăciun',
+        'ghost' => 'Fantomă',
+        'pumpkin' => 'Dovleac',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Festonat',
         'organic' => 'Organic',
         'christmas-tree' => 'Brad de Crăciun',
+        'ghost' => 'Fantomă',
+        'pumpkin' => 'Dovleac',
     ],
 
     'filters' => [

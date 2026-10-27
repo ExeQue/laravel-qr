@@ -27,8 +27,8 @@ The pictures show the top-left eye close up, with the modules beside it.
 | `circle` | `round-corner` | `soft-round-corner` | `squircle` |
 | ![octagon](images/outer-eyes/octagon.png) | ![hexagon](images/outer-eyes/hexagon.png) | ![leaf](images/outer-eyes/leaf.png) | ![drop](images/outer-eyes/drop.png) |
 | `octagon` | `hexagon` | `leaf` | `drop` |
-| ![scalloped](images/outer-eyes/scalloped.png) | ![dotted-ring](images/outer-eyes/dotted-ring.png) | ![hexagon-standing](images/outer-eyes/hexagon-standing.png) | |
-| `scalloped` | `dotted-ring` | `hexagon-standing` | |
+| ![scalloped](images/outer-eyes/scalloped.png) | ![dotted-ring](images/outer-eyes/dotted-ring.png) | ![hexagon-standing](images/outer-eyes/hexagon-standing.png) | ![ghost](images/outer-eyes/ghost.png) |
+| `scalloped` | `dotted-ring` | `hexagon-standing` | `ghost` |
 
 | Name | Class | Options | |
 |---|---|---|---|
@@ -47,6 +47,7 @@ The pictures show the top-left eye close up, with the modules beside it.
 | `drop` | `OuterEyes\Rounded` | `outer` [3, 3, 3, 0], `hole` [2, 2, 2, 0] | three corners round, one pointed |
 | `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides around a soft hole |
 | `dotted-ring` | `OuterEyes\DottedRing` | `diameter` 1.0 (0.8 to 1) | a dot on each of the ring's 24 modules |
+| `ghost` | `OuterEyes\Ghost` | — | a ghost's outline: a round head, straight sides and a scalloped hem, upright on every corner |
 
 `OuterEyes\Rounded` takes one radius for every corner, or four: top-right, bottom-right, bottom-left, top-left. Its
 hole must stay rounded enough that it does not poke through the ring; a radius pair that would is refused.
@@ -67,8 +68,8 @@ Shown inside the square outer eye.
 | `octagon` | `leaf` | `drop` | `sparkle` |
 | ![clover](images/inner-eyes/clover.png) | ![cross](images/inner-eyes/cross.png) | ![pill](images/inner-eyes/pill.png) | ![blob](images/inner-eyes/blob.png) |
 | `clover` | `cross` | `pill` | `blob` |
-| ![hexagon-standing](images/inner-eyes/hexagon-standing.png) | ![christmas-tree](images/inner-eyes/christmas-tree.png) | | |
-| `hexagon-standing` | `christmas-tree` | | |
+| ![hexagon-standing](images/inner-eyes/hexagon-standing.png) | ![christmas-tree](images/inner-eyes/christmas-tree.png) | ![ghost](images/inner-eyes/ghost.png) | ![pumpkin](images/inner-eyes/pumpkin.png) |
+| `hexagon-standing` | `christmas-tree` | `ghost` | `pumpkin` |
 
 | Name | Class | Options |
 |---|---|---|
@@ -94,6 +95,8 @@ Shown inside the square outer eye.
 | `pill` | `InnerEyes\Pill` | `vertical` true: standing up, or lying down |
 | `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
 | `christmas-tree` | `InnerEyes\ChristmasTree` | — a fir of three tiers on a trunk, upright on every corner |
+| `ghost` | `InnerEyes\Ghost` | — a ghost, upright on every corner |
+| `pumpkin` | `InnerEyes\Pumpkin` | — a pumpkin of three lobes under a stem, upright on every corner |
 
 The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
 still measures about three modules.
@@ -110,8 +113,10 @@ still measures about three modules.
 | `soft-round-corner` | `squircle` | `hexagon` | `octagon` |
 | ![leaf](images/eyes/leaf.png) | ![drop](images/eyes/drop.png) | ![sparkle](images/eyes/sparkle.png) | ![scalloped](images/eyes/scalloped.png) |
 | `leaf` | `drop` | `sparkle` | `scalloped` |
-| ![organic](images/eyes/organic.png) | ![hexagon-standing](images/eyes/hexagon-standing.png) | ![christmas-tree](images/eyes/christmas-tree.png) | |
-| `organic` | `hexagon-standing` | `christmas-tree` | |
+| ![organic](images/eyes/organic.png) | ![hexagon-standing](images/eyes/hexagon-standing.png) | ![christmas-tree](images/eyes/christmas-tree.png) | ![ghost](images/eyes/ghost.png) |
+| `organic` | `hexagon-standing` | `christmas-tree` | `ghost` |
+| ![pumpkin](images/eyes/pumpkin.png) | | | |
+| `pumpkin` | | | |
 
 | Preset | Outer | Inner |
 |---|---|---|
@@ -134,6 +139,8 @@ still measures about three modules.
 | `scalloped` | `scalloped` | `circle` |
 | `organic` | `soft` | `blob` |
 | `christmas-tree` | `soft` | `christmas-tree` |
+| `ghost` | `ghost` | `ghost` |
+| `pumpkin` | `circle` | `pumpkin` |
 
 `Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
 
@@ -146,8 +153,8 @@ all three eyes: the top-right a quarter clockwise, the bottom-left a quarter bac
 ![Turned on each corner](images/eyes/round-corner-mirrored.png)
 
 `mirrored()` turns every other eye part the same way, for shapes of your own that should point out too. Parts that
-look the same turned, and the `christmas-tree`, which should stand upright, implement `Shapes\Contracts\Symmetric`
-and are left as they are:
+look the same turned, and the `christmas-tree`, `ghost` and `pumpkin`, which should stand upright, implement
+`Shapes\Contracts\Symmetric` and are left as they are:
 
 ```php
 Qr::url($url)->eyes('my-arrow')->mirrored();
@@ -193,6 +200,8 @@ turns that are not quarter turns, which distort the pattern scanners look for.
 ![organic](images/eyes/organic-code.png)
 ![hexagon-standing](images/eyes/hexagon-standing-code.png)
 ![christmas-tree](images/eyes/christmas-tree-code.png)
+![ghost](images/eyes/ghost-code.png)
+![pumpkin](images/eyes/pumpkin-code.png)
 
 ## Eyes of your own
 

@@ -39,6 +39,7 @@ return [
         'organic' => 'Organiškas',
         'garland' => 'Girlianda',
         'baubles' => 'Kalėdiniai žaisliukai',
+        'ghosts' => 'Vaiduokliai',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Lašas',
         'scalloped' => 'Banguotas',
         'dotted-ring' => 'Taškuotas žiedas',
+        'ghost' => 'Vaiduoklis',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Piliulė',
         'blob' => 'Dėmė',
         'christmas-tree' => 'Kalėdų eglutė',
+        'ghost' => 'Vaiduoklis',
+        'pumpkin' => 'Moliūgas',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Banguotas',
         'organic' => 'Organiškas',
         'christmas-tree' => 'Kalėdų eglutė',
+        'ghost' => 'Vaiduoklis',
+        'pumpkin' => 'Moliūgas',
     ],
 
     'filters' => [

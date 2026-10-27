@@ -39,6 +39,7 @@ return [
         'organic' => 'Orgánach',
         'garland' => 'Bláthfhleasc',
         'baubles' => 'Liathróidí Nollag',
+        'ghosts' => 'Taibhsí',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Braon',
         'scalloped' => 'Tonnach',
         'dotted-ring' => 'Fáinne poncach',
+        'ghost' => 'Taibhse',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Piolla',
         'blob' => 'Ballóg',
         'christmas-tree' => 'Crann Nollag',
+        'ghost' => 'Taibhse',
+        'pumpkin' => 'Puimcín',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Tonnach',
         'organic' => 'Orgánach',
         'christmas-tree' => 'Crann Nollag',
+        'ghost' => 'Taibhse',
+        'pumpkin' => 'Puimcín',
     ],
 
     'filters' => [

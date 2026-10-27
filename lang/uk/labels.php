@@ -39,6 +39,7 @@ return [
         'organic' => 'Органічний',
         'garland' => 'Гірлянда',
         'baubles' => 'Ялинкові кульки',
+        'ghosts' => 'Привиди',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Крапля',
         'scalloped' => 'Фестончастий',
         'dotted-ring' => 'Кільце з точок',
+        'ghost' => 'Привид',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Капсула',
         'blob' => 'Пляма',
         'christmas-tree' => 'Ялинка',
+        'ghost' => 'Привид',
+        'pumpkin' => 'Гарбуз',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Фестончастий',
         'organic' => 'Органічний',
         'christmas-tree' => 'Ялинка',
+        'ghost' => 'Привид',
+        'pumpkin' => 'Гарбуз',
     ],
 
     'filters' => [

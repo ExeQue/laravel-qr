@@ -39,6 +39,7 @@ return [
         'organic' => 'Органско',
         'garland' => 'Гирланда',
         'baubles' => 'Божићне кугле',
+        'ghosts' => 'Духови',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Кап',
         'scalloped' => 'Таласасти руб',
         'dotted-ring' => 'Тачкасти прстен',
+        'ghost' => 'Дух',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Капсула',
         'blob' => 'Мрља',
         'christmas-tree' => 'Божићна јелка',
+        'ghost' => 'Дух',
+        'pumpkin' => 'Бундева',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Таласасти руб',
         'organic' => 'Органско',
         'christmas-tree' => 'Божићна јелка',
+        'ghost' => 'Дух',
+        'pumpkin' => 'Бундева',
     ],
 
     'filters' => [

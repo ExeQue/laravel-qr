@@ -39,6 +39,7 @@ return [
         'organic' => 'Organikus',
         'garland' => 'Füzér',
         'baubles' => 'Karácsonyi gömbök',
+        'ghosts' => 'Szellemek',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Csepp',
         'scalloped' => 'Hullámos',
         'dotted-ring' => 'Pöttyös gyűrű',
+        'ghost' => 'Szellem',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Kapszula',
         'blob' => 'Folt',
         'christmas-tree' => 'Karácsonyfa',
+        'ghost' => 'Szellem',
+        'pumpkin' => 'Tök',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Hullámos',
         'organic' => 'Organikus',
         'christmas-tree' => 'Karácsonyfa',
+        'ghost' => 'Szellem',
+        'pumpkin' => 'Tök',
     ],
 
     'filters' => [

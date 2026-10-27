@@ -39,6 +39,7 @@ The pictures show the top-left eye close up, with the modules beside it.
 | `drop` | `OuterEyes\Rounded` | `outer` [3, 3, 3, 0], `hole` [2, 2, 2, 0] | three corners round, one pointed |
 | `scalloped` | `OuterEyes\Scalloped` | `depth` 0.15 (up to 0.25), `bumps` 4 (2 to 8) | scalloped sides around a soft hole |
 | `dotted-ring` | `OuterEyes\DottedRing` | `diameter` 1.0 (0.8 to 1) | a dot on each of the ring's 24 modules |
+| `ghost` | `OuterEyes\Ghost` | — | a ghost's outline: a round head, straight sides and a scalloped hem, upright on every corner |
 
 `OuterEyes\Rounded` takes one radius for every corner, or four: top-right, bottom-right, bottom-left, top-left. Its
 hole must stay rounded enough that it does not poke through the ring; a radius pair that would is refused.
@@ -74,6 +75,8 @@ Shown inside the square outer eye.
 | `pill` | `InnerEyes\Pill` | `vertical` true: standing up, or lying down |
 | `blob` | `InnerEyes\Blob` | `amount` 0.08 (up to 0.15), `seed` 1 |
 | `christmas-tree` | `InnerEyes\ChristmasTree` | — a fir of three tiers on a trunk, upright on every corner |
+| `ghost` | `InnerEyes\Ghost` | — a ghost, upright on every corner |
+| `pumpkin` | `InnerEyes\Pumpkin` | — a pumpkin of three lobes under a stem, upright on every corner |
 
 The star, diamond, hexagon, sparkle, cross and pill reach a little past the 3×3 box where they are narrow, so a line across the middle
 still measures about three modules.
@@ -104,6 +107,8 @@ still measures about three modules.
 | `scalloped` | `scalloped` | `circle` |
 | `organic` | `soft` | `blob` |
 | `christmas-tree` | `soft` | `christmas-tree` |
+| `ghost` | `ghost` | `ghost` |
+| `pumpkin` | `circle` | `pumpkin` |
 
 `Eye` cases are also `ProvidesQrEye`, as is anything of your own that gives an outer and an inner eye.
 
@@ -114,8 +119,8 @@ your own with uneven corners - turn by themselves on each corner, so their disti
 all three eyes: the top-right a quarter clockwise, the bottom-left a quarter back.
 
 `mirrored()` turns every other eye part the same way, for shapes of your own that should point out too. Parts that
-look the same turned, and the `christmas-tree`, which should stand upright, implement `Shapes\Contracts\Symmetric`
-and are left as they are:
+look the same turned, and the `christmas-tree`, `ghost` and `pumpkin`, which should stand upright, implement
+`Shapes\Contracts\Symmetric` and are left as they are:
 
 ```php
 Qr::url($url)->eyes('my-arrow')->mirrored();

@@ -39,6 +39,7 @@ return [
         'organic' => 'Lífrænt',
         'garland' => 'Skrautlengja',
         'baubles' => 'Jólakúlur',
+        'ghosts' => 'Draugar',
     ],
 
     'outer_eyes' => [
@@ -57,6 +58,7 @@ return [
         'drop' => 'Dropi',
         'scalloped' => 'Bylgjað',
         'dotted-ring' => 'Punktahringur',
+        'ghost' => 'Draugur',
     ],
 
     'inner_eyes' => [
@@ -82,6 +84,8 @@ return [
         'pill' => 'Hylki',
         'blob' => 'Klessa',
         'christmas-tree' => 'Jólatré',
+        'ghost' => 'Draugur',
+        'pumpkin' => 'Grasker',
     ],
 
     'eyes' => [
@@ -104,6 +108,8 @@ return [
         'scalloped' => 'Bylgjað',
         'organic' => 'Lífrænt',
         'christmas-tree' => 'Jólatré',
+        'ghost' => 'Draugur',
+        'pumpkin' => 'Grasker',
     ],
 
     'filters' => [
