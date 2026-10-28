@@ -16,7 +16,7 @@ use ExeQue\Qr\Writers\Svg\Options as SvgOptions;
 use ExeQue\Qr\Writers\Svg\Writer as SvgWriter;
 use Imagick;
 
-covers(Metadata::class, RasterWriter::class, SvgWriter::class);
+covers(Metadata::class, \ExeQue\Qr\Writers\Raster\Metadata::class, RasterWriter::class, SvgWriter::class);
 
 pest()->group('writers');
 
@@ -49,6 +49,19 @@ describe('images', function (): void {
                 ->and(mb_convert_encoding((string) $image->getImageProperty('Copyright'), 'UTF-8', 'ISO-8859-1'))->toBe('© 2026 Acme');
         }
     })->with(ImageFormat::cases());
+
+    it('writes JPEG fields as EXIF, which Windows shows, beside the XMP', function (string $driver): void {
+        $jpeg = \ExeQue\Qr\Facades\Qr::make('hi')->metadata(title: 'Kort', author: 'Zoë', description: 'Scan', copyright: '© 2026 Acme', keywords: ['qr', 'kort'])->jpeg(100, driver: $driver)->contents();
+        // PHP gives the Windows tags' UTF-16 in Latin-1 unless told otherwise.
+        ini_set('exif.encode_unicode', 'UTF-8');
+        $exif = exif_read_data('data://image/jpeg;base64,'.base64_encode($jpeg), 'IFD0');
+        $bare = \ExeQue\Qr\Facades\Qr::make('hi')->metadata(url: 'https://acme.example')->jpeg(100, driver: $driver)->contents();
+
+        expect($exif)->toMatchArray(['ImageDescription' => 'Kort', 'Artist' => 'Zoë', 'Copyright' => '© 2026 Acme', 'Title' => 'Kort', 'Comments' => 'Scan', 'Author' => 'Zoë', 'Keywords' => 'qr; kort'])
+            ->and($jpeg)->toContain('http://ns.adobe.com/xap/1.0/')
+            ->and(imagecreatefromstring($jpeg))->not->toBeFalse()
+            ->and($bare)->not->toContain("Exif\0\0")->toContain('https://acme.example');
+    })->with(['imagick', 'gd']);
 
     it('writes PNG fields as plain text, which Windows shows, and as international text beyond Latin-1, before the image data', function (string $driver): void {
         $png = \ExeQue\Qr\Facades\Qr::make('hi')->metadata(title: 'Kort', author: 'Zoë 東京', copyright: '© 2026 Acme')->png(100, driver: $driver)->contents();
