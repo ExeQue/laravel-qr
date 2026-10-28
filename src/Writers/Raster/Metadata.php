@@ -48,12 +48,52 @@ final class Metadata
     public static function intoJpeg(string $jpeg, Attribution $metadata): string
     {
         $data = "http://ns.adobe.com/xap/1.0/\0".$metadata->toXmp();
-        $segment = "\xFF\xE1".pack('n', strlen($data) + 2).$data;
+        $segment = self::exif($metadata)."\xFF\xE1".pack('n', strlen($data) + 2).$data;
 
         // After the start of image, and the JFIF segment when there is one.
         $at = substr($jpeg, 2, 2) === "\xFF\xE0" ? 4 + (unpack('n', substr($jpeg, 4, 2)) ?: [1 => 0])[1] : 2;
 
         return substr($jpeg, 0, $at).$segment.substr($jpeg, $at);
+    }
+
+    /**
+     * The fields as EXIF, in an APP1 segment: what Windows shows in a JPEG's details. Text in the
+     * Windows tags is UTF-16; in the standard ones, UTF-8.
+     */
+    private static function exif(Attribution $metadata): string
+    {
+        $utf16 = fn (string $text): array => [1, mb_convert_encoding($text, 'UTF-16LE', 'UTF-8')."\0\0"];
+        $ascii = fn (string $text): array => [2, $text."\0"];
+        $keywords = $metadata->keywords === [] ? null : implode('; ', $metadata->keywords);
+
+        // Tag => [type, bytes]: 1 is a byte string, 2 text; tags in ascending order, as EXIF wants.
+        $tags = array_filter([
+            0x010E => $metadata->title === null ? null : $ascii($metadata->title),
+            0x013B => $metadata->author === null ? null : $ascii($metadata->author),
+            0x8298 => $metadata->copyright === null ? null : $ascii($metadata->copyright),
+            0x9C9B => $metadata->title === null ? null : $utf16($metadata->title),
+            0x9C9C => $metadata->description === null ? null : $utf16($metadata->description),
+            0x9C9D => $metadata->author === null ? null : $utf16($metadata->author),
+            0x9C9E => $keywords === null ? null : $utf16($keywords),
+        ]);
+
+        if ($tags === []) {
+            return '';
+        }
+
+        // A little-endian TIFF header, one directory of the tags, and the values too long to sit in it after.
+        $offset = 8 + 2 + 12 * count($tags) + 4;
+        [$entries, $values] = ['', ''];
+
+        foreach ($tags as $tag => [$type, $bytes]) {
+            $inline = strlen($bytes) <= 4;
+            $entries .= pack('vvV', $tag, $type, strlen($bytes)).($inline ? str_pad($bytes, 4, "\0") : pack('V', $offset + strlen($values)));
+            $values .= $inline ? '' : $bytes.(strlen($bytes) % 2 === 1 ? "\0" : '');
+        }
+
+        $data = "Exif\0\0II*\0".pack('V', 8).pack('v', count($tags)).$entries.pack('V', 0).$values;
+
+        return "\xFF\xE1".pack('n', strlen($data) + 2).$data;
     }
 
     /**

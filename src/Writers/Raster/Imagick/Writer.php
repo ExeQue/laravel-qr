@@ -261,8 +261,8 @@ final readonly class Writer implements Fakeable, WriterContract
 
         $metadata = $this->options->metadata;
 
-        // PNG metadata is written into the file afterward, as GD's is.
-        if (! $metadata->isEmpty() && $format !== ImageFormat::Png) {
+        // PNG and JPEG metadata is written into the file afterward, as GD's is.
+        if (! $metadata->isEmpty() && $format === ImageFormat::Webp) {
             $canvas->setImageProfile('xmp', $metadata->toXmp());
         }
 
@@ -273,6 +273,11 @@ final readonly class Writer implements Fakeable, WriterContract
 
         $bytes = $canvas->getImageBlob();
 
-        return $this->streams->buffer()->write($format === ImageFormat::Png && ! $metadata->isEmpty() ? Metadata::intoPng($bytes, $metadata) : $bytes);
+        return $this->streams->buffer()->write(match (true) {
+            $metadata->isEmpty() => $bytes,
+            $format === ImageFormat::Png => Metadata::intoPng($bytes, $metadata),
+            $format === ImageFormat::Jpeg => Metadata::intoJpeg($bytes, $metadata),
+            default => $bytes,
+        });
     }
 }
