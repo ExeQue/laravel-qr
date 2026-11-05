@@ -158,3 +158,17 @@ describe('opcache safety', function (): void {
         expect($offending)->toBe([]);
     });
 });
+
+describe('views', function (): void {
+    test('the qr view namespace needs no Monocle, so view:cache works where Monocle is not installed', function (): void {
+        $offending = [];
+
+        foreach (Finder::create()->files()->in(dirname(__DIR__, 2).'/resources/views') as $file) {
+            if (str_contains($file->getContents(), 'monocle::')) {
+                $offending[] = $file->getRelativePathname();
+            }
+        }
+
+        expect($offending)->toBe([]);
+    });
+});

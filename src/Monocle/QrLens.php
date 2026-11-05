@@ -99,7 +99,7 @@ final class QrLens implements Advises, Lens, Presentable, RequiresPackages, Rese
     {
         return Presentation::table()
             ->label('QR codes')
-            ->details('qr::monocle.details')
+            ->details('qr-monocle::details')
             ->columns(['kind', 'host', 'format', 'module_shape', 'outer_eye', 'inner_eye', 'filters', 'cached', 'version', 'modules', 'duration', 'guards'])
             ->detailsOnly(['content_hash', 'length', 'error_correction', 'encode_ms', 'render_ms', 'write_ms', 'logo', 'cacheable', 'style', 'min_version', 'mask', 'options'])
             ->groupBy(['kind' => 'by kind', 'format' => 'by format'])

@@ -120,6 +120,10 @@ final class QrServiceProvider extends ServiceProvider
             return; // @codeCoverageIgnore
         }
 
+        // Outside the qr view namespace: view:cache compiles every registered view, and this
+        // one needs Monocle's components, which a production install often leaves out.
+        $this->loadViewsFrom(__DIR__.'/../resources/monocle', 'qr-monocle');
+
         $this->app->booting(function (): void {
             if ((bool) $this->app->make('config')->get('qr.monocle.enabled', true)) {
                 Monocle::register(QrLens::class);
