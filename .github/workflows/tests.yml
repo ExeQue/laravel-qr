@@ -139,6 +139,9 @@ jobs:
         run: |
           apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-heic imagemagick-libs icu-libs libzip libpng libjpeg-turbo libwebp libavif libxpm freetype libgomp
           echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
+          # The image's PHP version, for the cache key: extensions built for an older patch release
+          # load on a newer one, and crash it now and then.
+          echo "php=$(php -r 'echo PHP_VERSION;')" >> "$GITHUB_ENV"
 
       # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.
       - name: Cache PHP extensions
@@ -149,7 +152,7 @@ jobs:
             /usr/local/lib/php/extensions
             /usr/local/etc/php/conf.d
             /usr/local/bin/composer
-          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v2
+          key: php-extensions-${{ env.php }}-imagemagick-${{ env.imagemagick }}-v2
 
       - name: Install PHP extensions
         if: steps.extensions.outputs.cache-hit != 'true'
@@ -197,6 +200,9 @@ jobs:
         run: |
           apk add --no-cache git nodejs npm tar zstd imagemagick imagemagick-svg imagemagick-jpeg imagemagick-webp imagemagick-heic imagemagick-libs icu-libs libzip libpng libjpeg-turbo libwebp libavif libxpm freetype libgomp
           echo "imagemagick=$(apk info -e -v imagemagick | sed 's/^imagemagick-//')" >> "$GITHUB_ENV"
+          # The image's PHP version, for the cache key: extensions built for an older patch release
+          # load on a newer one, and crash it now and then.
+          echo "php=$(php -r 'echo PHP_VERSION;')" >> "$GITHUB_ENV"
 
       # Compiling imagick and the rest takes minutes; they only change with PHP or ImageMagick.
       - name: Cache PHP extensions
@@ -207,7 +213,7 @@ jobs:
             /usr/local/lib/php/extensions
             /usr/local/etc/php/conf.d
             /usr/local/bin/composer
-          key: php-extensions-${{ env.PHP_VERSION }}-imagemagick-${{ env.imagemagick }}-v2
+          key: php-extensions-${{ env.php }}-imagemagick-${{ env.imagemagick }}-v2
 
       - name: Install PHP extensions
         if: steps.extensions.outputs.cache-hit != 'true'
