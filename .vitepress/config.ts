@@ -5,7 +5,8 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Laravel QR',
   description: 'QR codes for Laravel.',
-  base: '/laravel-qr/',
+  // GitHub Pages serves the docs under /laravel-qr/; the lerd docs worker serves them at the root of its subdomain.
+  base: process.env.DOCS_BASE ?? '/laravel-qr/',
   lastUpdated: true,
   head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/laravel-qr/logo.svg' }]],
   cleanUrls: true,
@@ -29,6 +30,8 @@ export default defineConfig({
 
   vite: {
     server: {
+      // Served through lerd on docs.laravel-qr.test, which Vite would otherwise refuse.
+      allowedHosts: ['.test'],
       watch: {
         ignored: ['**/vendor/**', '**/workbench/**', '**/tests/**', '**/.phpunit.cache/**'],
       },
