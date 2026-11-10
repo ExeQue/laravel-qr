@@ -109,6 +109,11 @@ final class Icons
      */
     private array $drawn = [];
 
+    /**
+     * @var array<string, array<string, string>> The cached icons of each kind read this request, by what they were drawn from.
+     */
+    private array $stored = [];
+
     private ?string $version = null;
 
     public function __construct(
@@ -316,17 +321,26 @@ final class Icons
             return $this->drawn[$key] = $draw();
         }
 
+        // One entry per kind holds all its icons, so a picker full of them is one read, not one per icon.
+        $kind = (string) $parts[0];
         $store = $this->caches->store($this->setting('store', null));
         $this->version ??= $this->pipeline->version().'.'.(InstalledVersions::getReference('exeque/laravel-qr') ?? InstalledVersions::getVersion('exeque/laravel-qr') ?? '');
-        $storeKey = $this->config->get('qr.cache.prefix', 'qr').':icon:'.$this->version.':'.hash('xxh128', $key);
-        $svg = $store->get($storeKey);
+        $storeKey = $this->config->get('qr.cache.prefix', 'qr').':icons:'.$kind.':'.$this->version;
 
-        if (is_string($svg)) {
-            return $this->drawn[$key] = new Icon($svg);
+        if (! isset($this->stored[$kind])) {
+            $set = $store->get($storeKey);
+            $this->stored[$kind] = is_array($set) ? array_filter($set, is_string(...)) : [];
+        }
+
+        if (isset($this->stored[$kind][$key])) {
+            return $this->drawn[$key] = new Icon($this->stored[$kind][$key]);
         }
 
         $icon = $this->drawn[$key] = $draw();
-        $store->put($storeKey, $icon->svg, (int) $this->setting('ttl', 604800));
+        // ponytail: a miss rewrites the kind's whole set; two requests drawing at once can drop
+        // each other's new icons, which the next request draws again.
+        $this->stored[$kind][$key] = $icon->svg;
+        $store->put($storeKey, $this->stored[$kind], (int) $this->setting('ttl', 604800));
 
         return $icon;
     }
