@@ -1,7 +1,7 @@
 # Caching
 
 Codes can be written once and served from the cache after that, which pays off for a page full of styled codes or
-large PNGs.
+large PNGs. The [icons](https://exeque.github.io/laravel-qr/docs/icons) of the built-in shapes and filters can be cached too, on their own switch and store.
 
 ## Within a request
 
@@ -41,6 +41,26 @@ Some codes cannot be cached, and are drawn fresh each time:
 - a gradient of your own that the registry cannot store;
 - a shape of your own with settings that does not implement `Configurable`.
 
+## Icons
+
+The icons of the package's own shapes and filters, given by name or enum, are drawn once per request. To keep them
+across requests, so a style picker does not draw the same icons on every page:
+
+```php
+'cache' => [
+    // ...
+    'icons' => [
+        'enabled' => true,          // QR_ICON_CACHE
+        'store' => null,            // QR_ICON_CACHE_STORE; the default store when null
+        'ttl' => 604800,
+    ],
+],
+```
+
+It is apart from the code cache: either can be on without the other, each in a store of its own. Instances, and names
+your application registers or replaces, are drawn every time, as they can change. `qr:clear`, `qr.cache.version` and
+package updates make cached icons stale. `composer bench:icons` in the package times them drawn and from the store.
+
 ## Making cached codes stale
 
 ```php
@@ -53,8 +73,43 @@ Qr::flush();                          // every code
 php artisan qr:clear
 ```
 
-Nothing is deleted; the codes' keys change, and the old entries expire. After changing how a shape of your own draws,
-raise its [version](https://exeque.github.io/laravel-qr/docs/extending#versions), or raise `qr.cache.version` to make every code stale.
+Nothing is deleted; the keys of codes and icons change, and the old entries expire. After changing how a shape of
+your own draws, raise its [version](https://exeque.github.io/laravel-qr/docs/extending#versions), or raise `qr.cache.version` to make every code and icon
+stale.
+
+## Choosing a store
+
+Stale entries are never read again, so the store has to remove them. Redis and Memcached expire entries on their own.
+The `file` and `database` stores do not: they only delete an expired entry when its key is read, so after `qr:clear`
+or a package update the old codes and icons stay on disk or in the table. Prefer a store that expires entries:
+
+```dotenv
+QR_CACHE_STORE=redis
+QR_ICON_CACHE_STORE=redis
+```
+
+If it has to be the file store, give the package one of its own in `config/cache.php`, so its directory can be emptied
+without touching the rest of your cache:
+
+```php
+'stores' => [
+    'qr' => [
+        'driver' => 'file',
+        'path' => storage_path('framework/cache/qr'),
+    ],
+],
+```
+
+```dotenv
+QR_CACHE_STORE=qr
+QR_ICON_CACHE_STORE=qr
+```
+
+and remove entries left behind from time to time, after `qr:clear` or a deploy that updates the package:
+
+```bash
+php artisan cache:clear qr
+```
 
 ## Events
 

@@ -21,7 +21,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 $app = Application::create(basePath: default_skeleton_path(), options: ['extra' => ['providers' => [QrServiceProvider::class]]]);
 Facade::setFacadeApplication($app);
-$app['config']->set(['qr.cache.enabled' => true, 'qr.cache.store' => 'file']);
+$app['config']->set(['qr.cache.icons.enabled' => true, 'qr.cache.icons.store' => 'file']);
 
 $qr = $app->make(Qr::class);
 $sets = [

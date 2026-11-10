@@ -48,7 +48,7 @@ use Illuminate\Contracts\Config\Repository as Config;
  * the codes are drawn with.
  *
  * Icons of the package's own shapes and filters, given by name or by the package's enums, are
- * drawn once per request, and kept in the cache store when the cache is enabled (qr.cache);
+ * drawn once per request, and kept in a cache store when the icon cache is enabled (qr.cache.icons);
  * qr:clear and package updates make them stale. Objects and names the application registered
  * are drawn every time, as they can change.
  */
@@ -312,11 +312,11 @@ final class Icons
             return $this->drawn[$key];
         }
 
-        if (! (bool) $this->config->get('qr.cache.enabled', false)) {
+        if (! (bool) $this->config->get('qr.cache.icons.enabled', false)) {
             return $this->drawn[$key] = $draw();
         }
 
-        $store = $this->caches->store($this->config->get('qr.cache.store'));
+        $store = $this->caches->store($this->config->get('qr.cache.icons.store'));
         $this->version ??= $this->pipeline->version().'.'.(InstalledVersions::getReference('exeque/laravel-qr') ?? InstalledVersions::getVersion('exeque/laravel-qr') ?? '');
         $storeKey = $this->config->get('qr.cache.prefix', 'qr').':icon:'.$this->version.':'.hash('xxh128', $key);
         $svg = $store->get($storeKey);
@@ -326,7 +326,7 @@ final class Icons
         }
 
         $icon = $this->drawn[$key] = $draw();
-        $store->put($storeKey, $icon->svg, (int) $this->config->get('qr.cache.ttl', 604800));
+        $store->put($storeKey, $icon->svg, (int) $this->config->get('qr.cache.icons.ttl', 604800));
 
         return $icon;
     }
