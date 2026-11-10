@@ -89,6 +89,7 @@
         "test:types": "vendor/bin/pest --type-coverage --min=100",
         "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
         "bench": "php benchmarks/raster.php",
+        "bench:icons": "php benchmarks/icons.php",
         "boost:references": "php scripts/boost-references.php"
     }
 }

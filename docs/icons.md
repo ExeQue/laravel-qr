@@ -34,6 +34,11 @@ Qr::icon(Module::Hearts)->withAttributes('class="size-5"');
 
 Any registered or app-provided shape works, by name, enum, class or instance.
 
+The package's own shapes and filters, given by name or enum, are drawn once per request, and kept in the
+[cache](caching.md) store when the cache is enabled, so a style picker does not draw the same icons on every page.
+`qr:clear` and package updates make them stale. Instances, and names your application registers, are drawn every time.
+`composer bench:icons` times every built-in icon drawn and from the store on your machine.
+
 ## In Blade
 
 ```blade

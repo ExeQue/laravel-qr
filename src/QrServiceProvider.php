@@ -46,6 +46,8 @@ final class QrServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/qr.php', 'qr');
 
         $this->app->scoped(Qr::class);
+        // Scoped, so the icons drawn in a request are drawn once.
+        $this->app->scoped(Icons\Icons::class);
 
         $this->streams();
         $this->logos();
