@@ -50,14 +50,15 @@ across requests, so a style picker does not draw the same icons on every page:
 'cache' => [
     // ...
     'icons' => [
-        'enabled' => true,          // QR_ICON_CACHE
-        'store' => null,            // QR_ICON_CACHE_STORE; the default store when null
+        'enabled' => true,          // QR_ICON_CACHE, else QR_CACHE
+        'store' => null,            // QR_ICON_CACHE_STORE, else QR_CACHE_STORE; the default store when null
         'ttl' => 604800,
     ],
 ],
 ```
 
-It is apart from the code cache: either can be on without the other, each in a store of its own. Instances, and names
+It follows the code cache unless set apart: `QR_ICON_CACHE` and `QR_ICON_CACHE_STORE` turn one on without the other,
+or put each in a store of its own. Instances, and names
 your application registers or replaces, are drawn every time, as they can change. `qr:clear`, `qr.cache.version` and
 package updates make cached icons stale. `composer bench:icons` in the package times them drawn and from the store.
 
@@ -85,7 +86,6 @@ or a package update the old codes and icons stay on disk or in the table. Prefer
 
 ```dotenv
 QR_CACHE_STORE=redis
-QR_ICON_CACHE_STORE=redis
 ```
 
 If it has to be the file store, give the package one of its own in `config/cache.php`, so its directory can be emptied
@@ -102,7 +102,6 @@ without touching the rest of your cache:
 
 ```dotenv
 QR_CACHE_STORE=qr
-QR_ICON_CACHE_STORE=qr
 ```
 
 and remove entries left behind from time to time, after `qr:clear` or a deploy that updates the package:

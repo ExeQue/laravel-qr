@@ -312,11 +312,11 @@ final class Icons
             return $this->drawn[$key];
         }
 
-        if (! (bool) $this->config->get('qr.cache.icons.enabled', false)) {
+        if (! (bool) $this->setting('enabled', false)) {
             return $this->drawn[$key] = $draw();
         }
 
-        $store = $this->caches->store($this->config->get('qr.cache.icons.store'));
+        $store = $this->caches->store($this->setting('store', null));
         $this->version ??= $this->pipeline->version().'.'.(InstalledVersions::getReference('exeque/laravel-qr') ?? InstalledVersions::getVersion('exeque/laravel-qr') ?? '');
         $storeKey = $this->config->get('qr.cache.prefix', 'qr').':icon:'.$this->version.':'.hash('xxh128', $key);
         $svg = $store->get($storeKey);
@@ -326,9 +326,17 @@ final class Icons
         }
 
         $icon = $this->drawn[$key] = $draw();
-        $store->put($storeKey, $icon->svg, (int) $this->config->get('qr.cache.icons.ttl', 604800));
+        $store->put($storeKey, $icon->svg, (int) $this->setting('ttl', 604800));
 
         return $icon;
+    }
+
+    /**
+     * An icon cache setting, or the code cache's where a published config has no icons block.
+     */
+    private function setting(string $key, mixed $default): mixed
+    {
+        return $this->config->get('qr.cache.icons.'.$key, $this->config->get('qr.cache.'.$key, $default));
     }
 
     /**

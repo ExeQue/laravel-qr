@@ -161,6 +161,14 @@ describe('caching', function (): void {
             ->and($keys())->not->toBe([]);
     });
 
+    it('follows the code cache where a published config has no icons block', function () use ($fresh): void {
+        $store = cache()->store('array');
+        config(['qr.cache' => ['enabled' => true, 'store' => 'array', 'ttl' => 60, 'prefix' => 'qr', 'version' => 1]]);
+        $fresh()->module('dots-large');
+
+        expect(array_filter(array_keys((fn (): array => $this->storage)->call($store->getStore())), fn (string $key): bool => str_contains($key, ':icon:')))->toHaveCount(1);
+    });
+
     it('draws objects, and names the application registered, every time', function () use ($fresh): void {
         $shape = Module::DotsLarge->qrModule();
 

@@ -47,9 +47,10 @@ return [
         'prefix' => 'qr',
         'version' => 1,
 
+        // The icons of the built-in shapes and filters; like codes unless set apart.
         'icons' => [
-            'enabled' => (bool) env('QR_ICON_CACHE', false),
-            'store' => env('QR_ICON_CACHE_STORE'),
+            'enabled' => (bool) env('QR_ICON_CACHE', env('QR_CACHE', false)),
+            'store' => env('QR_ICON_CACHE_STORE', env('QR_CACHE_STORE')),
             'ttl' => 604800,
         ],
     ],
