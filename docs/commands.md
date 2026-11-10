@@ -18,7 +18,7 @@ Parts that need options to be built (a palette needs its colors) are checked whe
 php artisan qr:clear
 ```
 
-Makes every cached code, and every cached [manifest](browser.md#caching), stale. See [Caching](caching.md).
+Makes every cached code, every cached [manifest](browser.md#caching) and every cached [icon](icons.md), stale. See [Caching](caching.md).
 
 ## qr:install
 

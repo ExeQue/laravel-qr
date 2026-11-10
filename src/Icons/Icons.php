@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ExeQue\Qr\Icons;
 
+use BackedEnum;
+use Closure;
+use Composer\InstalledVersions;
+use ExeQue\Qr\Builders\Pipeline;
 use ExeQue\Qr\Builders\Resolve;
 use ExeQue\Qr\Colors\Hex;
 use ExeQue\Qr\Contracts\Color;
@@ -18,6 +22,11 @@ use ExeQue\Qr\Geometry\Transform;
 use ExeQue\Qr\Gradients\Contracts\Gradient;
 use ExeQue\Qr\Gradients\LinearGradient;
 use ExeQue\Qr\Paints\Layered;
+use ExeQue\Qr\Registries\EyeRegistry;
+use ExeQue\Qr\Registries\FilterRegistry;
+use ExeQue\Qr\Registries\InnerEyeRegistry;
+use ExeQue\Qr\Registries\ModuleRegistry;
+use ExeQue\Qr\Registries\OuterEyeRegistry;
 use ExeQue\Qr\Rendering\Enums\Corner;
 use ExeQue\Qr\Rendering\EyeContext;
 use ExeQue\Qr\Rendering\EyePartStyle;
@@ -31,12 +40,19 @@ use ExeQue\Qr\Shapes\Contracts\ProvidesQrEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrInnerEye;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrModule;
 use ExeQue\Qr\Shapes\Contracts\ProvidesQrOuterEye;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Config\Repository as Config;
 
 /**
  * Draws shapes on their own, for style pickers and settings screens, from the same paths
  * the codes are drawn with.
+ *
+ * Icons of the package's own shapes and filters, given by name or by the package's enums, are
+ * drawn once per request, and kept in the cache store when the cache is enabled (qr.cache);
+ * qr:clear and package updates make them stale. Objects and names the application registered
+ * are drawn every time, as they can change.
  */
-final readonly class Icons
+final class Icons
 {
     /**
      * The cells of a module icon, so shapes that join their neighbors show how.
@@ -88,8 +104,23 @@ final readonly class Icons
         'eye-rotation-3d' => ['x' => 45, 'y' => 35],
     ];
 
+    /**
+     * @var array<string, Icon> Icons drawn in this request, by what they were drawn from.
+     */
+    private array $drawn = [];
+
+    private ?string $version = null;
+
     public function __construct(
-        private Resolve $resolve,
+        private readonly Resolve $resolve,
+        private readonly ModuleRegistry $modules,
+        private readonly OuterEyeRegistry $outerEyes,
+        private readonly InnerEyeRegistry $innerEyes,
+        private readonly EyeRegistry $eyes,
+        private readonly FilterRegistry $filters,
+        private readonly Pipeline $pipeline,
+        private readonly CacheFactory $caches,
+        private readonly Config $config,
     ) {
     }
 
@@ -97,6 +128,11 @@ final readonly class Icons
      * Five modules in a 3x3 box: `viewBox="0 0 3 3"`.
      */
     public function module(ModuleShape|ProvidesQrModule|string $shape): Icon
+    {
+        return $this->remember(['module', $this->name($shape, $this->modules->isBuiltIn(...))], fn (): Icon => $this->drawModule($shape));
+    }
+
+    private function drawModule(ModuleShape|ProvidesQrModule|string $shape): Icon
     {
         $shape = $this->resolve->module($shape);
         $paths = [];
@@ -114,13 +150,21 @@ final readonly class Icons
      */
     public function outerEye(OuterEyeShape|ProvidesQrOuterEye|string $shape, ?Corner $corner = null): Icon
     {
-        return self::svg(8, [self::place($this->resolve->outerEye($shape)->path(), $corner)]);
+        return $this->remember(['outer', $this->name($shape, $this->outerEyes->isBuiltIn(...)), $corner->value ?? '-'], fn (): Icon => self::svg(8, [self::place($this->resolve->outerEye($shape)->path(), $corner)]));
     }
 
     /**
      * The middle of an eye, with the square outer eye faintly behind it so its size reads right.
      */
     public function innerEye(InnerEyeShape|ProvidesQrInnerEye|string $shape, bool $withOuter = true, ?Corner $corner = null): Icon
+    {
+        return $this->remember(
+            ['inner', $this->name($shape, $this->innerEyes->isBuiltIn(...)), $withOuter ? $this->name('square', $this->outerEyes->isBuiltIn(...)) : '-', $corner->value ?? '-'],
+            fn (): Icon => $this->drawInnerEye($shape, $withOuter, $corner),
+        );
+    }
+
+    private function drawInnerEye(InnerEyeShape|ProvidesQrInnerEye|string $shape, bool $withOuter, ?Corner $corner): Icon
     {
         $inner = self::place($this->resolve->innerEye($shape)->path(), $corner);
 
@@ -140,14 +184,27 @@ final readonly class Icons
         InnerEyeShape|ProvidesQrInnerEye|string|null $inner = null,
         ?Corner $corner = null,
     ): Icon {
-        $preset = $eye === null ? null : $this->resolve->eye($eye);
-        $outer = $outer === null ? $preset?->qrOuterEye() ?? 'square' : $outer;
-        $inner = $inner === null ? $preset?->qrInnerEye() ?? 'square' : $inner;
+        // A preset's own parts are drawn from its name; parts not given and without a preset are squares.
+        $part = fn (mixed $given, Closure $isBuiltIn): ?string => match (true) {
+            $given !== null => $this->name($given, $isBuiltIn),
+            $eye !== null => '-',
+            default => $this->name('square', $isBuiltIn),
+        };
 
-        return self::svg(8, [
-            self::place($this->resolve->outerEye($outer)->path(), $corner),
-            self::place($this->resolve->innerEye($inner)->path(), $corner),
-        ]);
+        return $this->remember([
+            'eye',
+            $eye === null ? '-' : $this->name($eye, $this->eyes->isBuiltIn(...)),
+            $part($outer, $this->outerEyes->isBuiltIn(...)),
+            $part($inner, $this->innerEyes->isBuiltIn(...)),
+            $corner->value ?? '-',
+        ], function () use ($eye, $outer, $inner, $corner): Icon {
+            $preset = $eye === null ? null : $this->resolve->eye($eye);
+
+            return self::svg(8, [
+                self::place($this->resolve->outerEye($outer ?? $preset?->qrOuterEye() ?? 'square')->path(), $corner),
+                self::place($this->resolve->innerEye($inner ?? $preset?->qrInnerEye() ?? 'square')->path(), $corner),
+            ]);
+        });
     }
 
     /**
@@ -157,6 +214,18 @@ final readonly class Icons
      * stronger than their defaults. Colors show as how dark they are, as the icon is one color.
      */
     public function filter(NamedFilter|ProvidesQrFilter|string $filter): Icon
+    {
+        return $this->remember([
+            'filter',
+            $this->name($filter, $this->filters->isBuiltIn(...)),
+            // The shapes the sample is drawn with.
+            $this->name('square', $this->modules->isBuiltIn(...)),
+            $this->name('round-corner', $this->outerEyes->isBuiltIn(...)),
+            $this->name('round-corner', $this->innerEyes->isBuiltIn(...)),
+        ], fn (): Icon => $this->drawFilter($filter));
+    }
+
+    private function drawFilter(NamedFilter|ProvidesQrFilter|string $filter): Icon
     {
         $filter = is_string($filter) && array_key_exists($filter, self::FILTER_OPTIONS)
             ? $this->resolve->filter($filter, self::FILTER_OPTIONS[$filter])
@@ -222,6 +291,59 @@ final readonly class Icons
         ];
 
         return self::shades(8, [$part($eye->outer), $part($eye->inner)]);
+    }
+
+    /**
+     * The icon drawn from these parts: from this request, then the cache store, then drawn. Drawn
+     * every time when a part is null, as it was not the package's own; a failed draw is not kept.
+     *
+     * @param list<string|null> $parts
+     * @param Closure(): Icon $draw
+     */
+    private function remember(array $parts, Closure $draw): Icon
+    {
+        if (in_array(null, $parts, true)) {
+            return $draw();
+        }
+
+        $key = implode('|', $parts);
+
+        if (isset($this->drawn[$key])) {
+            return $this->drawn[$key];
+        }
+
+        if (! (bool) $this->config->get('qr.cache.enabled', false)) {
+            return $this->drawn[$key] = $draw();
+        }
+
+        $store = $this->caches->store($this->config->get('qr.cache.store'));
+        $this->version ??= $this->pipeline->version().'.'.(InstalledVersions::getReference('exeque/laravel-qr') ?? InstalledVersions::getVersion('exeque/laravel-qr') ?? '');
+        $storeKey = $this->config->get('qr.cache.prefix', 'qr').':icon:'.$this->version.':'.hash('xxh128', $key);
+        $svg = $store->get($storeKey);
+
+        if (is_string($svg)) {
+            return $this->drawn[$key] = new Icon($svg);
+        }
+
+        $icon = $this->drawn[$key] = $draw();
+        $store->put($storeKey, $icon->svg, (int) $this->config->get('qr.cache.ttl', 604800));
+
+        return $icon;
+    }
+
+    /**
+     * What a shape or filter is called, when it is the package's own: a built-in name, or one of the
+     * package's enum cases, which are told apart from names as filter cases draw with their defaults.
+     *
+     * @param Closure(string): bool $isBuiltIn
+     */
+    private function name(object|string $value, Closure $isBuiltIn): ?string
+    {
+        return match (true) {
+            is_string($value) => $isBuiltIn($value) ? $value : null,
+            $value instanceof BackedEnum && str_starts_with($value::class, 'ExeQue\\Qr\\') => $value::class.'::'.$value->value,
+            default => null,
+        };
     }
 
     /**

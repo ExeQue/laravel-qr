@@ -229,7 +229,7 @@ final class Qr
     }
 
     /**
-     * Makes every cached code, and every cached manifest, stale.
+     * Makes every cached code, manifest and icon stale.
      */
     public function flush(): void
     {

@@ -170,13 +170,22 @@ final class Pipeline
     }
 
     /**
+     * What makes every cached copy stale when it changes: the package's drawing, the configured
+     * version and the generation qr:clear raises.
+     */
+    public function version(): string
+    {
+        return self::RENDER_VERSION.'.'.$this->config->get('qr.cache.version', 1).'.'.(int) $this->store()->get($this->prefix().':generation', 0);
+    }
+
+    /**
      * The code's identity with the generations that make old copies stale.
      */
     private function cacheKey(Cache $store, PendingQr $code, string $identity): string
     {
         return implode(':', [
             $this->prefix(),
-            self::RENDER_VERSION.'.'.$this->config->get('qr.cache.version', 1).'.'.(int) $store->get($this->prefix().':generation', 0),
+            $this->version(),
             $identity,
             (int) $store->get($this->generationKey($code), 0),
         ]);

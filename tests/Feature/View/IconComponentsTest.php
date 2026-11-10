@@ -102,3 +102,74 @@ describe('components', function (): void {
     });
 
 });
+
+describe('caching', function (): void {
+    beforeEach(function (): void {
+        config(['qr.cache.enabled' => true, 'qr.cache.store' => 'array']);
+    });
+
+    // A new request: the scoped icons are built again, with nothing drawn yet.
+    $fresh = function (): Icons {
+        app()->forgetScopedInstances();
+
+        return app(Icons::class);
+    };
+
+    it('draws the package\'s own icons once per request', function (): void {
+        expect(Qr::icon('dots-large'))->toBe(Qr::icon('dots-large'))
+            ->and(Qr::icon(Module::Square))->toBe(Qr::icon(Module::Square))
+            ->and(Qr::icon(eye: 'heart', corner: Corner::TopRight))->toBe(Qr::icon(eye: 'heart', corner: Corner::TopRight))
+            ->and(Qr::icon(filter: 'wave'))->toBe(Qr::icon(filter: 'wave'));
+    });
+
+    it('tells a filter case from its name, as the case draws with its defaults', function (): void {
+        expect((string) Qr::icon(filter: \ExeQue\Qr\Filters\Enums\Filter::Wave))->not->toBe((string) Qr::icon(filter: 'wave'));
+    });
+
+    it('serves an icon from the cache store in a later request, until qr:clear', function () use ($fresh): void {
+        $drawn = (string) $fresh()->module('dots-large');
+
+        $store = cache()->store('array');
+        $key = collect((fn (): array => $this->storage)->call($store->getStore()))->keys()->first(fn (string $key): bool => str_contains($key, ':icon:'));
+        $store->put($key, '<svg>kept</svg>');
+
+        expect((string) $fresh()->module('dots-large'))->toBe('<svg>kept</svg>');
+
+        $this->artisan('qr:clear')->assertSuccessful();
+
+        expect((string) $fresh()->module('dots-large'))->toBe($drawn);
+    });
+
+    it('draws objects, and names the application registered, every time', function () use ($fresh): void {
+        $shape = Module::DotsLarge->qrModule();
+
+        expect(Qr::icon($shape))->not->toBe(Qr::icon($shape));
+
+        Qr::modules()->register('mine', Module::DotsLarge);
+        $dots = (string) Qr::icon('mine');
+        Qr::modules()->register('mine', Module::Square);
+
+        expect((string) Qr::icon('mine'))->not->toBe($dots)
+            ->and((string) Qr::icon('mine'))->toBe((string) Qr::icon(Module::Square));
+
+        // A built-in name the application replaced is its own too.
+        Qr::modules()->register('dots-large', Module::Square);
+
+        expect((string) $fresh()->module('dots-large'))->toBe((string) Qr::icon(Module::Square));
+    });
+
+    it('keeps each call\'s attributes to itself', function (): void {
+        $first = trim(Blade::render('<x-qr::module shape="dots-large" class="one" />'));
+        $second = trim(Blade::render('<x-qr::module shape="dots-large" class="two" label="Dots" />'));
+
+        expect($first)->toContain('class="one"')->toContain('aria-hidden="true"')->not->toContain('two')
+            ->and($second)->toContain('class="two"')->toContain('aria-label="Dots"')->not->toContain('one')->not->toContain('aria-hidden');
+    });
+
+    it('does not keep a failed draw', function (): void {
+        $draw = fn () => Qr::icon(filter: \ExeQue\Qr\Filters\Enums\Filter::Palette);
+
+        expect($draw)->toThrow(\ExeQue\Qr\Exceptions\InvalidFilterException::class)
+            ->and($draw)->toThrow(\ExeQue\Qr\Exceptions\InvalidFilterException::class);
+    });
+});
