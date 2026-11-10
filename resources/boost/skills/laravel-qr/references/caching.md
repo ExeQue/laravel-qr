@@ -60,7 +60,8 @@ across requests, so a style picker does not draw the same icons on every page:
 It follows the code cache unless set apart: `QR_ICON_CACHE` and `QR_ICON_CACHE_STORE` turn one on without the other,
 or put each in a store of its own. Instances, and names
 your application registers or replaces, are drawn every time, as they can change. `qr:clear`, `qr.cache.version` and
-package updates make cached icons stale. `composer bench:icons` in the package times them drawn and from the store.
+package updates make cached icons stale. Each kind (modules, outer eyes, inner eyes, eyes, filters) is kept as one
+entry, so a picker full of icons is one read from the store, not one per icon. `composer bench:icons` in the package times them drawn and from the store.
 
 ## Making cached codes stale
 

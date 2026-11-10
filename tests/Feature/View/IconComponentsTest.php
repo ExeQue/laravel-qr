@@ -130,8 +130,8 @@ describe('caching', function (): void {
         $drawn = (string) $fresh()->module('dots-large');
 
         $store = cache()->store('array');
-        $key = collect((fn (): array => $this->storage)->call($store->getStore()))->keys()->first(fn (string $key): bool => str_contains($key, ':icon:'));
-        $store->put($key, '<svg>kept</svg>');
+        $key = collect((fn (): array => $this->storage)->call($store->getStore()))->keys()->first(fn (string $key): bool => str_contains($key, ':icons:module:'));
+        $store->put($key, array_map(fn (): string => '<svg>kept</svg>', $store->get($key)));
 
         expect((string) $fresh()->module('dots-large'))->toBe('<svg>kept</svg>');
 
@@ -142,7 +142,7 @@ describe('caching', function (): void {
 
     it('caches icons and codes apart, each by its own switch', function () use ($fresh): void {
         $keys = fn (): array => array_keys((fn (): array => $this->storage)->call(cache()->store('array')->getStore()));
-        $icons = fn (): array => array_filter($keys(), fn (string $key): bool => str_contains($key, ':icon:'));
+        $icons = fn (): array => array_filter($keys(), fn (string $key): bool => str_contains($key, ':icons:'));
 
         // The icon cache on, the code cache off: icons are stored, codes are not.
         $fresh()->module('dots-large');
@@ -166,7 +166,21 @@ describe('caching', function (): void {
         config(['qr.cache' => ['enabled' => true, 'store' => 'array', 'ttl' => 60, 'prefix' => 'qr', 'version' => 1]]);
         $fresh()->module('dots-large');
 
-        expect(array_filter(array_keys((fn (): array => $this->storage)->call($store->getStore())), fn (string $key): bool => str_contains($key, ':icon:')))->toHaveCount(1);
+        expect(array_filter(array_keys((fn (): array => $this->storage)->call($store->getStore())), fn (string $key): bool => str_contains($key, ':icons:')))->toHaveCount(1);
+    });
+
+    it('reads the cached icons of a kind in one go', function () use ($fresh): void {
+        $draw = fn () => array_map($fresh()->module(...), Qr::modules()->names());
+        $draw();
+
+        $reads = [];
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Cache\Events\RetrievingKey::class, function (\Illuminate\Cache\Events\RetrievingKey $event) use (&$reads): void {
+            $reads[] = $event->key;
+        });
+        $icons = $draw();
+
+        expect(array_values(array_filter($reads, fn (string $key): bool => str_contains($key, ':icons:'))))->toHaveCount(1)
+            ->and(array_map(strval(...), $icons))->toBe(array_map(fn (string $name): string => (string) app(Icons::class)->module($name), Qr::modules()->names()));
     });
 
     it('draws objects, and names the application registered, every time', function () use ($fresh): void {
