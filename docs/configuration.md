@@ -26,8 +26,11 @@ What every code starts from.
 | `enabled` | `false` (`QR_CACHE`) | cache every code across requests |
 | `store` | `null` (`QR_CACHE_STORE`) | a cache store by name; the default store when null |
 | `ttl` | 604800 | seconds |
-| `prefix` | `qr` | the cache keys' prefix |
-| `version` | 1 | raise to make every cached code stale |
+| `prefix` | `qr` | the cache keys' prefix, for codes and icons |
+| `version` | 1 | raise to make every cached code and icon stale |
+| `icons.enabled` | `QR_CACHE` (`QR_ICON_CACHE`) | cache the [icons](icons.md) of the built-in shapes and filters across requests |
+| `icons.store` | `QR_CACHE_STORE` (`QR_ICON_CACHE_STORE`) | a cache store by name; the default store when null |
+| `icons.ttl` | 604800 | seconds |
 
 See [Caching](caching.md).
 

@@ -32,8 +32,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Written codes can be cached, per code with ->cache() or for every code
-    | here. Within a request a code is written once whatever this says. Raise
-    | the version to make every cached code stale; so does php artisan qr:clear.
+    | here; the icons of the built-in shapes and filters on their own. Within
+    | a request each is drawn once whatever this says. Raise the version to
+    | make every cached code and icon stale; so does php artisan qr:clear.
+    | Stale entries expire, but the file and database stores only delete
+    | them when read: prefer a store that expires them, such as Redis.
     |
     */
 
@@ -43,6 +46,13 @@ return [
         'ttl' => 604800,
         'prefix' => 'qr',
         'version' => 1,
+
+        // The icons of the built-in shapes and filters; like codes unless set apart.
+        'icons' => [
+            'enabled' => (bool) env('QR_ICON_CACHE', env('QR_CACHE', false)),
+            'store' => env('QR_ICON_CACHE_STORE', env('QR_CACHE_STORE')),
+            'ttl' => 604800,
+        ],
     ],
 
     /*

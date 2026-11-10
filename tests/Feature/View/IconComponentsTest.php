@@ -105,7 +105,7 @@ describe('components', function (): void {
 
 describe('caching', function (): void {
     beforeEach(function (): void {
-        config(['qr.cache.enabled' => true, 'qr.cache.store' => 'array']);
+        config(['qr.cache.icons.enabled' => true, 'qr.cache.icons.store' => 'array']);
     });
 
     // A new request: the scoped icons are built again, with nothing drawn yet.
@@ -138,6 +138,35 @@ describe('caching', function (): void {
         $this->artisan('qr:clear')->assertSuccessful();
 
         expect((string) $fresh()->module('dots-large'))->toBe($drawn);
+    });
+
+    it('caches icons and codes apart, each by its own switch', function () use ($fresh): void {
+        $keys = fn (): array => array_keys((fn (): array => $this->storage)->call(cache()->store('array')->getStore()));
+        $icons = fn (): array => array_filter($keys(), fn (string $key): bool => str_contains($key, ':icon:'));
+
+        // The icon cache on, the code cache off: icons are stored, codes are not.
+        $fresh()->module('dots-large');
+        Qr::make('https://example.com/apart')->svg();
+
+        expect($icons())->toHaveCount(1)
+            ->and(count($keys()) - count($icons()))->toBe(0);
+
+        // The other way around.
+        cache()->store('array')->flush();
+        config(['qr.cache.icons.enabled' => false, 'qr.cache.enabled' => true, 'qr.cache.store' => 'array']);
+        $fresh()->module('dots-large');
+        Qr::make('https://example.com/apart')->svg();
+
+        expect($icons())->toBe([])
+            ->and($keys())->not->toBe([]);
+    });
+
+    it('follows the code cache where a published config has no icons block', function () use ($fresh): void {
+        $store = cache()->store('array');
+        config(['qr.cache' => ['enabled' => true, 'store' => 'array', 'ttl' => 60, 'prefix' => 'qr', 'version' => 1]]);
+        $fresh()->module('dots-large');
+
+        expect(array_filter(array_keys((fn (): array => $this->storage)->call($store->getStore())), fn (string $key): bool => str_contains($key, ':icon:')))->toHaveCount(1);
     });
 
     it('draws objects, and names the application registered, every time', function () use ($fresh): void {
